@@ -37,41 +37,44 @@ const propertyPhotos = [
 
 export function GlobeShowcase() {
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouchActive, setIsTouchActive] = useState(false);
+  const showCards = isHovered || isTouchActive;
 
   return (
-    <div className="relative min-h-[560px] overflow-hidden rounded-[2.5rem] border border-black/8 bg-white/55 p-6 shadow-[0_30px_90px_rgba(135,144,170,0.18)] backdrop-blur-2xl lg:min-h-[690px]">
+    <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-black/8 bg-white/55 p-4 shadow-[0_30px_90px_rgba(135,144,170,0.18)] backdrop-blur-2xl sm:min-h-[520px] sm:p-6 lg:min-h-[690px]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.18),transparent_25%),radial-gradient(circle_at_80%_20%,rgba(92,200,201,0.14),transparent_18%)]" />
 
       <div className="relative flex h-full flex-col">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-xl">
             <p className="text-xs uppercase tracking-[0.32em] text-[#7b8291]">Explore the map</p>
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.05em] text-[#171b24] sm:text-4xl">
+            <h2 className="mt-2 font-display text-2xl font-semibold tracking-[-0.05em] text-[#171b24] sm:mt-3 sm:text-4xl">
               Stay discovery around the world
             </h2>
           </div>
-          <div className="rounded-full border border-black/8 bg-white/70 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[#6d7485]">
-            Hover the globe
+          <div className="w-fit rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[0.65rem] uppercase tracking-[0.22em] text-[#6d7485] sm:text-xs sm:tracking-[0.25em]">
+            Hover or tap the globe
           </div>
         </div>
 
-        <div className="relative flex flex-1 items-center justify-center py-8">
+        <div className="relative flex flex-1 items-center justify-center py-6 sm:py-8">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Number.POSITIVE_INFINITY, duration: 36, ease: "linear" }}
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#b6bed1]/65 sm:h-[32rem] sm:w-[32rem] lg:h-[38rem] lg:w-[38rem]"
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#b6bed1]/65 lg:block"
           />
           <motion.div
             animate={{ rotate: -360 }}
             transition={{ repeat: Number.POSITIVE_INFINITY, duration: 30, ease: "linear" }}
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#c5cddd]/75 sm:h-[36rem] sm:w-[36rem] lg:h-[44rem] lg:w-[44rem]"
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#c5cddd]/75 lg:block"
           />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/55 sm:h-[40rem] sm:w-[40rem] lg:h-[48rem] lg:w-[48rem]" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/55 lg:block" />
 
           <motion.div
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="relative flex size-[22rem] items-center justify-center rounded-full sm:size-[28rem] lg:size-[34rem]"
+            onTap={() => setIsTouchActive((value) => !value)}
+            className="relative flex size-[17.5rem] items-center justify-center rounded-full sm:size-[23rem] lg:size-[34rem]"
           >
             <div className="globe-sphere relative size-full overflow-hidden rounded-full border border-white/80 bg-[#dce6fb] shadow-[inset_-40px_-50px_80px_rgba(99,118,173,0.18),inset_30px_40px_60px_rgba(255,255,255,0.75),0_35px_80px_rgba(108,124,164,0.2)]">
               <video
@@ -89,20 +92,15 @@ export function GlobeShowcase() {
             </div>
 
             <AnimatePresence>
-              {isHovered &&
+              {showCards &&
                 propertyPhotos.map((photo, index) => (
                   <motion.div
                     key={photo.src}
                     initial={{ opacity: 0, scale: 0.8, y: 24 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      y: 0,
-                      rotate: photo.rotation,
-                    }}
+                    animate={{ opacity: 1, scale: 1, y: 0, rotate: photo.rotation }}
                     exit={{ opacity: 0, scale: 0.82, y: 18 }}
                     transition={{ duration: 0.45, delay: index * 0.08 }}
-                    className={`absolute ${photo.position} w-40 rounded-[1.5rem] border border-white/85 bg-white/88 p-2 shadow-[0_20px_45px_rgba(64,71,96,0.18)] backdrop-blur-xl sm:w-44`}
+                    className={`absolute ${photo.position} hidden w-40 rounded-[1.5rem] border border-white/85 bg-white/88 p-2 shadow-[0_20px_45px_rgba(64,71,96,0.18)] backdrop-blur-xl md:block sm:w-44`}
                   >
                     <div className="relative aspect-[4/5] overflow-hidden rounded-[1rem]">
                       <Image
@@ -125,7 +123,7 @@ export function GlobeShowcase() {
           </motion.div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-[#242936]">Trayati Stays</p>
             <p className="mt-1 text-sm text-[#70788a]">
@@ -133,7 +131,7 @@ export function GlobeShowcase() {
             </p>
           </div>
           <div className="rounded-[1.25rem] border border-black/8 bg-white/70 px-4 py-3 text-sm text-[#5f6879]">
-            Hover to reveal curated property photography
+            Tap on mobile, hover on larger screens
           </div>
         </div>
       </div>

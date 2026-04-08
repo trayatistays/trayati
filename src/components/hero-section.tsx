@@ -81,58 +81,55 @@ export function HeroSection() {
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(188,222,255,0.95),transparent_34%),linear-gradient(180deg,#fffdf7_0%,#f6f4ef_52%,#f1efe9_100%)]" />
       <motion.div
         style={{ transform: orbTransform }}
-        className="absolute left-[8%] top-24 -z-10 size-56 rounded-full bg-[#a78bfa]/16 blur-3xl"
+        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full bg-[#a78bfa]/16 blur-3xl sm:top-24 sm:size-56"
       />
       <motion.div
         style={{ transform: orbTransform }}
-        className="absolute bottom-20 right-[8%] -z-10 size-72 rounded-full bg-[#9ed7da]/16 blur-3xl"
+        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full bg-[#9ed7da]/16 blur-3xl sm:bottom-20 sm:size-72"
       />
 
-      <div className="flex min-h-screen w-full flex-col px-4 pb-8 pt-5 sm:px-6 lg:px-10">
+      <div className="flex min-h-screen w-full flex-col px-4 pb-8 pt-4 sm:px-6 sm:pt-5 lg:px-10">
         <Navbar menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} />
 
-        <div className="relative mt-8 flex flex-1 items-center">
-          <div className="grid w-full items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
+        <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
+          <div className="grid w-full items-start gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-12">
             <motion.div
               initial={{ opacity: 0, y: 44 }}
               animate={{ opacity: menuOpen ? 0.18 : 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
               style={{ transform: heroTransform }}
-              className="relative flex flex-col justify-center py-10 lg:px-4 lg:py-16 xl:pl-8"
+              className="relative flex flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:pl-8"
             >
-              <div className="gradient-stroke inline-flex w-fit items-center gap-3 rounded-full bg-white/72 px-4 py-2 text-sm text-[#4e5567] shadow-[0_18px_40px_rgba(121,131,153,0.12)] backdrop-blur-2xl">
+              <div className="gradient-stroke inline-flex w-fit max-w-full items-center gap-3 rounded-full bg-white/72 px-3.5 py-2 text-xs text-[#4e5567] shadow-[0_18px_40px_rgba(121,131,153,0.12)] backdrop-blur-2xl sm:px-4 sm:text-sm">
                 <span className="size-2 rounded-full bg-[#65c0a5] shadow-[0_0_18px_rgba(101,192,165,0.55)]" />
                 Premium OTA for curated stays
               </div>
 
-              <h1 className="text-balance mt-8 max-w-4xl font-display text-[2.9rem] font-semibold leading-[0.98] tracking-[-0.055em] text-[#181b24] sm:text-[4rem] lg:text-[5.05rem]">
-                we make discovering and booking stays
+              <h1 className="text-balance mt-6 max-w-4xl font-display text-[2.25rem] font-semibold leading-[1] tracking-[-0.055em] text-[#181b24] sm:mt-8 sm:text-[4rem] lg:text-[5.05rem]">
+                We make discovering and booking stays
               </h1>
 
-              <div className="mt-5 flex min-h-[5.9rem] items-center font-display text-[2.9rem] font-semibold leading-none tracking-[-0.06em] sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.55rem]">
-                <AnimatedText
-                  items={keywords}
-                  className="hero-word-shadow text-[#f3b16d]"
-                />
+              <div className="mt-4 flex min-h-[4.4rem] items-center font-display text-[2.35rem] font-semibold leading-none tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.55rem]">
+                <AnimatedText items={keywords} className="hero-word-shadow text-[#f3b16d]" />
               </div>
 
-              <p className="text-balance mt-6 max-w-2xl text-lg leading-8 text-[#5e6678]">
+              <p className="text-balance mt-5 max-w-2xl text-base leading-7 text-[#5e6678] sm:mt-6 sm:text-lg sm:leading-8">
                 Whether you&apos;re planning a quick getaway, a business trip, or a
                 long vacation, Trayati Stays connects you with the best
                 properties at the best prices, all in one place.
               </p>
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <motion.a
                   whileHover={{ scale: 1.03, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   href="#properties"
-                  className="rounded-full bg-[#181b24] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_20px_40px_rgba(24,27,36,0.18)]"
+                  className="w-full rounded-full bg-[#181b24] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_20px_40px_rgba(24,27,36,0.18)] sm:w-auto"
                   style={{ color: "#ffffff" }}
                 >
                   Explore Properties
                 </motion.a>
-                <div className="gradient-stroke rounded-full bg-white/70 px-4 py-3 text-sm text-[#5f6876] backdrop-blur-xl">
+                <div className="gradient-stroke w-full rounded-full bg-white/70 px-4 py-3 text-sm text-[#5f6876] backdrop-blur-xl sm:w-auto">
                   Smart search, local stays, seamless booking
                 </div>
               </div>
@@ -156,24 +153,24 @@ export function HeroSection() {
                 : { opacity: 0, scale: 1.02, pointerEvents: "none" }
             }
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 z-40 overflow-hidden rounded-[2rem]"
+            className="absolute inset-0 z-40 overflow-y-auto rounded-[2rem]"
             aria-hidden={!menuOpen}
           >
             <div className="absolute inset-0 bg-[rgba(248,247,244,0.96)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(172,213,255,0.24),transparent_26%)]" />
             <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(20,20,20,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,20,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
 
-            <div className="relative flex h-full flex-col px-6 py-6 text-[#171717] sm:px-8 lg:px-12">
+            <div className="relative flex min-h-full flex-col px-4 py-4 text-[#171717] sm:px-8 sm:py-6 lg:px-12">
               <div className="flex items-center justify-center pt-2">
-                <h2 className="font-display text-3xl font-semibold tracking-[-0.05em] text-[#202020] sm:text-4xl">
+                <h2 className="font-display text-2xl font-semibold tracking-[-0.05em] text-[#202020] sm:text-4xl">
                   Trayati Stays
                 </h2>
               </div>
 
-              <div className="grid flex-1 items-center gap-12 py-8 md:grid-cols-[0.9fr_auto_1fr] md:gap-20 lg:gap-24">
-                <div className="flex flex-col items-center justify-center gap-8 md:items-end">
-                  <div className="w-full max-w-[320px] overflow-hidden rounded-[2rem] border border-black/8 bg-white/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem] bg-[radial-gradient(circle_at_top,#dbeafe,#ede9fe_46%,#ffffff_100%)]">
+              <div className="grid flex-1 items-start gap-8 py-6 md:grid-cols-[0.9fr_auto_1fr] md:items-center md:gap-20 lg:gap-24">
+                <div className="flex flex-col items-center justify-center gap-6 md:items-end md:gap-8">
+                  <div className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border border-black/8 bg-white/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.35rem] bg-[radial-gradient(circle_at_top,#dbeafe,#ede9fe_46%,#ffffff_100%)]">
                       <motion.div
                         key={activeOverlayItem}
                         initial={{ opacity: 0, scale: 1.05 }}
@@ -190,11 +187,11 @@ export function HeroSection() {
                         />
                       </motion.div>
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,18,28,0.02),rgba(14,18,28,0.14)_45%,rgba(14,18,28,0.56)_100%)]" />
-                      <div className="absolute inset-x-6 bottom-6 rounded-[1.5rem] border border-white/20 bg-white/60 p-4 backdrop-blur-md">
+                      <div className="absolute inset-x-4 bottom-4 rounded-[1.25rem] border border-white/20 bg-white/68 p-3 backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-4">
                         <p className="text-xs uppercase tracking-[0.28em] text-black/45">
                           {activeOverlayItem}
                         </p>
-                        <p className="mt-2 font-display text-2xl text-black">
+                        <p className="mt-2 font-display text-xl text-black sm:text-2xl">
                           {overlayImages[activeOverlayItem].title}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-black/60">
@@ -204,7 +201,7 @@ export function HeroSection() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 self-start md:self-auto">
                     {socials.map(({ label, href, icon: Icon }) => (
                       <motion.a
                         key={label}
@@ -222,7 +219,7 @@ export function HeroSection() {
 
                 <div className="hidden h-full min-h-52 w-px bg-black/14 md:block" />
 
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center md:pl-2">
                   <p className="text-xs uppercase tracking-[0.34em] text-black/38">
                     Transition section
                   </p>
@@ -230,8 +227,8 @@ export function HeroSection() {
                     <AnimatedText items={destinations} interval={1800} />
                   </div>
 
-                  <nav aria-label="Trayati Stays menu" className="mt-8">
-                    <ul className="space-y-5">
+                  <nav aria-label="Trayati Stays menu" className="mt-6 sm:mt-8">
+                    <ul className="space-y-3 sm:space-y-5">
                       {menuItems.map((item, index) => (
                         <motion.li
                           key={item}
@@ -243,10 +240,11 @@ export function HeroSection() {
                             href="#"
                             onMouseEnter={() => setActiveOverlayItem(item)}
                             onFocus={() => setActiveOverlayItem(item)}
-                            className="group flex items-center justify-between rounded-full border border-transparent py-1 text-3xl capitalize tracking-[-0.05em] text-black/84 transition duration-300 hover:text-black sm:text-5xl"
+                            onClick={() => setActiveOverlayItem(item)}
+                            className="group flex items-center justify-between rounded-full border border-black/6 bg-white/35 px-4 py-3 text-2xl capitalize tracking-[-0.05em] text-black/84 transition duration-300 hover:border-black/10 hover:bg-white/55 hover:text-black sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
                           >
                             <span>{item}</span>
-                            <span className="relative ml-6 flex size-14 items-center justify-center">
+                            <span className="relative ml-4 flex size-12 items-center justify-center sm:ml-6 sm:size-14">
                               <span className="absolute inset-3 rounded-full border border-[#a78bfa]/25 bg-[#a78bfa]/10 opacity-0 transition duration-300 group-hover:inset-0 group-hover:opacity-100 group-hover:shadow-[0_0_24px_rgba(167,139,250,0.35)]" />
                               <span className="relative size-2 rounded-full bg-black/60 transition duration-300 group-hover:size-3 group-hover:bg-[#5b42c2]" />
                             </span>
@@ -266,7 +264,7 @@ export function HeroSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.7 }}
           transition={{ duration: 0.65 }}
-          className="mt-8 flex items-center justify-between gap-4 border-t border-black/8 pt-4 text-xs uppercase tracking-[0.28em] text-[#697080]"
+          className="mt-8 flex flex-col items-start gap-2 border-t border-black/8 pt-4 text-xs uppercase tracking-[0.22em] text-[#697080] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:tracking-[0.28em]"
         >
           <span>Built for premium stays</span>
           <span>Fast discovery • smart booking • personalised journeys</span>
