@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf8f2;
+  --foreground: #181b24;
+  --muted: #667085;
+  --lavender: #a78bfa;
+  --mint: #d6ffee;
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-strong: rgba(255, 255, 255, 0.86);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(188, 222, 255, 0.78), transparent 28%),
+    radial-gradient(circle at 78% 18%, rgba(167, 139, 250, 0.14), transparent 22%),
+    linear-gradient(180deg, #fffdf7 0%, #f8f5ef 52%, #f1eee7 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(24, 27, 36, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 27, 36, 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 45%, transparent 92%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.hero-glow {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 24px 80px rgba(128, 140, 164, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.gradient-stroke {
+  position: relative;
+}
+
+.gradient-stroke::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.34),
+    rgba(167, 139, 250, 0.56),
+    rgba(110, 231, 183, 0.26)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hero-word-shadow {
+  text-shadow:
+    0 0 18px rgba(243, 177, 109, 0.16),
+    0 0 32px rgba(243, 177, 109, 0.08);
+}
+
+.globe-sphere {
+  transform-style: preserve-3d;
 }
