@@ -1,19 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import { useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
 import { Navbar } from "@/components/navbar";
+import { socialLinks } from "@/data/social-links";
 
 const keywords = ["Effortless", "Smart", "Personalised"];
 const destinations = ["Goa", "Jaipur", "Manali", "Udaipur", "Coorg"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [
-  { label: "WhatsApp", href: "#", icon: FaWhatsapp },
-  { label: "Instagram", href: "#", icon: FaInstagram },
-  { label: "Facebook", href: "#", icon: FaFacebookF },
+  { label: "WhatsApp", href: socialLinks.whatsapp.url, icon: FaWhatsapp },
+  { label: "Instagram", href: socialLinks.instagram.url, icon: FaInstagram },
+  { label: "Facebook", href: socialLinks.facebook.url, icon: FaFacebookF },
 ];
 const overlayImages: Record<string, { src: string; title: string; subtitle: string }> = {
   About: {
@@ -38,6 +41,7 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
   },
 };
 export function HeroSection() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeOverlayItem, setActiveOverlayItem] = useState("About");
   const mouseX = useMotionValue(0);
@@ -63,6 +67,17 @@ export function HeroSection() {
   const resetMouse = () => {
     mouseX.set(0);
     mouseY.set(0);
+  };
+
+  const handleMenuClick = (item: string) => {
+    const routes: Record<string, string> = {
+      About: "/about",
+      Blogs: "/blogs",
+      Connect: "/connect",
+      Solutions: "/solutions",
+    };
+    setMenuOpen(false);
+    setTimeout(() => router.push(routes[item]), 300);
   };
 
   return (
@@ -127,15 +142,13 @@ export function HeroSection() {
               </p>
 
               <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-                <motion.a
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  href="#featured-stays"
-                  className="w-full rounded-full px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(199,91,26,0.40)] sm:w-auto"
+                <Link
+                  href="/booking"
+                  className="w-full rounded-full px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(199,91,26,0.40)] sm:w-auto transition hover:scale-105 active:scale-98"
                   style={{ backgroundColor: "var(--cta)" }}
                 >
                   Explore Properties
-                </motion.a>
+                </Link>
                 <div
                   className="gradient-stroke w-full rounded-full px-4 py-3 text-sm backdrop-blur-xl sm:w-auto"
                   style={{
@@ -253,6 +266,7 @@ export function HeroSection() {
                     <AnimatedText items={destinations} interval={1800} />
                   </div>
 
+                  {/* Menu items */}
                   <nav aria-label="Trayati Stays menu" className="mt-6 sm:mt-8">
                     <ul className="space-y-3 sm:space-y-5">
                       {menuItems.map((item, index) => (
@@ -262,17 +276,16 @@ export function HeroSection() {
                           animate={menuOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
                           transition={{ delay: 0.12 + index * 0.08, duration: 0.35 }}
                         >
-                          <motion.a
-                            href="#"
+                          <motion.button
                             onMouseEnter={() => setActiveOverlayItem(item)}
                             onFocus={() => setActiveOverlayItem(item)}
-                            onClick={() => setActiveOverlayItem(item)}
+                            onClick={() => handleMenuClick(item)}
                             whileHover={{
                               borderColor: "var(--border-soft)",
                               backgroundColor: "rgba(32, 60, 76, 0.06)",
                               color: "var(--cta)",
                             }}
-                            className="group flex items-center justify-between rounded-full border px-4 py-3 text-2xl capitalize tracking-[-0.05em] transition duration-300 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
+                            className="group w-full flex items-center justify-between rounded-full border px-4 py-3 text-2xl capitalize tracking-[-0.05em] transition duration-300 bg-transparent sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
                             style={{
                               borderColor: "var(--border-soft)",
                               color: "var(--primary)",
@@ -292,7 +305,7 @@ export function HeroSection() {
                                 style={{ backgroundColor: "var(--gold)" }}
                               />
                             </span>
-                          </motion.a>
+                          </motion.button>
                         </motion.li>
                       ))}
                     </ul>

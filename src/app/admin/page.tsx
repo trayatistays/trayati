@@ -36,8 +36,8 @@ function Field({
     "w-full rounded-[0.9rem] px-4 py-3 text-sm outline-none transition";
   const sty = {
     backgroundColor: "rgba(8,22,50,0.9)",
-    border: "1px solid rgba(80,150,220,0.2)",
-    color: "var(--foreground)",
+    border: "1px solid rgba(80,150,220,0.5)",
+    color: "#E5E7EB",
   };
   return (
     <label className="block">
@@ -97,7 +97,7 @@ function ModalWrapper({
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-2xl rounded-[2rem] border p-6 sm:p-8 max-h-[90vh] overflow-hidden flex flex-col"
         style={{
-          borderColor: "rgba(80,150,220,0.18)",
+          borderColor: "rgba(80,150,220,0.3)",
           backgroundColor: "rgba(6,16,40,0.98)",
           backdropFilter: "blur(24px)",
           boxShadow: "0 50px 120px rgba(0,0,0,0.8)",
@@ -113,8 +113,8 @@ function ModalWrapper({
             onClick={onClose}
             className="ml-auto flex size-9 items-center justify-center rounded-full text-sm transition"
             style={{
-              backgroundColor: "rgba(80,150,220,0.12)",
-              color: "var(--foreground-soft)",
+              backgroundColor: "rgba(80,150,220,0.25)",
+              color: "#E5E7EB",
             }}
           >
             ✕
@@ -172,7 +172,7 @@ function ViewModal({
                 className="rounded-[0.9rem] px-3 py-2.5"
                 style={{
                   backgroundColor: "rgba(10,26,58,0.7)",
-                  border: "1px solid rgba(80,150,220,0.12)",
+                  border: "1px solid rgba(80,150,220,0.3)",
                 }}
               >
                 <p
@@ -189,7 +189,7 @@ function ViewModal({
             className="rounded-[0.9rem] px-3 py-2.5 text-sm"
             style={{
               backgroundColor: "rgba(10,26,58,0.7)",
-              border: "1px solid rgba(80,150,220,0.12)",
+              border: "1px solid rgba(80,150,220,0.3)",
             }}
           >
             <p
@@ -224,8 +224,8 @@ function ViewModal({
                   key={a}
                   className="rounded-full px-3 py-1.5 text-xs font-medium"
                   style={{
-                    backgroundColor: "rgba(30,109,191,0.2)",
-                    color: "var(--foreground-soft)",
+                    backgroundColor: "rgba(30,109,191,0.35)",
+                    color: "#D1D5DB",
                   }}
                 >
                   {a}
@@ -257,28 +257,173 @@ function EditModal({
 
   return (
     <ModalWrapper title="Edit Stay" onClose={onClose}>
-      <div className="space-y-3 pr-1">
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field label="Property Name" value={form.title} onChange={(v) => set("title", v)} />
-          <Field label="Subtitle" value={form.subtitle} onChange={(v) => set("subtitle", v)} />
-          <Field label="Type" value={form.type} onChange={(v) => set("type", v)} />
-          <Field label="Tag" value={form.tag} onChange={(v) => set("tag", v)} />
-          <Field label="City" value={form.city} onChange={(v) => set("city", v)} />
-          <Field label="State" value={form.state} onChange={(v) => set("state", v)} />
-          <Field label="Country" value={form.country} onChange={(v) => set("country", v)} />
-          <Field label="PIN Code" value={form.pin} onChange={(v) => set("pin", v)} />
-          <Field label="Rating (0–5)" value={form.rating} onChange={(v) => set("rating", Number(v))} type="number" />
-          <Field label="Price / Night (₹)" value={form.pricePerNight} onChange={(v) => set("pricePerNight", Number(v))} type="number" />
+      <div className="space-y-6 pr-1 max-h-[calc(90vh-120px)] overflow-y-auto">
+        {/* Basic Info */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Basic Information
+          </p>
+          <div className="space-y-3">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field label="Property Name" value={form.title} onChange={(v) => set("title", v)} />
+              <Field label="Subtitle" value={form.subtitle} onChange={(v) => set("subtitle", v)} />
+              <Field label="Type" value={form.type} onChange={(v) => set("type", v)} />
+              <Field label="Tag" value={form.tag} onChange={(v) => set("tag", v)} />
+              <Field label="City" value={form.city} onChange={(v) => set("city", v)} />
+              <Field label="State" value={form.state} onChange={(v) => set("state", v)} />
+              <Field label="Country" value={form.country} onChange={(v) => set("country", v)} />
+              <Field label="PIN Code" value={form.pin} onChange={(v) => set("pin", v)} />
+              <Field label="Rating (0–5)" value={form.rating} onChange={(v) => set("rating", Number(v))} type="number" />
+              <Field label="Base Price (₹)" value={form.basePrice || form.pricePerNight} onChange={(v) => set("basePrice", Number(v))} type="number" />
+            </div>
+            <Field label="Address" value={form.address} onChange={(v) => set("address", v)} />
+            <Field label="Location Display" value={form.location} onChange={(v) => set("location", v)} />
+            <Field label="Google Maps URL" value={form.googleMapsUrl ?? ""} onChange={(v) => set("googleMapsUrl", v)} />
+            <Field label="Description" value={form.description} onChange={(v) => set("description", v)} multiline />
+          </div>
         </div>
-        <Field label="Address" value={form.address} onChange={(v) => set("address", v)} />
-        <Field label="Google Maps URL" value={form.googleMapsUrl ?? ""} onChange={(v) => set("googleMapsUrl", v)} />
-        <Field label="Description" value={form.description} onChange={(v) => set("description", v)} multiline />
-        <Field
-          label="Amenities (comma separated)"
-          value={form.amenities.join(", ")}
-          onChange={(v) => set("amenities", v.split(",").map((s) => s.trim()).filter(Boolean))}
-          multiline
-        />
+
+        {/* Photos */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Photo URLs
+          </p>
+          <div className="space-y-2">
+            {form.photos.map((photo, idx) => (
+              <Field
+                key={idx}
+                label={`Photo ${idx + 1} URL`}
+                value={photo}
+                onChange={(v) => {
+                  const newPhotos = [...form.photos];
+                  newPhotos[idx] = v;
+                  set("photos", newPhotos);
+                }}
+              />
+            ))}
+            <button
+              onClick={() => set("photos", [...form.photos, ""])}
+              className="text-xs font-semibold uppercase tracking-[0.18em] px-3 py-2 rounded"
+              style={{
+                backgroundColor: "rgba(30,109,191,0.35)",
+                color: "#D1D5DB",
+              }}
+            >
+              + Add Photo URL
+            </button>
+          </div>
+        </div>
+
+        {/* Amenities */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Amenities
+          </p>
+          <div className="space-y-3">
+            {/* Basic Amenities List */}
+            <div>
+              <Field
+                label="Amenities (comma separated)"
+                value={form.amenities.join(", ")}
+                onChange={(v) => set("amenities", v.split(",").map((s) => s.trim()).filter(Boolean))}
+                multiline
+              />
+            </div>
+
+            {/* Amenities Checkboxes */}
+            <div className="grid grid-cols-2 gap-2">
+              {Object.keys(form.amenitiesDetail).map((key) => (
+                <label
+                  key={key}
+                  className="flex items-center gap-2 p-2 rounded text-xs"
+                  style={{
+                    backgroundColor: "rgba(10,26,58,0.7)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.amenitiesDetail[key as keyof typeof form.amenitiesDetail]}
+                    onChange={(e) => {
+                      set("amenitiesDetail", {
+                        ...form.amenitiesDetail,
+                        [key]: e.target.checked,
+                      });
+                    }}
+                    className="rounded"
+                  />
+                  <span className="capitalize">
+                    {key.replace(/([A-Z])/g, " $1").trim()}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Meal Options */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Meal Options
+          </p>
+          <div className="space-y-3">
+            {form.mealOptions.map((meal, idx) => (
+              <div key={idx} className="rounded-[0.9rem] p-3" style={{ backgroundColor: "rgba(10,26,58,0.7)" }}>
+                <label className="flex items-center gap-2 mb-3 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={meal.available}
+                    onChange={(e) => {
+                      const newMeals = [...form.mealOptions];
+                      newMeals[idx].available = e.target.checked;
+                      set("mealOptions", newMeals);
+                    }}
+                    className="rounded"
+                  />
+                  <span className="font-semibold capitalize">{meal.type}</span>
+                </label>
+                {meal.available && (
+                  <div className="space-y-2">
+                    <input
+                      type="number"
+                      placeholder="Price (₹)"
+                      value={meal.price || ""}
+                      onChange={(e) => {
+                        const newMeals = [...form.mealOptions];
+                        newMeals[idx].price = Number(e.target.value);
+                        set("mealOptions", newMeals);
+                      }}
+                      className="w-full px-2 py-1 rounded text-xs"
+                      style={{
+                        backgroundColor: "rgba(8,22,50,0.9)",
+                        border: "1px solid rgba(80,150,220,0.5)",
+                        color: "#E5E7EB",
+                      }}
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={meal.description || ""}
+                      onChange={(e) => {
+                        const newMeals = [...form.mealOptions];
+                        newMeals[idx].description = e.target.value;
+                        set("mealOptions", newMeals);
+                      }}
+                      className="w-full px-2 py-1 rounded text-xs resize-none"
+                      rows={2}
+                      style={{
+                        backgroundColor: "rgba(8,22,50,0.9)",
+                        border: "1px solid rgba(80,150,220,0.5)",
+                        color: "#E5E7EB",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Cloudinary Note */}
         <div
           className="rounded-[0.9rem] px-4 py-3 text-xs"
           style={{
@@ -287,12 +432,13 @@ function EditModal({
             color: "var(--gold)",
           }}
         >
-          Image upload coming soon — will connect to Cloudinary.
+          <strong>Cloudinary Integration:</strong> Image uploads will be connected to Cloudinary. Photo URLs can be placeholder paths for now.
         </div>
       </div>
+
       <div
         className="flex gap-3 mt-5 pt-5 border-t shrink-0"
-        style={{ borderColor: "rgba(80,150,220,0.14)" }}
+        style={{ borderColor: "rgba(80,150,220,0.3)" }}
       >
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -310,8 +456,8 @@ function EditModal({
           className="rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
           style={{
             backgroundColor: "rgba(10,26,58,0.9)",
-            border: "1px solid rgba(80,150,220,0.2)",
-            color: "var(--foreground)",
+            border: "1px solid rgba(80,150,220,0.4)",
+            color: "#E5E7EB",
           }}
         >
           Cancel
@@ -337,8 +483,8 @@ function DeleteConfirm({
         <div
           className="size-16 rounded-full flex items-center justify-center mx-auto mb-4"
           style={{
-            backgroundColor: "rgba(220,38,38,0.12)",
-            border: "1px solid rgba(220,38,38,0.25)",
+            backgroundColor: "rgba(220,38,38,0.2)",
+            border: "1px solid rgba(220,38,38,0.4)",
           }}
         >
           <span className="text-2xl">🗑</span>
@@ -365,8 +511,8 @@ function DeleteConfirm({
           className="flex-1 rounded-full py-3 text-sm font-semibold uppercase tracking-[0.18em]"
           style={{
             backgroundColor: "rgba(10,26,58,0.9)",
-            border: "1px solid rgba(80,150,220,0.2)",
-            color: "var(--foreground)",
+            border: "1px solid rgba(80,150,220,0.4)",
+            color: "#E5E7EB",
           }}
         >
           Cancel
@@ -435,13 +581,13 @@ function AdminStayCard({
           <div className="flex gap-2 text-xs flex-wrap">
             <span
               className="rounded-full px-3 py-1.5 font-semibold"
-              style={{ backgroundColor: "rgba(30,109,191,0.2)", color: "var(--foreground)" }}
+              style={{ backgroundColor: "rgba(30,109,191,0.35)", color: "#D1D5DB" }}
             >
               ★ {stay.rating.toFixed(1)}
             </span>
             <span
               className="rounded-full px-3 py-1.5 font-semibold"
-              style={{ backgroundColor: "rgba(53,192,196,0.14)", color: "var(--foreground)" }}
+              style={{ backgroundColor: "rgba(53,192,196,0.25)", color: "#D1D5DB" }}
             >
               {formatPrice(stay.pricePerNight)}/night
             </span>
@@ -450,9 +596,9 @@ function AdminStayCard({
           <div className="flex gap-2 mt-auto pt-1">
             {(
               [
-                { label: "View", action: onView, bg: "rgba(10,26,58,0.9)", col: "var(--foreground)" },
-                { label: "Edit", action: onEdit, bg: "rgba(30,109,191,0.22)", col: "var(--foreground)" },
-                { label: "Delete", action: onDelete, bg: "rgba(220,38,38,0.12)", col: "rgba(248,113,113,0.95)" },
+                { label: "View", action: onView, bg: "rgba(10,26,58,0.9)", col: "#E5E7EB" },
+                { label: "Edit", action: onEdit, bg: "rgba(30,109,191,0.45)", col: "#E5E7EB" },
+                { label: "Delete", action: onDelete, bg: "rgba(220,38,38,0.25)", col: "#FECACA" },
               ] as const
             ).map(({ label, action, bg, col }) => (
               <motion.button
@@ -463,7 +609,7 @@ function AdminStayCard({
                 className="rounded-full px-4 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.2em]"
                 style={{
                   backgroundColor: bg,
-                  border: "1px solid rgba(80,150,220,0.14)",
+                  border: "1px solid rgba(80,150,220,0.25)",
                   color: col,
                 }}
               >
@@ -499,8 +645,8 @@ function LoginScreen({
 
   const inputSty = {
     backgroundColor: "rgba(8,22,50,0.95)",
-    border: "1px solid rgba(80,150,220,0.2)",
-    color: "var(--foreground)",
+    border: "1px solid rgba(80,150,220,0.5)",
+    color: "#E5E7EB",
   };
 
   return (
@@ -639,6 +785,299 @@ function LoginScreen({
   );
 }
 
+// ─── Add Stay Modal ────────────────────────────────────────────────
+function AddStayModal({
+  onSave,
+  onClose,
+}: {
+  onSave: (s: FeaturedStay) => void;
+  onClose: () => void;
+}) {
+  // eslint-disable-next-line react-hooks/purity
+  const generateInitialId = () => `stay-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  
+  const [form, setForm] = useState<FeaturedStay>({
+    id: generateInitialId(),
+    title: "",
+    subtitle: "Trayati Stays",
+    location: "",
+    city: "",
+    state: "",
+    country: "India",
+    pin: "",
+    address: "",
+    description: "",
+    rating: 4.8,
+    pricePerNight: 10000,
+    basePrice: 10000,
+    image: "/property-exterior.jpg",
+    alt: "New property",
+    tag: "Luxury Stay",
+    type: "Private Villa",
+    amenities: [],
+    photos: ["/property-exterior.jpg"],
+    roomTypes: [
+      {
+        id: "room-1",
+        name: "Standard Room",
+        category: "Standard",
+        units: 1,
+        bedConfiguration: "Queen bed",
+        bathroom: "Attached bathroom",
+        pricePerNight: 10000,
+        maxOccupancy: 2,
+      },
+    ],
+    amenitiesDetail: {
+      parking: true,
+      heaterOnRequest: false,
+      tv: true,
+      fridge: true,
+      washingMachine: false,
+      powerBackup: true,
+      airConditioning: true,
+      geyser: true,
+      kitchen: false,
+      garden: false,
+      balcony: true,
+      lounge: false,
+      studyArea: false,
+      fireplace: false,
+      pool: false,
+      spa: false,
+    },
+    mealOptions: [
+      { type: "breakfast", available: false, price: 0, description: "" },
+      { type: "lunch", available: false, price: 0, description: "" },
+      { type: "dinner", available: false, price: 0, description: "" },
+    ],
+    cancellationPolicies: [
+      {
+        name: "Flexible",
+        description: "Free cancellation",
+        refundPercentage: 100,
+        daysBeforeCheckin: 7,
+      },
+    ],
+    googleMapsUrl: "",
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const set = (key: keyof FeaturedStay, val: any) =>
+    setForm((prev) => ({ ...prev, [key]: val }));
+
+  return (
+    <ModalWrapper title="Add New Stay" onClose={onClose}>
+      <div className="space-y-6 pr-1 max-h-[calc(90vh-120px)] overflow-y-auto">
+        {/* Basic Info */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Basic Information
+          </p>
+          <div className="space-y-3">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field label="Property Name" value={form.title} onChange={(v) => set("title", v)} />
+              <Field label="Subtitle" value={form.subtitle} onChange={(v) => set("subtitle", v)} />
+              <Field label="Type" value={form.type} onChange={(v) => set("type", v)} />
+              <Field label="Tag" value={form.tag} onChange={(v) => set("tag", v)} />
+              <Field label="City" value={form.city} onChange={(v) => set("city", v)} />
+              <Field label="State" value={form.state} onChange={(v) => set("state", v)} />
+              <Field label="Country" value={form.country} onChange={(v) => set("country", v)} />
+              <Field label="PIN Code" value={form.pin} onChange={(v) => set("pin", v)} />
+              <Field label="Rating (0–5)" value={form.rating} onChange={(v) => set("rating", Number(v))} type="number" />
+              <Field label="Base Price (₹)" value={form.basePrice} onChange={(v) => set("basePrice", Number(v))} type="number" />
+            </div>
+            <Field label="Location Display" value={form.location} onChange={(v) => set("location", v)} />
+            <Field label="Address" value={form.address} onChange={(v) => set("address", v)} />
+            <Field label="Google Maps URL" value={form.googleMapsUrl ?? ""} onChange={(v) => set("googleMapsUrl", v)} />
+            <Field label="Description" value={form.description} onChange={(v) => set("description", v)} multiline />
+          </div>
+        </div>
+
+        {/* Photos */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Photo URLs
+          </p>
+          <div className="space-y-2">
+            {form.photos.map((photo, idx) => (
+              <Field
+                key={idx}
+                label={`Photo ${idx + 1} URL`}
+                value={photo}
+                onChange={(v) => {
+                  const newPhotos = [...form.photos];
+                  newPhotos[idx] = v;
+                  set("photos", newPhotos);
+                }}
+              />
+            ))}
+            <button
+              onClick={() => set("photos", [...form.photos, ""])}
+              className="text-xs font-semibold uppercase tracking-[0.18em] px-3 py-2 rounded"
+              style={{
+                backgroundColor: "rgba(30,109,191,0.35)",
+                color: "#D1D5DB",
+              }}
+            >
+              + Add Photo URL
+            </button>
+          </div>
+        </div>
+
+        {/* Amenities */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Amenities
+          </p>
+          <div className="space-y-3">
+            {/* Basic Amenities List */}
+            <div>
+              <Field
+                label="Amenities (comma separated)"
+                value={form.amenities.join(", ")}
+                onChange={(v) => set("amenities", v.split(",").map((s) => s.trim()).filter(Boolean))}
+                multiline
+              />
+            </div>
+
+            {/* Amenities Checkboxes */}
+            <div className="grid grid-cols-2 gap-2">
+              {Object.keys(form.amenitiesDetail).map((key) => (
+                <label
+                  key={key}
+                  className="flex items-center gap-2 p-2 rounded text-xs"
+                  style={{
+                    backgroundColor: "rgba(10,26,58,0.7)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.amenitiesDetail[key as keyof typeof form.amenitiesDetail]}
+                    onChange={(e) => {
+                      set("amenitiesDetail", {
+                        ...form.amenitiesDetail,
+                        [key]: e.target.checked,
+                      });
+                    }}
+                    className="rounded"
+                  />
+                  <span className="capitalize">
+                    {key.replace(/([A-Z])/g, " $1").trim()}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Meal Options */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "var(--muted)" }}>
+            Meal Options
+          </p>
+          <div className="space-y-3">
+            {form.mealOptions.map((meal, idx) => (
+              <div key={idx} className="rounded-[0.9rem] p-3" style={{ backgroundColor: "rgba(10,26,58,0.7)" }}>
+                <label className="flex items-center gap-2 mb-3 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={meal.available}
+                    onChange={(e) => {
+                      const newMeals = [...form.mealOptions];
+                      newMeals[idx].available = e.target.checked;
+                      set("mealOptions", newMeals);
+                    }}
+                    className="rounded"
+                  />
+                  <span className="font-semibold capitalize">{meal.type}</span>
+                </label>
+                {meal.available && (
+                  <div className="space-y-2">
+                    <input
+                      type="number"
+                      placeholder="Price (₹)"
+                      value={meal.price || ""}
+                      onChange={(e) => {
+                        const newMeals = [...form.mealOptions];
+                        newMeals[idx].price = Number(e.target.value);
+                        set("mealOptions", newMeals);
+                      }}
+                      className="w-full px-2 py-1 rounded text-xs"
+                      style={{
+                        backgroundColor: "rgba(8,22,50,0.9)",
+                        border: "1px solid rgba(80,150,220,0.5)",
+                        color: "#E5E7EB",
+                      }}
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={meal.description || ""}
+                      onChange={(e) => {
+                        const newMeals = [...form.mealOptions];
+                        newMeals[idx].description = e.target.value;
+                        set("mealOptions", newMeals);
+                      }}
+                      className="w-full px-2 py-1 rounded text-xs resize-none"
+                      rows={2}
+                      style={{
+                        backgroundColor: "rgba(8,22,50,0.9)",
+                        border: "1px solid rgba(80,150,220,0.5)",
+                        color: "#E5E7EB",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Cloudinary Note */}
+        <div
+          className="rounded-[0.9rem] px-4 py-3 text-xs"
+          style={{
+            backgroundColor: "rgba(200,144,26,0.08)",
+            border: "1px solid rgba(200,144,26,0.2)",
+            color: "var(--gold)",
+          }}
+        >
+          <strong>Cloudinary Integration:</strong> Image uploads will be connected to Cloudinary. Photo URLs can be placeholder paths for now.
+        </div>
+      </div>
+
+      <div
+        className="flex gap-3 mt-5 pt-5 border-t shrink-0"
+        style={{ borderColor: "rgba(80,150,220,0.3)" }}
+      >
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => onSave(form)}
+          className="flex-1 rounded-full py-3 text-sm font-bold uppercase tracking-[0.2em] text-white"
+          style={{ backgroundColor: "var(--cta)" }}
+        >
+          Create Stay
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onClose}
+          className="rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
+          style={{
+            backgroundColor: "rgba(10,26,58,0.9)",
+            border: "1px solid rgba(80,150,220,0.4)",
+            color: "#E5E7EB",
+          }}
+        >
+          Cancel
+        </motion.button>
+      </div>
+    </ModalWrapper>
+  );
+}
+
 // ─── Admin Dashboard ──────────────────────────────────────────────
 function AdminDashboard({
   stays,
@@ -646,11 +1085,14 @@ function AdminDashboard({
   onView,
   onEdit,
   onDelete,
+  onAdd,
   viewStay,
   editStay,
   deleteStay,
+  addStay,
   onDeleteConfirm,
   onEditSave,
+  onAddSave,
   onCloseModals,
 }: {
   stays: FeaturedStay[];
@@ -658,11 +1100,14 @@ function AdminDashboard({
   onView: (s: FeaturedStay) => void;
   onEdit: (s: FeaturedStay) => void;
   onDelete: (s: FeaturedStay) => void;
+  onAdd: (v: boolean) => void;
   viewStay: FeaturedStay | null;
   editStay: FeaturedStay | null;
   deleteStay: FeaturedStay | null;
+  addStay: boolean;
   onDeleteConfirm: (id: string) => void;
   onEditSave: (s: FeaturedStay) => void;
+  onAddSave: (s: FeaturedStay) => void;
   onCloseModals: () => void;
 }) {
   const avgRating = stays.length
@@ -760,6 +1205,7 @@ function AdminDashboard({
             </p>
           </div>
           <motion.button
+            onClick={() => onAdd(true)}
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
             className="rounded-full px-5 py-2.5 text-sm font-bold uppercase tracking-[0.2em] text-white"
@@ -867,6 +1313,13 @@ function AdminDashboard({
             onClose={onCloseModals}
           />
         )}
+        {addStay && (
+          <AddStayModal
+            key="add"
+            onSave={onAddSave}
+            onClose={onCloseModals}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
@@ -880,6 +1333,7 @@ export default function AdminPage() {
   const [viewStay, setViewStay] = useState<FeaturedStay | null>(null);
   const [editStay, setEditStay] = useState<FeaturedStay | null>(null);
   const [deleteStay, setDeleteStay] = useState<FeaturedStay | null>(null);
+  const [addStay, setAddStay] = useState(false);
 
   useEffect(() => {
     const isAdmin = localStorage.getItem("trayati_admin") === "true";
@@ -908,6 +1362,7 @@ export default function AdminPage() {
     setViewStay(null);
     setEditStay(null);
     setDeleteStay(null);
+    setAddStay(false);
   };
 
   if (!mounted) return null;
@@ -920,9 +1375,11 @@ export default function AdminPage() {
       onView={setViewStay}
       onEdit={setEditStay}
       onDelete={setDeleteStay}
+      onAdd={setAddStay}
       viewStay={viewStay}
       editStay={editStay}
       deleteStay={deleteStay}
+      addStay={addStay}
       onDeleteConfirm={(id) => {
         setStays((prev) => prev.filter((s) => s.id !== id));
         setDeleteStay(null);
@@ -930,6 +1387,10 @@ export default function AdminPage() {
       onEditSave={(updated) => {
         setStays((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
         setEditStay(null);
+      }}
+      onAddSave={(newStay) => {
+        setStays((prev) => [newStay, ...prev]);
+        setAddStay(false);
       }}
       onCloseModals={closeModals}
     />

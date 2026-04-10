@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import {
   motion,
@@ -193,14 +194,23 @@ function StayCard({
                   View on Map&nbsp;↗
                 </a>
               )}
-              <motion.button
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                className="rounded-full px-7 py-2.5 text-sm font-bold text-white shadow-[0_14px_36px_rgba(199,91,26,0.45)]"
+              <Link
+                href={`/booking?stayId=${stay.id}`}
+                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white shadow-[0_14px_36px_rgba(199,91,26,0.45)] transition hover:scale-105 active:scale-97"
                 style={{ backgroundColor: "var(--cta)" }}
               >
                 Book This Stay
-              </motion.button>
+              </Link>
+              <Link
+                href={`/property/${stay.id}`}
+                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white shadow-[0_8px_24px_rgba(32,60,76,0.35)] transition hover:scale-105 active:scale-97"
+                style={{
+                  backgroundColor: "rgba(32,60,76,0.75)",
+                  border: "1px solid rgba(245,241,232,0.3)",
+                }}
+              >
+                View Details&nbsp;→
+              </Link>
             </div>
           </div>
         </div>
@@ -217,7 +227,10 @@ function RotatingBadge() {
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 22, ease: "linear" }}
-        className="relative size-24"
+        className="relative size-32"
+        style={{
+          filter: "drop-shadow(0 0 20px rgba(199,91,26,0.6)) drop-shadow(0 0 40px rgba(199,91,26,0.3))",
+        }}
       >
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <defs>
@@ -227,18 +240,21 @@ function RotatingBadge() {
             />
           </defs>
           <text
-            fontSize="8"
-            fill="rgba(32,60,76,0.55)"
-            fontWeight="600"
-            letterSpacing="1.4"
+            fontSize="10"
+            fill="rgba(199,91,26,0.95)"
+            fontWeight="900"
+            letterSpacing="2.2"
             style={{ fontFamily: "var(--font-montserrat)" }}
           >
             <textPath href="#badge-path">{text}</textPath>
           </text>
         </svg>
         <div
-          className="absolute inset-0 m-auto size-5 rounded-full"
-          style={{ backgroundColor: "var(--gold)" }}
+          className="absolute inset-0 m-auto size-8 rounded-full shadow-lg"
+          style={{
+            backgroundColor: "var(--gold)",
+            boxShadow: "0 0 30px rgba(199,91,26,0.8), 0 0 60px rgba(199,91,26,0.4)",
+          }}
         />
       </motion.div>
     </div>
