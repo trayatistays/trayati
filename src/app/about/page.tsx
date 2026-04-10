@@ -83,17 +83,6 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-16 sm:pt-32 sm:pb-24">
-        {/* Background Decorative Elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div
-            className="absolute -top-20 -right-20 w-[600px] h-[600px] rounded-full blur-[120px] opacity-20"
-            style={{ background: "radial-gradient(circle, var(--primary) 0%, transparent 70%)" }}
-          />
-          <div
-            className="absolute top-1/2 -left-40 w-[500px] h-[500px] rounded-full blur-[100px] opacity-10"
-            style={{ background: "radial-gradient(circle, var(--cta) 0%, transparent 70%)" }}
-          />
-        </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
