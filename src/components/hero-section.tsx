@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
-import { GlobeShowcase } from "@/components/globe-showcase";
 import { Navbar } from "@/components/navbar";
 
 const keywords = ["Effortless", "Smart", "Personalised"];
@@ -38,10 +37,8 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
     subtitle: "A smarter way to present and discover memorable stays.",
   },
 };
-
 export function HeroSection() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [activeOverlayItem, setActiveOverlayItem] = useState("About");
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -52,16 +49,13 @@ export function HeroSection() {
   const heroTransform = useMotionTemplate`translate3d(${smoothX}px, ${smoothY}px, 0px)`;
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     const { currentTarget, clientX, clientY } = event;
     const rect = currentTarget.getBoundingClientRect();
     const x = (clientX - rect.left - rect.width / 2) / 36;
     const y = (clientY - rect.top - rect.height / 2) / 40;
-
     mouseX.set(x);
     mouseY.set(y);
   };
@@ -76,44 +70,57 @@ export function HeroSection() {
       id="top"
       onMouseMove={handleMouseMove}
       onMouseLeave={resetMouse}
-      className="relative isolate min-h-screen overflow-hidden"
+      className="relative isolate min-h-[85vh] overflow-hidden"
     >
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(188,222,255,0.95),transparent_34%),linear-gradient(180deg,#fffdf7_0%,#f6f4ef_52%,#f1efe9_100%)]" />
+      {/* Background accents */}
       <motion.div
-        style={{ transform: orbTransform }}
-        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full bg-[#a78bfa]/16 blur-3xl sm:top-24 sm:size-56"
+        style={{ transform: orbTransform, backgroundColor: "rgba(164, 106, 45, 0.18)" }}
+        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56"
       />
       <motion.div
-        style={{ transform: orbTransform }}
-        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full bg-[#9ed7da]/16 blur-3xl sm:bottom-20 sm:size-72"
+        style={{ transform: orbTransform, backgroundColor: "rgba(95, 168, 168, 0.20)" }}
+        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72"
       />
 
-      <div className="flex min-h-screen w-full flex-col px-4 pb-8 pt-4 sm:px-6 sm:pt-5 lg:px-10">
-        <Navbar menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} />
+      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-4 sm:px-6 sm:pt-5 lg:px-10">
+        <Navbar menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((v) => !v)} />
 
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
-          <div className="grid w-full items-start gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-12">
+          <div className="w-full">
             <motion.div
               initial={{ opacity: 0, y: 44 }}
-              animate={{ opacity: menuOpen ? 0.18 : 1, y: 0 }}
+              animate={{ opacity: menuOpen ? 0.15 : 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
               style={{ transform: heroTransform }}
-              className="relative flex flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:pl-8"
+              className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
-              <div className="gradient-stroke inline-flex w-fit max-w-full items-center gap-3 rounded-full bg-white/72 px-3.5 py-2 text-xs text-[#4e5567] shadow-[0_18px_40px_rgba(121,131,153,0.12)] backdrop-blur-2xl sm:px-4 sm:text-sm">
-                <span className="size-2 rounded-full bg-[#65c0a5] shadow-[0_0_18px_rgba(101,192,165,0.55)]" />
+              <div
+                className="gradient-stroke inline-flex w-fit max-w-full items-center gap-3 rounded-full px-3.5 py-2 text-xs shadow-[0_12px_30px_rgba(32,60,76,0.10)] backdrop-blur-2xl sm:px-4 sm:text-sm"
+                style={{
+                  backgroundColor: "rgba(245, 241, 232, 0.92)",
+                  color: "var(--foreground-soft)",
+                  border: "1px solid var(--border-soft)",
+                }}
+              >
+                <span
+                  className="size-2 rounded-full shadow-[0_0_12px_rgba(74,107,68,0.5)]"
+                  style={{ backgroundColor: "var(--forest)" }}
+                />
                 Premium OTA for curated stays
               </div>
 
-              <h1 className="text-balance mt-6 max-w-4xl font-display text-[2.25rem] font-semibold leading-[1] tracking-[-0.055em] text-[#181b24] sm:mt-8 sm:text-[4rem] lg:text-[5.05rem]">
-                We make discovering and booking stays
+              <h1 className="text-balance mt-6 max-w-5xl font-display text-[2.25rem] font-semibold leading-[1] tracking-[-0.055em] sm:mt-8 sm:text-[4rem] lg:text-[5.2rem] xl:text-[5.8rem]" style={{ color: "var(--primary)" }}>
+                we make discovering and booking stays
               </h1>
 
-              <div className="mt-4 flex min-h-[4.4rem] items-center font-display text-[2.35rem] font-semibold leading-none tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.55rem]">
-                <AnimatedText items={keywords} className="hero-word-shadow text-[#f3b16d]" />
+              <div className="mt-4 flex min-h-[4.4rem] items-center font-display text-[3.35rem] font-semibold leading-none tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.7rem] xl:text-[6.15rem]">
+                <AnimatedText items={keywords} className="hero-word-shadow text-[var(--gold)]" />
               </div>
 
-              <p className="text-balance mt-5 max-w-2xl text-base leading-7 text-[#5e6678] sm:mt-6 sm:text-lg sm:leading-8">
+              <p
+                className="text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
+                style={{ color: "var(--foreground-soft)" }}
+              >
                 Whether you&apos;re planning a quick getaway, a business trip, or a
                 long vacation, Trayati Stays connects you with the best
                 properties at the best prices, all in one place.
@@ -123,28 +130,26 @@ export function HeroSection() {
                 <motion.a
                   whileHover={{ scale: 1.03, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  href="#properties"
-                  className="w-full rounded-full bg-[#181b24] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_20px_40px_rgba(24,27,36,0.18)] sm:w-auto"
-                  style={{ color: "#ffffff" }}
+                  href="#featured-stays"
+                  className="w-full rounded-full px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(199,91,26,0.40)] sm:w-auto"
+                  style={{ backgroundColor: "var(--cta)" }}
                 >
                   Explore Properties
                 </motion.a>
-                <div className="gradient-stroke w-full rounded-full bg-white/70 px-4 py-3 text-sm text-[#5f6876] backdrop-blur-xl sm:w-auto">
+                <div
+                  className="gradient-stroke w-full rounded-full px-4 py-3 text-sm backdrop-blur-xl sm:w-auto"
+                  style={{
+                    backgroundColor: "rgba(245, 241, 232, 0.88)",
+                    color: "var(--foreground-soft)",
+                  }}
+                >
                   Smart search, local stays, seamless booking
                 </div>
               </div>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 54 }}
-              animate={{ opacity: menuOpen ? 0.12 : 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
-              className="relative"
-            >
-              <GlobeShowcase />
-            </motion.div>
           </div>
 
+          {/* Full-page menu overlay */}
           <motion.aside
             initial={false}
             animate={
@@ -156,21 +161,28 @@ export function HeroSection() {
             className="absolute inset-0 z-40 overflow-y-auto rounded-[2rem]"
             aria-hidden={!menuOpen}
           >
-            <div className="absolute inset-0 bg-[rgba(248,247,244,0.96)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(172,213,255,0.24),transparent_26%)]" />
-            <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(20,20,20,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,20,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
+            <div className="absolute inset-0" style={{ backgroundColor: "rgba(245, 241, 232, 0.97)" }} />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(95,168,168,0.16),transparent_24%),radial-gradient(circle_at_80%_18%,rgba(164,106,45,0.10),transparent_20%)]" />
+            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(32,60,76,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(32,60,76,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
 
-            <div className="relative flex min-h-full flex-col px-4 py-4 text-[#171717] sm:px-8 sm:py-6 lg:px-12">
+            <div className="relative flex min-h-full flex-col px-4 py-4 sm:px-8 sm:py-6 lg:px-12">
               <div className="flex items-center justify-center pt-2">
-                <h2 className="font-display text-2xl font-semibold tracking-[-0.05em] text-[#202020] sm:text-4xl">
+                <h2 className="font-display text-2xl font-semibold tracking-[-0.05em] sm:text-4xl" style={{ color: "var(--primary)" }}>
                   Trayati Stays
                 </h2>
               </div>
 
               <div className="grid flex-1 items-start gap-8 py-6 md:grid-cols-[0.9fr_auto_1fr] md:items-center md:gap-20 lg:gap-24">
+                {/* Preview card */}
                 <div className="flex flex-col items-center justify-center gap-6 md:items-end md:gap-8">
-                  <div className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border border-black/8 bg-white/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.35rem] bg-[radial-gradient(circle_at_top,#dbeafe,#ede9fe_46%,#ffffff_100%)]">
+                  <div
+                    className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(32,60,76,0.14)] backdrop-blur-xl"
+                    style={{
+                      borderColor: "var(--border-soft)",
+                      backgroundColor: "rgba(245, 241, 232, 0.92)",
+                    }}
+                  >
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.35rem]" style={{ backgroundColor: "rgba(220, 215, 200, 1)" }}>
                       <motion.div
                         key={activeOverlayItem}
                         initial={{ opacity: 0, scale: 1.05 }}
@@ -186,21 +198,28 @@ export function HeroSection() {
                           className="object-cover"
                         />
                       </motion.div>
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,18,28,0.02),rgba(14,18,28,0.14)_45%,rgba(14,18,28,0.56)_100%)]" />
-                      <div className="absolute inset-x-4 bottom-4 rounded-[1.25rem] border border-white/20 bg-white/68 p-3 backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-4">
-                        <p className="text-xs uppercase tracking-[0.28em] text-black/45">
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(32,60,76,0.55)_100%)]" />
+                      <div
+                        className="absolute inset-x-4 bottom-4 rounded-[1.25rem] border p-3 backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-4"
+                        style={{
+                          borderColor: "var(--border-soft)",
+                          backgroundColor: "rgba(245, 241, 232, 0.90)",
+                        }}
+                      >
+                        <p className="text-xs uppercase tracking-[0.28em]" style={{ color: "var(--muted)" }}>
                           {activeOverlayItem}
                         </p>
-                        <p className="mt-2 font-display text-xl text-black sm:text-2xl">
+                        <p className="mt-2 font-display text-xl" style={{ color: "var(--primary)" }}>
                           {overlayImages[activeOverlayItem].title}
                         </p>
-                        <p className="mt-2 text-sm leading-6 text-black/60">
+                        <p className="mt-2 text-sm leading-6" style={{ color: "var(--foreground-soft)" }}>
                           {overlayImages[activeOverlayItem].subtitle}
                         </p>
                       </div>
                     </div>
                   </div>
 
+                  {/* Socials */}
                   <div className="flex items-center gap-3 self-start md:self-auto">
                     {socials.map(({ label, href, icon: Icon }) => (
                       <motion.a
@@ -208,7 +227,12 @@ export function HeroSection() {
                         href={href}
                         whileHover={{ scale: 1.08, y: -2 }}
                         whileTap={{ scale: 0.96 }}
-                        className="flex size-11 items-center justify-center rounded-full border border-black/10 bg-white text-base text-[#181b24] shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition duration-300 hover:border-[#a78bfa] hover:bg-[#a78bfa] hover:text-white"
+                        className="flex size-11 items-center justify-center rounded-full border text-base shadow-[0_8px_20px_rgba(32,60,76,0.12)] transition duration-300"
+                        style={{
+                          borderColor: "var(--border-soft)",
+                          backgroundColor: "rgba(240, 236, 226, 0.96)",
+                          color: "var(--primary)",
+                        }}
                         aria-label={label}
                       >
                         <Icon />
@@ -217,13 +241,15 @@ export function HeroSection() {
                   </div>
                 </div>
 
-                <div className="hidden h-full min-h-52 w-px bg-black/14 md:block" />
+                {/* Divider */}
+                <div className="hidden h-full min-h-52 w-px md:block" style={{ backgroundColor: "var(--border-soft)" }} />
 
+                {/* Nav links */}
                 <div className="flex flex-col justify-center md:pl-2">
-                  <p className="text-xs uppercase tracking-[0.34em] text-black/38">
-                    Transition section
+                  <p className="text-xs uppercase tracking-[0.34em]" style={{ color: "var(--muted)" }}>
+                    Explore section
                   </p>
-                  <div className="mt-3 text-2xl font-medium text-[#5b42c2] sm:text-3xl">
+                  <div className="mt-3 text-2xl font-medium sm:text-3xl" style={{ color: "var(--gold)" }}>
                     <AnimatedText items={destinations} interval={1800} />
                   </div>
 
@@ -236,19 +262,37 @@ export function HeroSection() {
                           animate={menuOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
                           transition={{ delay: 0.12 + index * 0.08, duration: 0.35 }}
                         >
-                          <a
+                          <motion.a
                             href="#"
                             onMouseEnter={() => setActiveOverlayItem(item)}
                             onFocus={() => setActiveOverlayItem(item)}
                             onClick={() => setActiveOverlayItem(item)}
-                            className="group flex items-center justify-between rounded-full border border-black/6 bg-white/35 px-4 py-3 text-2xl capitalize tracking-[-0.05em] text-black/84 transition duration-300 hover:border-black/10 hover:bg-white/55 hover:text-black sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
+                            whileHover={{
+                              borderColor: "var(--border-soft)",
+                              backgroundColor: "rgba(32, 60, 76, 0.06)",
+                              color: "var(--cta)",
+                            }}
+                            className="group flex items-center justify-between rounded-full border px-4 py-3 text-2xl capitalize tracking-[-0.05em] transition duration-300 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
+                            style={{
+                              borderColor: "var(--border-soft)",
+                              color: "var(--primary)",
+                            }}
                           >
                             <span>{item}</span>
                             <span className="relative ml-4 flex size-12 items-center justify-center sm:ml-6 sm:size-14">
-                              <span className="absolute inset-3 rounded-full border border-[#a78bfa]/25 bg-[#a78bfa]/10 opacity-0 transition duration-300 group-hover:inset-0 group-hover:opacity-100 group-hover:shadow-[0_0_24px_rgba(167,139,250,0.35)]" />
-                              <span className="relative size-2 rounded-full bg-black/60 transition duration-300 group-hover:size-3 group-hover:bg-[#5b42c2]" />
+                              <span
+                                className="absolute inset-3 rounded-full border opacity-0 transition duration-300 group-hover:inset-0 group-hover:opacity-100"
+                                style={{
+                                  borderColor: "rgba(164, 106, 45, 0.4)",
+                                  backgroundColor: "rgba(164, 106, 45, 0.14)",
+                                }}
+                              />
+                              <span
+                                className="relative size-2 rounded-full transition duration-300 group-hover:size-3"
+                                style={{ backgroundColor: "var(--gold)" }}
+                              />
                             </span>
-                          </a>
+                          </motion.a>
                         </motion.li>
                       ))}
                     </ul>
@@ -258,24 +302,7 @@ export function HeroSection() {
             </div>
           </motion.aside>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.7 }}
-          transition={{ duration: 0.65 }}
-          className="mt-8 flex flex-col items-start gap-2 border-t border-black/8 pt-4 text-xs uppercase tracking-[0.22em] text-[#697080] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:tracking-[0.28em]"
-        >
-          <span>Built for premium stays</span>
-          <span>Fast discovery • smart booking • personalised journeys</span>
-        </motion.div>
       </div>
-
-      {!mounted ? null : (
-        <div className="sr-only" aria-live="polite">
-          Current highlight rotates between effortless, smart, and personalised.
-        </div>
-      )}
     </section>
   );
 }
