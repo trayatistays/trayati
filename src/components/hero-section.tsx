@@ -53,8 +53,6 @@ export function HeroSection() {
   const heroTransform = useMotionTemplate`translate3d(${smoothX}px, ${smoothY}px, 0px)`;
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
-
-
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     const { currentTarget, clientX, clientY } = event;
     const rect = currentTarget.getBoundingClientRect();
@@ -95,6 +93,18 @@ export function HeroSection() {
       <motion.div
         style={{ transform: orbTransform, backgroundColor: "rgba(95, 168, 168, 0.20)" }}
         className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72"
+      />
+
+      {/* Tiled Tribal Pattern with Text-Aware Masking */}
+      <div 
+        className="absolute inset-0 -z-10 opacity-[0.12]"
+        style={{
+          backgroundImage: "url('/images/hero-pattern.jpg')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "320px",
+          WebkitMaskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
+          maskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
+        }}
       />
 
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-4 sm:px-6 sm:pt-5 lg:px-10">
