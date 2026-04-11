@@ -83,7 +83,7 @@ export function ExperiencesSection() {
           </p>
         </motion.div>
 
-        {/* Featured Experiences */}
+        {/* Featured Experien*/}
         {featuredExperiences.length > 0 && (
           <div className="mb-16">
             <h3 className="font-display text-2xl font-bold mb-8 tracking-[-0.02em]">Featured Stories</h3>
