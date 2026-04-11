@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
-import { HiX } from "react-icons/hi";
+import { HiOutlineUserCircle, HiX } from "react-icons/hi";
 
 type NavbarProps = {
   menuOpen: boolean;
@@ -11,6 +12,7 @@ type NavbarProps = {
 };
 
 export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
+  const { isSignedIn } = useUser();
   return (
     <motion.header
       initial={{ opacity: 0, y: -30 }}
@@ -38,7 +40,7 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
             src="/trayati-logo.jpg"
             alt="Trayati logo"
             fill
-            sizes="(max-width: 640px) 40px, 48px"
+            sizes="(max-width: 640px) 60px, 68px"
             className="object-cover"
             priority
           />
@@ -51,24 +53,12 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
             className="truncate text-[0.62rem] font-medium uppercase tracking-[0.18em] sm:text-xs sm:tracking-[0.24em]"
             style={{ color: "var(--muted)" }}
           >
-            Premium stay discovery
+            Find Your Rhythm
           </p>
         </div>
       </a>
 
-      <div className="flex shrink-0 items-center gap-2">
-        <Link
-          href="/admin"
-          className="rounded-full px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] transition duration-300 sm:px-5 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
-          style={{
-            border: "1px solid var(--border-soft)",
-            backgroundColor: "rgba(240, 236, 226, 0.9)",
-            color: "var(--primary)",
-          }}
-        >
-          Admin
-        </Link>
-
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <motion.div
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
@@ -81,6 +71,31 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
             Book Now
           </Link>
         </motion.div>
+
+        {isSignedIn ? (
+          <UserButton
+            appearance={{
+              elements: {
+                userButtonAvatarBox: "size-10 sm:size-11",
+              },
+            }}
+          />
+        ) : (
+          <SignInButton mode="modal">
+            <button
+              type="button"
+              className="flex size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_rgba(32,60,76,0.12)] backdrop-blur-xl transition duration-300 sm:size-12"
+              style={{
+                borderColor: "var(--border-soft)",
+                color: "var(--primary)",
+                backgroundColor: "rgba(240, 236, 226, 0.95)",
+              }}
+              aria-label="Sign in"
+            >
+              <HiOutlineUserCircle className="text-[1.5rem] sm:text-[1.7rem]" />
+            </button>
+          </SignInButton>
+        )}
 
         <motion.button
           type="button"

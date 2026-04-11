@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { FeaturedStay } from "@/data/featured-stays";
+import { ReserveNowButton } from "@/components/reserve-now-button";
 
 interface PropertyBookingWidgetProps {
   stay: FeaturedStay;
@@ -89,12 +89,10 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
           </div>
         </div>
 
-        <Link
-          href={`/booking?stayId=${stay.id}`}
+        <ReserveNowButton
+          stayId={stay.id}
           className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg text-center transition-all shadow-lg hover:shadow-xl"
-        >
-          Book Now
-        </Link>
+        />
 
         <button className="w-full border-2 border-amber-600 text-amber-600 hover:bg-amber-50 font-semibold py-2 px-4 rounded-lg transition-colors">
           View Rooms

@@ -3,11 +3,24 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { experiences } from "@/data/testimonials-and-blogs";
+import { useEffect, useState } from "react";
+import { experiences, type Experience } from "@/data/testimonials-and-blogs";
 
 export function ExperiencesSection() {
-  const featuredExperiences = experiences.filter((exp) => exp.featured);
-  const otherExperiences = experiences.filter((exp) => !exp.featured);
+  const [items, setItems] = useState<Experience[]>(experiences);
+  const featuredExperiences = items.filter((exp) => exp.featured);
+  const otherExperiences = items.filter((exp) => !exp.featured);
+
+  useEffect(() => {
+    void fetch("/api/experiences", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { experiences?: Experience[] } | null) => {
+        if (data?.experiences?.length) {
+          setItems(data.experiences);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -33,7 +46,17 @@ export function ExperiencesSection() {
   } as const;
 
   return (
-    <section className="py-16 sm:py-24" style={{ backgroundColor: "rgba(30,109,191,0.02)" }}>
+    <section className="relative overflow-hidden py-16 sm:py-24" style={{ backgroundColor: "rgba(30,109,191,0.02)" }}>
+      {/* Background Pattern */}
+      <div
+        className="absolute inset-0 -z-10 opacity-[0.03]"
+        style={{
+          backgroundImage: "url('/images/section-pattern.jpg')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "280px",
+        }}
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div

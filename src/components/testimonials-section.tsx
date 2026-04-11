@@ -2,9 +2,23 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { testimonials } from "@/data/testimonials-and-blogs";
+import { useEffect, useState } from "react";
+import { testimonials, type Testimonial } from "@/data/testimonials-and-blogs";
 
 export function TestimonialsSection() {
+  const [items, setItems] = useState<Testimonial[]>(testimonials);
+
+  useEffect(() => {
+    void fetch("/api/testimonials", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { testimonials?: Testimonial[] } | null) => {
+        if (data?.testimonials?.length) {
+          setItems(data.testimonials);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -29,7 +43,19 @@ export function TestimonialsSection() {
   } as const;
 
   return (
-    <section className="py-16 sm:py-24">
+    <section className="relative overflow-hidden py-16 sm:py-24">
+      {/* Background Pattern */}
+      <div
+        className="absolute inset-0 -z-10 opacity-[0.04]"
+        style={{
+          backgroundImage: "url('/images/section-pattern.jpg')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "260px",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        }}
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -64,7 +90,7 @@ export function TestimonialsSection() {
           viewport={{ once: true }}
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
-          {testimonials.map((testimonial) => (
+          {items.map((testimonial) => (
             <motion.div
               key={testimonial.id}
               variants={itemVariants}

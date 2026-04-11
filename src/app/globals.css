@@ -36,6 +36,10 @@ html {
   scroll-behavior: smooth;
 }
 
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background:
@@ -71,6 +75,12 @@ a {
 button {
   font: inherit;
   font-family: var(--font-montserrat);
+}
+
+img,
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .text-balance {
@@ -116,4 +126,20 @@ button {
 
 .globe-sphere {
   transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

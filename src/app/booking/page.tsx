@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { BookingFilterForm } from "@/components/booking-filter-form";
 import { BookingResults } from "@/components/booking-results";
-import { featuredStays } from "@/data/featured-stays";
+import { ReserveNowButton } from "@/components/reserve-now-button";
+import { useStays } from "@/hooks/use-stays";
 
 type FilterState = {
   location: string;
@@ -19,7 +20,8 @@ type FilterState = {
 function BookingContent() {
   const searchParams = useSearchParams();
   const stayId = searchParams.get("stayId");
-  const selectedStay = stayId ? featuredStays.find((s) => s.id === stayId) : null;
+  const { stays } = useStays();
+  const selectedStay = stayId ? stays.find((s) => s.id === stayId) : null;
 
   const [filters, setFilters] = useState<FilterState>({
     location: "",
@@ -331,15 +333,15 @@ function BookingContent() {
                       </motion.div>
                     )}
 
-                    <button
+                    <ReserveNowButton
+                      stayId={selectedStay.id}
+                      roomId={selectedRoomId}
                       className="w-full rounded-full py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105"
                       style={{
                         backgroundColor: "var(--cta)",
                         boxShadow: "0 8px 24px rgba(199,91,26,0.3)",
                       }}
-                    >
-                      Reserve Now
-                    </button>
+                    />
 
                     <p style={{ color: "var(--muted)" }} className="text-xs text-center">
                       Final price will be confirmed after dates are selected&apos;

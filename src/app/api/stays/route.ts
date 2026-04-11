@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { createStay, getAllStays } from "@/lib/stays-store";
-import type { FeaturedStay } from "@/data/featured-stays";
+import { staySchema } from "@/lib/schemas";
 
 export async function GET() {
   const stays = await getAllStays();
@@ -8,15 +10,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as FeaturedStay;
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-  if (!body?.id || !body?.title) {
+  const parsed = staySchema.safeParse(await request.json());
+
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "A valid stay payload is required." },
+      { error: z.prettifyError(parsed.error) },
       { status: 400 },
     );
   }
 
-  const stay = await createStay(body);
+  const stay = await createStay(parsed.data);
   return NextResponse.json({ stay }, { status: 201 });
 }

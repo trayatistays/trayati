@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { featuredStays } from "@/data/featured-stays";
+import { useStays } from "@/hooks/use-stays";
 
 type FilterState = {
   location: string;
@@ -23,14 +23,28 @@ function formatPrice(n: number) {
 }
 
 export function BookingResults({ filters }: { filters: FilterState }) {
+  const { stays, isLoading, error } = useStays();
   const filteredStays = useMemo(() => {
-    return featuredStays.filter((stay) => {
-      if (filters.location && !stay.state.includes(filters.location)) {
+    return stays.filter((stay) => {
+      if (
+        filters.location &&
+        !`${stay.city} ${stay.state} ${stay.country}`
+          .toLowerCase()
+          .includes(filters.location.toLowerCase())
+      ) {
         return false;
       }
       return true;
     });
-  }, [filters.location]);
+  }, [filters.location, stays]);
+
+  if (isLoading) {
+    return <p style={{ color: "var(--muted)" }}>Loading stays...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-600">{error}</p>;
+  }
 
   if (filteredStays.length === 0) {
     return (

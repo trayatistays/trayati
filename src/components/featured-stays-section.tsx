@@ -10,9 +10,9 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
+import { useStays } from "@/hooks/use-stays";
 
 // ─── Constants ────────────────────────────────────────────────────
-const N = featuredStays.length;
 // 125vh per card → 500vh total → 400vh effective scroll range with ["end end"] offset
 // Each card gets exactly 100vh of scroll (500vh - 100vh viewport = 400vh ÷ 4)
 const VH_PER_CARD = 125;
@@ -29,12 +29,14 @@ function formatPrice(price: number) {
 function ProgressDot({
   index,
   scrollYProgress,
+  total,
 }: {
   index: number;
   scrollYProgress: MotionValue<number>;
+  total: number;
 }) {
-  const s = index / N;
-  const e = (index + 1) / N;
+  const s = index / total;
+  const e = (index + 1) / total;
   const buf = 0.04;
   const opacity = useTransform(
     scrollYProgress,
@@ -68,15 +70,17 @@ function StayCard({
   stay,
   index,
   scrollYProgress,
+  total,
 }: {
   stay: FeaturedStay;
   index: number;
   scrollYProgress: MotionValue<number>;
+  total: number;
 }) {
   const isFirst = index === 0;
-  const isLast = index === N - 1;
-  const segStart = index / N; // when THIS card becomes active
-  const segEnd = (index + 1) / N; // when NEXT card becomes active
+  const isLast = index === total - 1;
+  const segStart = index / total; // when THIS card becomes active
+  const segEnd = (index + 1) / total; // when NEXT card becomes active
 
   // ── Scale down ──────────────────────────────────────────────────
   // This card scales from 1 → 0.9 while the NEXT card is sliding in.
@@ -90,8 +94,8 @@ function StayCard({
   // ── Slide in from below ──────────────────────────────────────────
   // This card slides from y="100%" to y="0%" over the PREVIOUS card's segment.
   // For card 0: already in place (no animation).
-  const prevSegStart = (index - 1) / N;
-  const prevSegEnd = index / N;
+  const prevSegStart = (index - 1) / total;
+  const prevSegEnd = index / total;
   const y = useTransform(
     scrollYProgress,
     isFirst ? [0, 1] : [prevSegStart, prevSegEnd],
@@ -132,7 +136,7 @@ function StayCard({
           {/* Counter */}
           <div className="absolute top-6 left-7">
             <span className="font-display text-[0.6rem] font-bold uppercase tracking-[0.44em] text-white/50">
-              {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(N).padStart(2, "0")}
+              {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(total).padStart(2, "0")}
             </span>
           </div>
 
@@ -264,6 +268,9 @@ function RotatingBadge() {
 // ─── Main Export ──────────────────────────────────────────────────
 export function FeaturedStaysSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { stays } = useStays();
+  const activeStays = stays.length ? stays : featuredStays;
+  const total = activeStays.length;
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -306,17 +313,18 @@ export function FeaturedStaysSection() {
       {/* Sticky scroll zone */}
       <div
         ref={containerRef}
-        style={{ height: `${N * VH_PER_CARD}vh` }}
+        style={{ height: `${total * VH_PER_CARD}vh` }}
         className="relative mt-4"
       >
         <div className="sticky top-0 h-screen overflow-hidden">
           {/* Cards */}
           <div className="relative w-full h-full">
-            {featuredStays.map((stay, i) => (
+            {activeStays.map((stay, i) => (
               <StayCard
                 key={stay.id}
                 stay={stay}
                 index={i}
+                total={total}
                 scrollYProgress={scrollYProgress}
               />
             ))}
@@ -330,8 +338,13 @@ export function FeaturedStaysSection() {
             className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3"
             style={{ right: "clamp(0.75rem, 3vw, 2rem)" }}
           >
-            {featuredStays.map((_, i) => (
-              <ProgressDot key={i} index={i} scrollYProgress={scrollYProgress} />
+            {activeStays.map((_, i) => (
+              <ProgressDot
+                key={i}
+                index={i}
+                total={total}
+                scrollYProgress={scrollYProgress}
+              />
             ))}
           </div>
 

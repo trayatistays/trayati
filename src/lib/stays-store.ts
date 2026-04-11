@@ -3,6 +3,12 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
+import {
+  deleteContentItem,
+  getCollection,
+  getContentItem,
+  upsertContentItem,
+} from "@/lib/content-store";
 
 const staysFilePath = path.join(process.cwd(), "src", "data", "stays.json");
 
@@ -25,6 +31,11 @@ async function writePayload(stays: FeaturedStay[]) {
 }
 
 export async function getAllStays(): Promise<FeaturedStay[]> {
+  const supabaseStays = await getCollection<FeaturedStay>("stays", []);
+  if (supabaseStays.length > 0) {
+    return supabaseStays;
+  }
+
   try {
     const raw = await fs.readFile(staysFilePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<StaysPayload>;
@@ -39,11 +50,22 @@ export async function getAllStays(): Promise<FeaturedStay[]> {
 }
 
 export async function getStayById(id: string) {
+  const supabaseStay = await getContentItem<FeaturedStay>("stays", id, []);
+  if (supabaseStay) {
+    return supabaseStay;
+  }
+
   const stays = await getAllStays();
   return stays.find((stay) => stay.id === id) ?? null;
 }
 
 export async function createStay(stay: FeaturedStay) {
+  try {
+    return await upsertContentItem("stays", stay);
+  } catch (error) {
+    console.warn("Falling back to local stay storage.", error);
+  }
+
   const stays = await getAllStays();
   const nextStays = [stay, ...stays];
   await writePayload(nextStays);
@@ -51,6 +73,12 @@ export async function createStay(stay: FeaturedStay) {
 }
 
 export async function updateStay(id: string, stay: FeaturedStay) {
+  try {
+    return await upsertContentItem("stays", { ...stay, id });
+  } catch (error) {
+    console.warn("Falling back to local stay storage.", error);
+  }
+
   const stays = await getAllStays();
   const index = stays.findIndex((item) => item.id === id);
 
@@ -65,6 +93,12 @@ export async function updateStay(id: string, stay: FeaturedStay) {
 }
 
 export async function deleteStay(id: string) {
+  try {
+    return await deleteContentItem("stays", id);
+  } catch (error) {
+    console.warn("Falling back to local stay storage.", error);
+  }
+
   const stays = await getAllStays();
   const nextStays = stays.filter((stay) => stay.id !== id);
 

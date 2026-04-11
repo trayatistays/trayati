@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cookies } from "next/headers";
+
 const DEFAULT_ADMIN_USERNAME = "admin";
 const DEFAULT_ADMIN_PASSWORD = "admin";
 
@@ -11,5 +13,17 @@ export function validateAdminCredentials(username: string, password: string) {
   const expectedPassword =
     process.env.TRAYATI_ADMIN_PASSWORD ?? DEFAULT_ADMIN_PASSWORD;
 
+  if (
+    process.env.NODE_ENV === "production" &&
+    (!process.env.TRAYATI_ADMIN_USERNAME || !process.env.TRAYATI_ADMIN_PASSWORD)
+  ) {
+    return false;
+  }
+
   return username === expectedUsername && password === expectedPassword;
+}
+
+export async function isAdminAuthenticated() {
+  const cookieStore = await cookies();
+  return cookieStore.get(ADMIN_COOKIE_NAME)?.value === "1";
 }

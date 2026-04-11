@@ -1,27 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const blogPosts = [
-  {
-    title: "Hidden Gems of Himachal Pradesh",
-    excerpt: "Discover the lesser-known valleys and escapes in the mountains.",
-    date: "Mar 15, 2026",
-  },
-  {
-    title: "The Art of Mindful Travel",
-    excerpt: "How to slow down and truly experience your destination.",
-    date: "Mar 10, 2026",
-  },
-  {
-    title: "Rajasthan: Desert Dreams & Royal Stays",
-    excerpt: "Experience the grandeur of Rajasthan's iconic properties.",
-    date: "Mar 1, 2026",
-  },
-];
+import { experiences, type Experience } from "@/data/testimonials-and-blogs";
 
 export default function BlogsPage() {
+  const [blogPosts, setBlogPosts] = useState<Experience[]>(experiences);
+
+  useEffect(() => {
+    void fetch("/api/experiences", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { experiences?: Experience[] } | null) => {
+        if (data?.experiences?.length) {
+          setBlogPosts(data.experiences);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--background)" }}>
       {/* Header */}
@@ -90,7 +87,7 @@ export default function BlogsPage() {
                 {post.title}
               </h3>
               <p style={{ color: "var(--foreground-soft)" }} className="mb-4">
-                {post.excerpt}
+                {post.description}
               </p>
               <p style={{ color: "var(--cta)" }} className="text-sm font-semibold uppercase tracking-[0.16em]">
                 Read More →
