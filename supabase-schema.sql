@@ -6,6 +6,29 @@ create table if not exists public.trayati_content (
   primary key (collection, id)
 );
 
+create table if not exists public.property_submissions (
+  id text not null,
+  clerk_user_id text not null,
+  user_name text not null,
+  user_email text not null,
+  property_payload jsonb not null,
+  status text not null default 'pending',
+  submitted_at timestamptz not null default now(),
+  reviewed_at timestamptz,
+  reviewed_by text,
+  admin_notes text,
+  primary key (id)
+);
+
+alter table public.property_submissions enable row level security;
+
+create policy "service role can manage property submissions"
+on public.property_submissions
+for all
+to service_role
+using (true)
+with check (true);
+
 alter table public.trayati_content enable row level security;
 
 create policy "service role can manage trayati content"

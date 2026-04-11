@@ -73,6 +73,44 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
         </motion.div>
 
         {isSignedIn ? (
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Link
+              href="/list-property"
+              className="inline-flex rounded-full border px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] shadow-[0_16px_36px_rgba(32,60,76,0.12)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
+              style={{
+                borderColor: "var(--cta)",
+                color: "var(--cta)",
+                backgroundColor: "rgba(245,241,232,0.88)",
+              }}
+            >
+              List With Us
+            </Link>
+          </motion.div>
+        ) : (
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
+              <button
+                type="button"
+                className="inline-flex rounded-full border px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] shadow-[0_16px_36px_rgba(32,60,76,0.12)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
+                style={{
+                  borderColor: "var(--cta)",
+                  color: "var(--cta)",
+                  backgroundColor: "rgba(245,241,232,0.88)",
+                }}
+              >
+                List With Us
+              </button>
+            </SignInButton>
+          </motion.div>
+        )}
+
+        {isSignedIn ? (
           <UserButton
             appearance={{
               elements: {

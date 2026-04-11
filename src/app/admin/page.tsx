@@ -14,7 +14,7 @@ import {
 import { slugifyId } from "@/lib/schemas";
 import { HiStar } from "react-icons/hi";
 
-type Collection = "stays" | "experiences" | "testimonials" | "reservations";
+type Collection = "stays" | "experiences" | "testimonials" | "reservations" | "submissions";
 type AdminItem = Record<string, unknown> & { id: string };
 
 const collections: { id: Collection; label: string; description: string }[] = [
@@ -22,6 +22,7 @@ const collections: { id: Collection; label: string; description: string }[] = [
   { id: "experiences", label: "Experiences", description: "Stories, destination content, and blog cards." },
   { id: "testimonials", label: "Testimonials", description: "Guest reviews for trust and conversion." },
   { id: "reservations", label: "Reservations", description: "Reserve Now requests captured from signed-in users." },
+  { id: "submissions", label: "Property Submissions", description: "Property listings submitted by users awaiting approval." },
 ];
 
 type ReservationRecord = {
@@ -36,6 +37,19 @@ type ReservationRecord = {
   guests: number;
   status: "requested" | "confirmed" | "cancelled";
   createdAt: string;
+};
+
+type PropertySubmission = {
+  id: string;
+  clerk_user_id: string;
+  user_name: string;
+  user_email: string;
+  property_payload: FeaturedStay;
+  status: "pending" | "approved" | "rejected";
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  admin_notes: string | null;
 };
 
 function createStayTemplate(): FeaturedStay {
@@ -86,6 +100,18 @@ const templates: Record<Collection, AdminItem> = {
     clerkUserId: "created-by-admin",
     status: "requested",
     createdAt: new Date().toISOString(),
+  },
+  submissions: {
+    id: `submission-${Date.now()}`,
+    clerk_user_id: "",
+    user_name: "",
+    user_email: "",
+    property_payload: createStayTemplate(),
+    status: "pending",
+    submitted_at: new Date().toISOString(),
+    reviewed_at: null,
+    reviewed_by: null,
+    admin_notes: null,
   },
 };
 
@@ -578,19 +604,24 @@ export default function AdminPage() {
     setDraft(formatJson(nextItem));
   }
 
-  const loadCollection = useCallback(async (nextCollection: Collection = collection) => {
+const loadCollection = useCallback(async (nextCollection: Collection = collection) => {
     setIsBusy(true);
     setError(null);
 
-    const response = await fetch(
-      nextCollection === "reservations"
-        ? "/api/admin/reservations"
-        : `/api/admin/content/${nextCollection}`,
-      { cache: "no-store" },
-    );
+    let url = "";
+    if (nextCollection === "reservations") {
+      url = "/api/admin/reservations";
+    } else if (nextCollection === "submissions") {
+      url = "/api/admin/submissions";
+    } else {
+      url = `/api/admin/content/${nextCollection}`;
+    }
+
+    const response = await fetch(url, { cache: "no-store" });
     const data = (await response.json()) as {
       items?: AdminItem[];
       reservations?: ReservationRecord[];
+      submissions?: PropertySubmission[];
       error?: string;
     };
     setIsBusy(false);
@@ -605,7 +636,14 @@ export default function AdminPage() {
       return;
     }
 
-    const nextItems = data.items ?? data.reservations ?? [];
+    let nextItems: AdminItem[] = [];
+    if (nextCollection === "submissions") {
+      nextItems = (data.submissions ?? []) as AdminItem[];
+    } else if (nextCollection === "reservations") {
+      nextItems = data.reservations ?? [];
+    } else {
+      nextItems = data.items ?? [];
+    }
     const first = nextItems[0] ?? templates[nextCollection];
     setItems(nextItems);
     setSelectedId(first.id ?? null);
@@ -658,11 +696,32 @@ export default function AdminPage() {
     setNotice("Saved successfully.");
   }
 
-  async function deleteSelected() {
+async function deleteSelected() {
     if (!selectedId) return;
     setIsBusy(true);
     setNotice(null);
     setError(null);
+
+    if (collection === "submissions") {
+      const response = await fetch("/api/admin/submissions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedId }),
+      });
+      const data = (await response.json()) as { error?: string };
+      setIsBusy(false);
+      if (!response.ok) {
+        setError(data.error ?? "Unable to delete submission.");
+        return;
+      }
+      const nextItems = items.filter((item) => item.id !== selectedId);
+      const nextSelected = nextItems[0] ?? null;
+      setItems(nextItems);
+      setSelectedId(nextSelected?.id ?? null);
+      setDraft(nextSelected ? formatJson(nextSelected) : formatJson(templates[collection]));
+      setNotice("Submission deleted.");
+      return;
+    }
 
     const response = await fetch(`/api/admin/content/${collection}/${encodeURIComponent(selectedId)}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
@@ -679,6 +738,70 @@ export default function AdminPage() {
     setSelectedId(nextSelected?.id ?? null);
     setDraft(nextSelected ? formatJson(nextSelected) : formatJson(templates[collection]));
     setNotice("Deleted.");
+  }
+
+  async function approveSubmission() {
+    if (collection !== "submissions" || !selectedId) return;
+    setIsBusy(true);
+    setNotice(null);
+    setError(null);
+
+    const response = await fetch("/api/admin/submissions", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: selectedId, action: "approve" }),
+    });
+    const data = (await response.json()) as { error?: string };
+    setIsBusy(false);
+
+    if (!response.ok) {
+      setError(data.error ?? "Unable to approve submission.");
+      return;
+    }
+
+    const currentSubmission = items.find((item) => item.id === selectedId) as PropertySubmission | undefined;
+    if (currentSubmission?.property_payload) {
+      const propertyStay: FeaturedStay = {
+        ...currentSubmission.property_payload,
+        id: currentSubmission.property_payload.id || `stay-${Date.now()}`,
+      };
+      const saveResponse = await fetch("/api/admin/content/stays", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(propertyStay),
+      });
+      const saveData = (await saveResponse.json()) as { item?: AdminItem; error?: string };
+      if (!saveResponse.ok || !saveData.item) {
+        setNotice("Submission approved but failed to add to stays.");
+        return;
+      }
+    }
+
+    setNotice("Submission approved and added to stays.");
+    void loadCollection("submissions");
+  }
+
+  async function rejectSubmission() {
+    if (collection !== "submissions" || !selectedId) return;
+    setIsBusy(true);
+    setNotice(null);
+    setError(null);
+
+    const response = await fetch("/api/admin/submissions", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: selectedId, action: "reject" }),
+    });
+    const data = (await response.json()) as { error?: string };
+    setIsBusy(false);
+
+    if (!response.ok) {
+      setError(data.error ?? "Unable to reject submission.");
+      return;
+    }
+
+    setNotice("Submission rejected.");
+    void loadCollection("submissions");
   }
 
   async function uploadPhotos(files: FileList | null) {
@@ -722,10 +845,10 @@ export default function AdminPage() {
     return <AdminLogin onLogin={() => { setAuthenticated(true); void loadCollection("stays"); }} />;
   }
 
-  const supportsFormEditor = ["stays", "experiences", "testimonials"].includes(
+const supportsFormEditor = ["stays", "experiences", "testimonials"].includes(
     collection,
   );
-  const isReadOnly = collection === "reservations";
+  const isReadOnly = collection === "reservations" || collection === "submissions";
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--background)" }}>
@@ -826,14 +949,16 @@ export default function AdminPage() {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="font-display text-xl font-bold">Editor</h2>
-                <p className="text-sm" style={{ color: "var(--muted)" }}>
+<p className="text-sm" style={{ color: "var(--muted)" }}>
                   {collection === "stays"
                     ? "Use the stay form for quick edits, then switch to JSON if you want full control."
                     : collection === "experiences"
                       ? "Curate experience stories with the form, or jump into JSON for full control."
                       : collection === "testimonials"
                         ? "Manage guest reviews via the form, with JSON available for full control."
-                        : "Reservations are read-only and enriched with guest details."}
+                        : collection === "submissions"
+                          ? "Review user-submitted properties. Approve to add to stays, or reject to decline."
+                          : "Reservations are read-only and enriched with guest details."}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -865,7 +990,7 @@ export default function AdminPage() {
                     </button>
                   </>
                 )}
-                {!isReadOnly && (
+{!isReadOnly && (
                   <>
                     <button
                       onClick={saveDraft}
@@ -1011,6 +1136,137 @@ export default function AdminPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+) : collection === "submissions" ? (
+              <div className="space-y-4">
+                {(items as PropertySubmission[]).map((submission) => (
+                  <div
+                    key={submission.id}
+                    className="rounded-lg border p-4"
+                    style={{
+                      borderColor: submission.status === "pending" ? "rgba(234,179,8,0.5)" : submission.status === "approved" ? "rgba(34,197,94,0.5)" : "rgba(239,68,68,0.5)",
+                      backgroundColor: "rgba(255,255,255,0.45)",
+                    }}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                      <div>
+                        <h3 className="font-display text-lg font-bold">{submission.property_payload?.title || "Untitled Property"}</h3>
+                        <p className="text-sm" style={{ color: "var(--muted)" }}>
+                          Submitted by {submission.user_name} ({submission.user_email})
+                        </p>
+                      </div>
+                      <span
+                        className="inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]"
+                        style={{
+                          backgroundColor: submission.status === "pending" ? "rgba(234,179,8,0.12)" : submission.status === "approved" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                          color: submission.status === "pending" ? "#b45309" : submission.status === "approved" ? "#15803d" : "#b91c1c",
+                          borderColor: submission.status === "pending" ? "rgba(234,179,8,0.4)" : submission.status === "approved" ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)",
+                        }}
+                      >
+                        {submission.status}
+                      </span>
+                    </div>
+                    
+                    {selectedId === submission.id && (
+                      <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Location</p>
+                            <p className="text-sm">{submission.property_payload?.city}, {submission.property_payload?.state}, {submission.property_payload?.country}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Price per Night</p>
+                            <p className="text-sm">₹{submission.property_payload?.pricePerNight?.toLocaleString() || "N/A"}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Type</p>
+                            <p className="text-sm">{submission.property_payload?.type || "N/A"}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Submitted</p>
+                            <p className="text-sm">{formatDate(submission.submitted_at)}</p>
+                          </div>
+                        </div>
+                        
+                        {submission.property_payload?.description && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Description</p>
+                            <p className="text-sm">{submission.property_payload.description}</p>
+                          </div>
+                        )}
+                        
+                        {submission.property_payload?.amenities && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Amenities</p>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                              {submission.property_payload.amenities.map((amenity, i) => (
+                                <span key={i} className="rounded-full border px-2 py-1 text-xs">{amenity}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {submission.property_payload?.photos && submission.property_payload.photos.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Photos ({submission.property_payload.photos.length})</p>
+                            <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
+                              {submission.property_payload.photos.slice(0, 5).map((photo, i) => (
+                                <div key={i} className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border">
+                                  <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="80px" />
+                                </div>
+                              ))}
+                              {submission.property_payload.photos.length > 5 && (
+                                <div className="flex items-center justify-center w-20 h-20 rounded-lg border bg-gray-100 text-sm">
+                                  +{submission.property_payload.photos.length - 5} more
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {submission.property_payload?.roomTypes && submission.property_payload.roomTypes.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>Room Types</p>
+                            <div className="mt-2 space-y-2">
+                              {submission.property_payload.roomTypes.map((room, i) => (
+                                <div key={i} className="rounded border p-3 text-sm">
+                                  <p className="font-semibold">{room.name} ({room.category})</p>
+                                  <p style={{ color: "var(--muted)" }}>{room.bedConfiguration} - ₹{room.pricePerNight}/night</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {submission.status === "pending" && (
+                          <div className="flex flex-wrap gap-3 pt-4 border-t">
+                            <button
+                              onClick={approveSubmission}
+                              disabled={isBusy}
+                              className="rounded-lg px-4 py-2 text-sm font-bold text-white"
+                              style={{ backgroundColor: "#15803d" }}
+                            >
+                              {isBusy ? "Processing..." : "Approve & Add to Stays"}
+                            </button>
+                            <button
+                              onClick={rejectSubmission}
+                              disabled={isBusy}
+                              className="rounded-lg border px-4 py-2 text-sm font-bold"
+                              style={{ borderColor: "rgba(239,68,68,0.4)", color: "#b91c1c" }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+)}
+              </div>
+            )}
+                  </div>
+                ))}
+                {!items.length && (
+                  <p className="text-sm" style={{ color: "var(--muted)" }}>
+                    No pending submissions.
+                  </p>
+                )}
               </div>
             ) : (
               <textarea
