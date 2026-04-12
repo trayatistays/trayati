@@ -75,6 +75,33 @@ export function buildStayMetadata(stay: FeaturedStay): Metadata {
   };
 }
 
+export function buildBreadcrumbJsonLd(stay: FeaturedStay) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Browse Stays",
+        item: `${siteUrl}/booking`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: stay.title,
+        item: `${siteUrl}/property/${stay.id}`,
+      },
+    ],
+  };
+}
+
 export function buildStayJsonLd(stay: FeaturedStay) {
   return {
     "@context": "https://schema.org",

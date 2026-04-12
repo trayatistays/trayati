@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PropertyPageClient } from "@/components/property-page-client";
 import { getStayById } from "@/lib/stays-store";
-import { buildStayJsonLd, buildStayMetadata } from "@/lib/seo";
+import { buildStayJsonLd, buildStayMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 
 // Revalidate property pages from the CDN edge cache every hour.
 // This means zero Supabase calls for cached requests — huge performance gain.
@@ -35,11 +35,14 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   }
 
   const jsonLd = buildStayJsonLd(stay);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(stay);
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <PropertyPageClient stay={stay} />
     </>
   );
 }
+

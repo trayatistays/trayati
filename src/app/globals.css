@@ -63,18 +63,20 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* Two pattern images tiled together across the full viewport */
+  /* WebP versions — ~50% smaller than original JPGs */
   background-image:
-    url("/images/tribal-pattern-figures.jpg"),
-    url("/images/tribal-pattern-symbols.jpg");
+    url("/images/tribal-pattern-figures.webp"),
+    url("/images/tribal-pattern-symbols.webp");
   background-position: left top, right bottom;
   background-size: 280px 280px, 240px 240px;
   background-repeat: repeat, repeat;
-  /* Teal-tinted watermark effect matching the screenshot */
+  /* Teal-tinted watermark effect matching the brand palette */
   opacity: 0.22;
   mix-blend-mode: multiply;
-  /* shift black figures toward aqua-teal brand tone (--aqua: #5FA8A8) */
   filter: sepia(1) saturate(1.4) hue-rotate(140deg) contrast(0.72) brightness(1.25);
+  /* Prevent unnecessary GPU compositing layer on low-end devices */
+  will-change: auto;
+  contain: strict;
 }
 
 a {
