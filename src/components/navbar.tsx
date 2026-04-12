@@ -6,19 +6,22 @@ import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { HiOutlineUserCircle, HiX } from "react-icons/hi";
 
+import { LiveIndiaSoulButton } from "./live-india-soul-button";
+
 type NavbarProps = {
   menuOpen: boolean;
   onToggleMenu: () => void;
+  onOpenExperience?: () => void;
 };
 
-export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
+export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps) {
   const { isSignedIn } = useUser();
   return (
     <motion.header
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative z-30 flex items-center justify-between gap-3 rounded-[1.6rem] border px-2.5 py-2.5 shadow-[0_20px_50px_rgba(32,60,76,0.12)] backdrop-blur-2xl sm:gap-4 sm:rounded-[2rem] sm:px-4 sm:py-3 lg:px-5"
+      className="relative z-30 flex flex-wrap items-center justify-between gap-3 rounded-[1.6rem] border px-2.5 py-2.5 shadow-[0_20px_50px_rgba(32,60,76,0.12)] backdrop-blur-2xl sm:gap-4 sm:rounded-[2rem] sm:px-4 sm:py-3 lg:px-5"
       style={{
         borderColor: "var(--border-soft)",
         backgroundColor: "rgba(245, 241, 232, 0.88)",
@@ -58,17 +61,24 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
         </div>
       </a>
 
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="order-3 basis-full sm:order-2 sm:basis-auto">
+        {onOpenExperience && (
+          <LiveIndiaSoulButton onClick={onOpenExperience} />
+        )}
+      </div>
+
+      <div className="order-2 ml-auto flex shrink-0 items-center gap-2 sm:order-3 sm:ml-0 sm:gap-3">
         <motion.div
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
         >
           <Link
             href="/booking"
-            className="inline-flex rounded-full px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_16px_36px_rgba(199,91,26,0.38)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
+            className="inline-flex rounded-full px-3 py-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_16px_36px_rgba(199,91,26,0.38)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
             style={{ backgroundColor: "var(--cta)" }}
           >
-            Book Now
+            <span className="sm:hidden">Book</span>
+            <span className="hidden sm:inline">Book Now</span>
           </Link>
         </motion.div>
 
@@ -76,6 +86,7 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
           <motion.div
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
+            className="hidden lg:block"
           >
             <Link
               href="/list-property"
@@ -93,6 +104,7 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
           <motion.div
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
+            className="hidden lg:block"
           >
             <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
               <button
@@ -122,7 +134,7 @@ export function Navbar({ menuOpen, onToggleMenu }: NavbarProps) {
           <SignInButton mode="modal">
             <button
               type="button"
-              className="flex size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_rgba(32,60,76,0.12)] backdrop-blur-xl transition duration-300 sm:size-12"
+              className="hidden size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_rgba(32,60,76,0.12)] backdrop-blur-xl transition duration-300 sm:flex sm:size-12"
               style={{
                 borderColor: "var(--border-soft)",
                 color: "var(--primary)",

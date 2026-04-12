@@ -11,6 +11,7 @@ import {
   type Experience,
   type Testimonial,
 } from "@/data/testimonials-and-blogs";
+import { experienceTypes } from "@/data/experience-types";
 import { slugifyId } from "@/lib/schemas";
 import { HiStar } from "react-icons/hi";
 
@@ -73,6 +74,7 @@ function createStayTemplate(): FeaturedStay {
     image: "/trayati-logo.jpg",
     alt: "Trayati stay",
     photos: ["/trayati-logo.jpg"],
+    experienceType: "Folklore Homestays",
     amenities: ["Scenic views", "WiFi", "Curated hospitality"],
   };
 }
@@ -286,6 +288,7 @@ function StayEditor({ stay, onChange, onUploadPhotos, uploading }: { stay: Featu
         <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Pin Code</span><input className="w-full rounded-lg border px-4 py-3" value={stay.pin} onChange={(event) => setField("pin", event.target.value)} /></label>
         <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Tag</span><input className="w-full rounded-lg border px-4 py-3" value={stay.tag} onChange={(event) => setField("tag", event.target.value)} /></label>
         <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Type</span><input className="w-full rounded-lg border px-4 py-3" value={stay.type} onChange={(event) => setField("type", event.target.value)} /></label>
+        <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Experience Type</span><select className="w-full rounded-lg border px-4 py-3" value={stay.experienceType} onChange={(event) => setField("experienceType", event.target.value as FeaturedStay["experienceType"])}>{experienceTypes.map((type) => (<option key={type} value={type}>{type}</option>))}</select></label>
         <label className="block md:col-span-2"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Subtitle</span><input className="w-full rounded-lg border px-4 py-3" value={stay.subtitle} onChange={(event) => setField("subtitle", event.target.value)} /></label>
         <label className="block md:col-span-2"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Address</span><input className="w-full rounded-lg border px-4 py-3" value={stay.address} onChange={(event) => setField("address", event.target.value)} /></label>
         <label className="block md:col-span-2"><span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]">Google Maps URL</span><input className="w-full rounded-lg border px-4 py-3" value={stay.googleMapsUrl ?? ""} onChange={(event) => setField("googleMapsUrl", event.target.value)} /></label>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { locations, guestCategories } from "@/data/social-links";
+import { experienceTypes, type ExperienceType } from "@/data/experience-types";
 
 type FilterState = {
   location: string;
@@ -10,24 +10,18 @@ type FilterState = {
   checkOut: string;
   guests: number;
   category: string;
+  experienceType: ExperienceType | "";
 };
 
 export function BookingFilterForm({
   onFilter,
+  filters,
 }: {
   onFilter: (filters: FilterState) => void;
+  filters: FilterState;
 }) {
-  const [filters, setFilters] = useState<FilterState>({
-    location: "",
-    checkIn: "",
-    checkOut: "",
-    guests: 1,
-    category: "couple",
-  });
-
   const handleChange = (key: keyof FilterState, value: string | number) => {
     const updated = { ...filters, [key]: value };
-    setFilters(updated);
     onFilter(updated);
   };
 
@@ -69,6 +63,29 @@ export function BookingFilterForm({
             {locations.map((loc) => (
               <option key={loc} value={loc}>
                 {loc}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-[0.65rem] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: "var(--muted)" }}>
+            Stay Experience
+          </label>
+          <select
+            value={filters.experienceType}
+            onChange={(e) => handleChange("experienceType", e.target.value)}
+            className="rounded-[1rem] px-4 py-3 text-sm outline-none transition border"
+            style={{
+              borderColor: "var(--border-soft)",
+              backgroundColor: "rgba(255,255,255,0.8)",
+              color: "var(--foreground)",
+            }}
+          >
+            <option value="">All experience types</option>
+            {experienceTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
               </option>
             ))}
           </select>
@@ -133,7 +150,7 @@ export function BookingFilterForm({
         </div>
 
         {/* Category */}
-        <div className="flex flex-col sm:col-span-2 lg:col-span-1">
+        <div className="flex flex-col sm:col-span-2 lg:col-span-2">
           <label className="text-[0.65rem] font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "var(--muted)" }}>
             Guest Type
           </label>

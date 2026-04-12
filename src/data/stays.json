@@ -19,6 +19,7 @@
       "alt": "Samar Villa – Himalayan panorama from Kasar Devi, Uttarakhand",
       "tag": "Private Villa",
       "type": "Private Villa",
+      "experienceType": "Villas",
       "amenities": [
         "Himalayan views",
         "Private garden",
@@ -139,6 +140,7 @@
       "alt": "Orchid Nest – Mountain cottage in Dharamsala, Himachal Pradesh",
       "tag": "Mountain Cottage",
       "type": "Cottage",
+      "experienceType": "Folklore Homestays",
       "amenities": [
         "Valley views",
         "Meditation deck",
@@ -247,6 +249,7 @@
       "alt": "Saffron Haveli – Heritage stay in Jaisalmer fort",
       "tag": "Heritage Haveli",
       "type": "Heritage Property",
+      "experienceType": "Folklore Homestays",
       "amenities": [
         "Fort views",
         "Heritage architecture",
@@ -361,6 +364,7 @@
       "alt": "Blue Tide Villa – Beachfront villa in Varkala, Kerala",
       "tag": "Beachfront Villa",
       "type": "Beach Villa",
+      "experienceType": "Villas",
       "amenities": [
         "Sea views",
         "Private balcony",

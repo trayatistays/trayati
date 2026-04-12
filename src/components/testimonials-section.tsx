@@ -1,12 +1,134 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, type CSSProperties } from "react";
+import { HiOutlineStar, HiOutlineXMark } from "react-icons/hi2";
 import { testimonials, type Testimonial } from "@/data/testimonials-and-blogs";
+
+function TestimonialDialog({
+  item,
+  onClose,
+}: {
+  item: Testimonial | null;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!item) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [item, onClose]);
+
+  return (
+    <AnimatePresence>
+      {item ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,24,31,0.55)] px-4 py-6 backdrop-blur-md sm:px-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              onClose();
+            }
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border p-6 sm:p-8"
+            style={{
+              borderColor: "rgba(32,60,76,0.12)",
+              background:
+                "linear-gradient(145deg, rgba(250,247,240,0.98), rgba(237,233,222,0.96))",
+              boxShadow: "0 30px 90px rgba(15,24,31,0.24)",
+            }}
+          >
+            <div className="absolute right-5 top-5">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex size-11 items-center justify-center rounded-full border"
+                style={{
+                  borderColor: "rgba(32,60,76,0.12)",
+                  backgroundColor: "rgba(255,255,255,0.72)",
+                  color: "var(--primary)",
+                }}
+                aria-label="Close testimonial details"
+              >
+                <HiOutlineXMark className="text-2xl" />
+              </button>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
+              <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 sm:h-24 sm:w-24" style={{ borderColor: "rgba(32,60,76,0.12)" }}>
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  unoptimized={item.image.startsWith("http")}
+                />
+              </div>
+
+              <div className="pr-10">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.26em]" style={{ backgroundColor: "rgba(199,91,26,0.12)", color: "var(--cta)" }}>
+                    Guest Testimonial
+                  </span>
+                  <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.26em]" style={{ backgroundColor: "rgba(32,60,76,0.08)", color: "var(--primary)" }}>
+                    {item.rating.toFixed(1)} / 5
+                  </span>
+                </div>
+                <h3 className="mt-5 font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl" style={{ color: "var(--primary)" }}>
+                  {item.name}
+                </h3>
+                <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
+                  {item.title}
+                </p>
+                <p className="mt-5 text-lg leading-8" style={{ color: "var(--foreground-soft)" }}>
+                  &ldquo;{item.text}&rdquo;
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {item.source ? (
+                    <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.22em]" style={{ backgroundColor: "rgba(32,60,76,0.08)", color: "var(--primary)" }}>
+                      {item.source}
+                    </span>
+                  ) : null}
+                  <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.22em]" style={{ backgroundColor: "rgba(95,168,168,0.12)", color: "var(--forest)" }}>
+                    {item.date}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
 
 export function TestimonialsSection() {
   const [items, setItems] = useState<Testimonial[]>(testimonials);
+  const [activeItem, setActiveItem] = useState<Testimonial | null>(null);
 
   useEffect(() => {
     void fetch("/api/testimonials", { cache: "no-store" })
@@ -19,159 +141,109 @@ export function TestimonialsSection() {
       .catch(() => undefined);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  } as const;
+  const carouselItems = [...items, ...items];
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24">
-      {/* Background Pattern */}
-      <div
-        className="absolute inset-0 -z-10 opacity-[0.04]"
-        style={{
-          backgroundImage: "url('/images/section-pattern.jpg')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "260px",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-        }}
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span
-            className="inline-block text-xs font-bold uppercase tracking-[0.3em] px-4 py-2 rounded-full mb-4"
-            style={{
-              backgroundColor: "rgba(30,109,191,0.1)",
-              color: "var(--primary)",
-            }}
+    <>
+      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24">
+        <div className="px-4 sm:px-6 lg:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="mb-10 flex flex-col gap-5 lg:mb-14 lg:flex-row lg:items-end lg:justify-between"
           >
-            Guest Stories
-          </span>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4">
-            Experiences That Touch Hearts
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground-soft)" }}>
-            Discover what our guests say about their journeys with Trayati Stays
-          </p>
-        </motion.div>
-
-        {/* Testimonials Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
-        >
-          {items.map((testimonial) => (
-            <motion.div
-              key={testimonial.id}
-              variants={itemVariants}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="rounded-2xl p-6 sm:p-8 backdrop-blur-xl group overflow-hidden relative"
-              style={{
-                backgroundColor: "rgba(245,241,232,0.7)",
-                border: "1px solid rgba(80,150,220,0.2)",
-                boxShadow: "0 10px 40px rgba(32,60,76,0.08)",
-              }}
-            >
-              {/* Decorative gradient background */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            <div>
+              <span
+                className="inline-block rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.3em]"
                 style={{
-                  background: "linear-gradient(135deg, rgba(199,91,26,0.05), rgba(95,168,168,0.05))",
-                  pointerEvents: "none",
+                  backgroundColor: "rgba(32,60,76,0.08)",
+                  color: "var(--primary)",
                 }}
-              />
+              >
+                Guest Stories
+              </span>
+              <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
+                Testimonials now move like the rest of the brand experience.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
+              The section now runs as a living carousel across the full page width. Hover slows it down, and clicking any review opens a focused detail panel.
+            </p>
+          </motion.div>
+        </div>
 
-              <div className="relative z-10 space-y-4">
-                {/* Rating Stars */}
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.span
-                      key={i}
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ delay: i * 0.1 }}
-                      viewport={{ once: true }}
-                      className="text-lg"
-                      style={{
-                        color: i < Math.floor(testimonial.rating) ? "var(--cta)" : "rgba(80,150,220,0.2)",
-                      }}
-                    >
-                      ★
-                    </motion.span>
-                  ))}
-                  <span style={{ color: "var(--muted)" }} className="text-xs font-semibold ml-2">
-                    {testimonial.rating}
-                  </span>
-                </div>
+        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.08)", backgroundColor: "rgba(245,241,232,0.62)" }}>
+          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "url('/images/tribal-pattern-figures.jpg')", backgroundSize: "260px", backgroundRepeat: "repeat" }} />
+          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
+          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
 
-                {/* Testimonial Text */}
-                <p className="text-base leading-relaxed" style={{ color: "var(--foreground)" }}>
-                  &quot;{testimonial.text}&quot;
-                </p>
-
-                {/* Author Info */}
-                <div className="flex items-center gap-4 pt-4 border-t" style={{ borderColor: "rgba(80,150,220,0.1)" }}>
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden border" style={{ borderColor: "var(--primary)" }}>
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">{testimonial.name}</p>
-                    <p style={{ color: "var(--muted)" }} className="text-xs">
-                      {testimonial.title}
-                    </p>
-                  </div>
-                  {testimonial.source && (
-                    <span
-                      className="text-xs font-bold uppercase px-2 py-1 rounded"
-                      style={{
-                        backgroundColor: "var(--cta)/10",
-                        color: "var(--cta)",
-                      }}
-                    >
-                      {testimonial.source}
+          <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+            <div
+              className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
+              style={
+                {
+                  "--marquee-duration": "38s",
+                  "--marquee-duration-hover": "68s",
+                } as CSSProperties
+              }
+            >
+              {carouselItems.map((testimonial, index) => (
+                <button
+                  key={`${testimonial.id}-${index}`}
+                  type="button"
+                  onClick={() => setActiveItem(testimonial)}
+                  className="group w-[18rem] shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left transition duration-300 hover:-translate-y-1 sm:w-[22rem]"
+                  style={{
+                    borderColor: "rgba(32,60,76,0.12)",
+                    background:
+                      "linear-gradient(155deg, rgba(255,255,255,0.78), rgba(245,241,232,0.88))",
+                    boxShadow: "0 18px 48px rgba(32,60,76,0.08)",
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="relative h-14 w-14 overflow-hidden rounded-full border" style={{ borderColor: "rgba(32,60,76,0.12)" }}>
+                      <Image
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        fill
+                        className="object-cover transition duration-500 group-hover:scale-110"
+                        unoptimized={testimonial.image.startsWith("http")}
+                      />
+                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(199,91,26,0.12)", color: "var(--cta)" }}>
+                      <HiOutlineStar className="text-sm" />
+                      {testimonial.rating.toFixed(1)}
                     </span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+                  </div>
+
+                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--primary)" }}>
+                    {testimonial.name}
+                  </h3>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--muted)" }}>
+                    {testimonial.title}
+                  </p>
+                  <p className="mt-4 line-clamp-4 text-sm leading-7" style={{ color: "var(--foreground-soft)" }}>
+                    &ldquo;{testimonial.text}&rdquo;
+                  </p>
+
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "rgba(32,60,76,0.08)" }}>
+                    <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--gold)" }}>
+                      {testimonial.source ?? "Guest review"}
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+                      Open details
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <TestimonialDialog item={activeItem} onClose={() => setActiveItem(null)} />
+    </>
   );
 }

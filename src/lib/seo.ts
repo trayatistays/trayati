@@ -5,6 +5,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://trayati.example";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: "Trayati Stays",
   title: {
     default: "Trayati Stays | Luxury Stays Across India",
     template: "%s | Trayati Stays",
@@ -19,12 +20,17 @@ export const siteMetadata: Metadata = {
     "heritage stays",
     "holiday rentals India",
   ],
+  alternates: {
+    canonical: "/",
+  },
+  category: "travel",
   openGraph: {
     type: "website",
     siteName: "Trayati Stays",
     title: "Trayati Stays | Luxury Stays Across India",
     description:
       "Discover premium villas, mountain retreats, heritage stays, and curated travel experiences across India's most soulful destinations.",
+    url: siteUrl,
     images: ["/trayati-logo.jpg"],
   },
   twitter: {

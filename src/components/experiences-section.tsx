@@ -1,15 +1,147 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, type CSSProperties } from "react";
+import { HiMiniArrowUpRight, HiOutlineClock, HiOutlineXMark } from "react-icons/hi2";
 import { experiences, type Experience } from "@/data/testimonials-and-blogs";
+
+function ExperienceDialog({
+  item,
+  onClose,
+}: {
+  item: Experience | null;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!item) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [item, onClose]);
+
+  return (
+    <AnimatePresence>
+      {item ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,24,31,0.58)] px-4 py-6 backdrop-blur-md sm:px-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              onClose();
+            }
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 28, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border"
+            style={{
+              borderColor: "rgba(32,60,76,0.12)",
+              background:
+                "linear-gradient(150deg, rgba(250,247,240,0.98), rgba(237,233,222,0.96))",
+              boxShadow: "0 30px 90px rgba(15,24,31,0.24)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute right-5 top-5 z-10 flex size-11 items-center justify-center rounded-full border"
+              style={{
+                borderColor: "rgba(245,241,232,0.22)",
+                backgroundColor: "rgba(22,44,56,0.72)",
+                color: "#fff",
+              }}
+              aria-label="Close experience details"
+            >
+              <HiOutlineXMark className="text-2xl" />
+            </button>
+
+            <div className="grid lg:grid-cols-[1fr_0.95fr]">
+              <div className="relative min-h-[16rem] lg:min-h-[32rem]">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                  unoptimized={item.image.startsWith("http")}
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,44,56,0.08),rgba(22,44,56,0.72))]" />
+                <div className="absolute inset-x-5 bottom-5">
+                  <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-white" style={{ backgroundColor: "rgba(199,91,26,0.88)" }}>
+                    {item.category}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.24em]" style={{ backgroundColor: "rgba(32,60,76,0.08)", color: "var(--primary)" }}>
+                    Editorial Story
+                  </span>
+                  {item.readTime ? (
+                    <span className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.22em]" style={{ backgroundColor: "rgba(95,168,168,0.12)", color: "var(--forest)" }}>
+                      <HiOutlineClock className="text-sm" />
+                      {item.readTime} min read
+                    </span>
+                  ) : null}
+                </div>
+
+                <h3 className="mt-5 font-display text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl" style={{ color: "var(--primary)" }}>
+                  {item.title}
+                </h3>
+
+                <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--muted)" }}>
+                  {(item.author ?? "Trayati Editorial")} | {item.date}
+                </p>
+
+                <p className="mt-6 text-base leading-8 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
+                  {item.description}
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    href="/blogs"
+                    onClick={onClose}
+                    className="inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white"
+                    style={{ backgroundColor: "var(--primary)" }}
+                  >
+                    Explore stories
+                    <HiMiniArrowUpRight className="text-lg" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
 
 export function ExperiencesSection() {
   const [items, setItems] = useState<Experience[]>(experiences);
-  const featuredExperiences = items.filter((exp) => exp.featured);
-  const otherExperiences = items.filter((exp) => !exp.featured);
+  const [activeItem, setActiveItem] = useState<Experience | null>(null);
 
   useEffect(() => {
     void fetch("/api/experiences", { cache: "no-store" })
@@ -22,254 +154,142 @@ export function ExperiencesSection() {
       .catch(() => undefined);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  } as const;
+  const carouselItems = [...items, ...items];
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24" style={{ backgroundColor: "rgba(30,109,191,0.02)" }}>
-      {/* Background Pattern */}
-      <div
-        className="absolute inset-0 -z-10 opacity-[0.03]"
-        style={{
-          backgroundImage: "url('/images/section-pattern.jpg')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "280px",
-        }}
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span
-            className="inline-block text-xs font-bold uppercase tracking-[0.3em] px-4 py-2 rounded-full mb-4"
-            style={{
-              backgroundColor: "rgba(199,91,26,0.1)",
-              color: "var(--cta)",
-            }}
+    <>
+      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24" style={{ backgroundColor: "rgba(30,109,191,0.02)" }}>
+        <div className="px-4 sm:px-6 lg:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="mb-10 flex flex-col gap-5 lg:mb-14 lg:flex-row lg:items-end lg:justify-between"
           >
-            Travel Stories & Insights
-          </span>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4">
-            Explore & Learn
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground-soft)" }}>
-            Discover destination guides, travel tips, and inspiring stories from conscious travelers
-          </p>
-        </motion.div>
+            <div>
+              <span
+                className="inline-block rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.3em]"
+                style={{
+                  backgroundColor: "rgba(199,91,26,0.1)",
+                  color: "var(--cta)",
+                }}
+              >
+                Travel Stories & Insights
+              </span>
+              <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
+                Experience stories now flow as a continuous story rail.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
+              This area now uses a moving full-width carousel instead of static bento cards, with hover-to-slow motion and click-to-open story details.
+            </p>
+          </motion.div>
+        </div>
 
-        {/* Featured Experien*/}
-        {featuredExperiences.length > 0 && (
-          <div className="mb-16">
-            <h3 className="font-display text-2xl font-bold mb-8 tracking-[-0.02em]">Featured Stories</h3>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid lg:grid-cols-3 gap-6 sm:gap-8"
+        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.08)" }}>
+          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url('/images/tribal-pattern-symbols.jpg')", backgroundSize: "240px", backgroundRepeat: "repeat" }} />
+          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
+          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
+
+          <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+            <div
+              className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
+              style={
+                {
+                  "--marquee-duration": "42s",
+                  "--marquee-duration-hover": "72s",
+                  "--marquee-direction": "reverse",
+                } as CSSProperties
+              }
             >
-              {featuredExperiences.map((experience) => (
-                <motion.div
-                  key={experience.id}
-                  variants={itemVariants}
-                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                  className="rounded-2xl overflow-hidden backdrop-blur-xl group cursor-pointer relative"
+              {carouselItems.map((experience, index) => (
+                <button
+                  key={`${experience.id}-${index}`}
+                  type="button"
+                  onClick={() => setActiveItem(experience)}
+                  className="group w-[19rem] shrink-0 overflow-hidden rounded-[1.9rem] border text-left transition duration-300 hover:-translate-y-1 sm:w-[25rem]"
                   style={{
-                    backgroundColor: "rgba(245,241,232,0.8)",
-                    border: "1px solid rgba(80,150,220,0.2)",
-                    boxShadow: "0 10px 40px rgba(32,60,76,0.08)",
+                    borderColor: "rgba(32,60,76,0.12)",
+                    background:
+                      "linear-gradient(155deg, rgba(255,255,255,0.78), rgba(245,241,232,0.88))",
+                    boxShadow: "0 18px 48px rgba(32,60,76,0.08)",
                   }}
                 >
-                  {/* Image Container */}
-                  <div className="relative overflow-hidden h-52 sm:h-64 bg-gradient-to-br from-blue-400/20 to-orange-400/20">
+                  <div className="relative h-56 overflow-hidden">
                     <Image
                       src={experience.image}
                       alt={experience.title}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                      unoptimized={experience.image.startsWith("http")}
                     />
-                    {/* Overlay gradient on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Category badge */}
-                    <motion.span
-                      className="absolute top-4 left-4 text-xs font-bold uppercase px-3 py-1 rounded-full"
-                      style={{
-                        backgroundColor: "rgba(199,91,26,0.9)",
-                        color: "#fff",
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {experience.category}
-                    </motion.span>
-
-                    {/* Featured badge */}
-                    <motion.span
-                      className="absolute top-4 right-4 text-xs font-bold uppercase px-3 py-1 rounded-full"
-                      style={{
-                        backgroundColor: "rgba(30,109,191,0.9)",
-                        color: "#fff",
-                      }}
-                    >
-                      Featured
-                    </motion.span>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 sm:p-8 space-y-4">
-                    <h3 className="font-display text-xl font-bold leading-snug tracking-[-0.02em] group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-cta group-hover:bg-clip-text transition-all duration-300">
-                      {experience.title}
-                    </h3>
-
-                    <p style={{ color: "var(--foreground-soft)" }} className="text-sm leading-relaxed line-clamp-2">
-                      {experience.description}
-                    </p>
-
-                    {/* Meta info */}
-                    <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "rgba(80,150,220,0.15)" }}>
-                      <div className="flex items-center gap-4 text-xs">
-                        {experience.author && (
-                          <span style={{ color: "var(--muted)" }}>By {experience.author}</span>
-                        )}
-                        {experience.readTime && (
-                          <>
-                            <span style={{ color: "rgba(80,150,220,0.3)" }}>•</span>
-                            <span style={{ color: "var(--muted)" }}>{experience.readTime} min read</span>
-                          </>
-                        )}
-                      </div>
-                      <motion.span
-                        whileHover={{ x: 4 }}
-                        style={{ color: "var(--primary)" }}
-                        className="font-semibold text-sm"
-                      >
-                        →
-                      </motion.span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        )}
-
-        {/* All Experiences */}
-        {otherExperiences.length > 0 && (
-          <div>
-            <h3 className="font-display text-2xl font-bold mb-8 tracking-[-0.02em]">More Stories</h3>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
-            >
-              {otherExperiences.slice(0, 3).map((experience) => (
-                <motion.div
-                  key={experience.id}
-                  variants={itemVariants}
-                  whileHover={{ y: -8 }}
-                  className="rounded-2xl overflow-hidden backdrop-blur-xl group cursor-pointer"
-                  style={{
-                    backgroundColor: "rgba(245,241,232,0.6)",
-                    border: "1px solid rgba(80,150,220,0.15)",
-                    boxShadow: "0 8px 32px rgba(32,60,76,0.06)",
-                  }}
-                >
-                  {/* Small Image */}
-                  <div className="relative overflow-hidden h-40 bg-gradient-to-br from-blue-400/10 to-orange-400/10">
-                    <Image
-                      src={experience.image}
-                      alt={experience.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5 sm:p-6 space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <h4 className="font-display font-bold text-sm leading-tight">{experience.title}</h4>
-                      <span
-                        className="text-xs font-semibold uppercase px-2 py-1 rounded whitespace-nowrap"
-                        style={{
-                          backgroundColor: "rgba(199,91,26,0.1)",
-                          color: "var(--cta)",
-                        }}
-                      >
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_20%,rgba(22,44,56,0.82)_100%)]" />
+                    <div className="absolute inset-x-5 bottom-5">
+                      <span className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.26em] text-white" style={{ backgroundColor: "rgba(199,91,26,0.88)" }}>
                         {experience.category}
                       </span>
                     </div>
+                  </div>
 
-                    <p style={{ color: "var(--foreground-soft)" }} className="text-xs line-clamp-2">
+                  <div className="p-5 sm:p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--muted)" }}>
+                        {experience.author ?? "Trayati Editorial"}
+                      </p>
+                      {experience.readTime ? (
+                        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--gold)" }}>
+                          <HiOutlineClock className="text-sm" />
+                          {experience.readTime} min
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <h3 className="mt-4 line-clamp-2 font-display text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--primary)" }}>
+                      {experience.title}
+                    </h3>
+                    <p className="mt-4 line-clamp-3 text-sm leading-7" style={{ color: "var(--foreground-soft)" }}>
                       {experience.description}
                     </p>
 
-                    <div className="flex items-center gap-3 pt-3 border-t text-xs" style={{ borderColor: "rgba(80,150,220,0.1)" }}>
-                      {experience.author && <span style={{ color: "var(--muted)" }}>{experience.author}</span>}
-                      {experience.readTime && (
-                        <>
-                          <span style={{ color: "rgba(80,150,220,0.2)" }}>•</span>
-                          <span style={{ color: "var(--muted)" }}>{experience.readTime} min</span>
-                        </>
-                      )}
+                    <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "rgba(32,60,76,0.08)" }}>
+                      <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--cta)" }}>
+                        {experience.date}
+                      </span>
+                      <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+                        Open story
+                        <HiMiniArrowUpRight className="text-sm" />
+                      </span>
                     </div>
                   </div>
-                </motion.div>
+                </button>
               ))}
-            </motion.div>
+            </div>
           </div>
-        )}
+        </div>
 
-        {/* View All Button */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.2 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="mt-12 px-4 text-center sm:px-6 lg:px-10"
         >
           <Link
             href="/blogs"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-bold uppercase tracking-[0.2em] transition group"
+            className="inline-flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] transition group"
             style={{
               backgroundColor: "var(--primary)",
               color: "#fff",
             }}
           >
             <span>Explore All Stories</span>
-            <span className="inline-block transition-transform group-hover:translate-x-1">
-              →
-            </span>
+            <span className="inline-block transition-transform group-hover:translate-x-1">-&gt;</span>
           </Link>
         </motion.div>
-      </div>
-    </section>
+      </section>
+
+      <ExperienceDialog item={activeItem} onClose={() => setActiveItem(null)} />
+    </>
   );
 }

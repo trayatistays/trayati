@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { experienceTypes } from "@/data/experience-types";
 
 const stringArray = z.array(z.string().trim().min(1)).default([]);
 
@@ -66,6 +67,7 @@ export const staySchema = z.object({
   alt: z.string().trim().min(1),
   tag: z.string().trim().min(1),
   type: z.string().trim().min(1),
+  experienceType: z.enum(experienceTypes),
   amenities: stringArray,
   photos: stringArray,
   roomTypes: z.array(roomTypeSchema).default([]),

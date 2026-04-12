@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiArrowLeft, HiCheck, HiX } from "react-icons/hi";
+import { experienceTypes, type ExperienceType } from "@/data/experience-types";
 
 type RoomType = {
   name: string;
@@ -32,6 +33,7 @@ type PropertyForm = {
   googleMapsUrl: string;
   tag: string;
   type: string;
+  experienceType: ExperienceType;
   amenities: string;
   photos: string[];
   roomTypes: RoomType[];
@@ -120,6 +122,7 @@ export default function ListPropertyPage() {
     googleMapsUrl: "",
     tag: "New Listing",
     type: "Boutique Stay",
+    experienceType: "Folklore Homestays",
     amenities: "",
     photos: [],
     roomTypes: [initialRoomType],
@@ -228,6 +231,7 @@ export default function ListPropertyPage() {
         alt: `${form.title} - ${form.city}, ${form.state}`,
         tag: form.tag,
         type: form.type,
+        experienceType: form.experienceType,
         amenities: selectedAmenities,
         photos: photoUrls.length ? photoUrls : ["/trayati-logo.jpg"],
         roomTypes: roomTypesParsed,
@@ -371,6 +375,21 @@ export default function ListPropertyPage() {
                     onChange={(e) => updateField("tag", e.target.value)}
                     placeholder="e.g., Premium Stay"
                   />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
+                    Stay Experience *
+                  </span>
+                  <select
+                    className="w-full rounded-lg border px-4 py-3"
+                    style={{ borderColor: "var(--border-soft)" }}
+                    value={form.experienceType}
+                    onChange={(e) => updateField("experienceType", e.target.value as ExperienceType)}
+                  >
+                    {experienceTypes.map((type) => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
                 </label>
                 <label className="block">
                   <span className="mb-1 block text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>

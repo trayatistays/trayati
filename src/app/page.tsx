@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HeroSection } from "@/components/hero-section";
 import { FeaturedStaysSection } from "@/components/featured-stays-section";
+import { InstagramCarousel } from "@/components/instagram-carousel";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { ExperiencesSection } from "@/components/experiences-section";
 
@@ -16,8 +17,9 @@ export default function Home() {
     <main className="min-h-screen">
       <HeroSection />
       <FeaturedStaysSection />
-      <TestimonialsSection />
       <ExperiencesSection />
+      <TestimonialsSection />
+      <InstagramCarousel />
     </main>
   );
 }

@@ -1,4 +1,6 @@
 // ─── Room Type Definition ─────────────────────────────────────────
+import type { ExperienceType } from "@/data/experience-types";
+
 export type RoomType = {
   id: string;
   name: string;
@@ -67,6 +69,7 @@ export type FeaturedStay = {
   alt: string;
   tag: string;
   type: string;
+  experienceType: ExperienceType;
   amenities: string[];
   photos: string[];
   roomTypes: RoomType[];
@@ -96,6 +99,7 @@ export const featuredStays: FeaturedStay[] = [
     alt: "Samar Villa – Himalayan panorama from Kasar Devi, Uttarakhand",
     tag: "Private Villa",
     type: "Private Villa",
+    experienceType: "Villas",
     amenities: [
       "Himalayan views",
       "Private garden",
@@ -217,6 +221,7 @@ export const featuredStays: FeaturedStay[] = [
     alt: "Orchid Nest – Mountain cottage in Dharamsala, Himachal Pradesh",
     tag: "Mountain Cottage",
     type: "Cottage",
+    experienceType: "Folklore Homestays",
     amenities: [
       "Valley views",
       "Meditation deck",
@@ -326,6 +331,7 @@ export const featuredStays: FeaturedStay[] = [
     alt: "Saffron Haveli – Heritage stay in Jaisalmer fort",
     tag: "Heritage Haveli",
     type: "Heritage Property",
+    experienceType: "Folklore Homestays",
     amenities: [
       "Fort views",
       "Heritage architecture",
@@ -441,6 +447,7 @@ export const featuredStays: FeaturedStay[] = [
     alt: "Blue Tide Villa – Beachfront villa in Varkala, Kerala",
     tag: "Beachfront Villa",
     type: "Beach Villa",
+    experienceType: "Villas",
     amenities: [
       "Sea views",
       "Private balcony",

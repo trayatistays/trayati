@@ -8,6 +8,7 @@ import { BookingFilterForm } from "@/components/booking-filter-form";
 import { BookingResults } from "@/components/booking-results";
 import { ReserveNowButton } from "@/components/reserve-now-button";
 import { useStays } from "@/hooks/use-stays";
+import type { ExperienceType } from "@/data/experience-types";
 
 type FilterState = {
   location: string;
@@ -15,15 +16,17 @@ type FilterState = {
   checkOut: string;
   guests: number;
   category: string;
+  experienceType: ExperienceType | "";
 };
 
 function BookingContent() {
   const searchParams = useSearchParams();
   const stayId = searchParams.get("stayId");
+  const experience = (searchParams.get("experience") ?? "") as ExperienceType | "";
   const { stays } = useStays();
   const selectedStay = stayId ? stays.find((s) => s.id === stayId) : null;
 
-  const [filters, setFilters] = useState<FilterState>({
+  const [baseFilters, setBaseFilters] = useState<Omit<FilterState, "experienceType">>({
     location: "",
     checkIn: "",
     checkOut: "",
@@ -36,6 +39,26 @@ function BookingContent() {
       ? selectedStay.roomTypes[0].id 
       : null
   );
+
+  const filters: FilterState = {
+    ...baseFilters,
+    experienceType: experience,
+  };
+
+  const filteredCount = stays.filter((stay) => {
+    if (
+      filters.location &&
+      !`${stay.city} ${stay.state} ${stay.country}`
+        .toLowerCase()
+        .includes(filters.location.toLowerCase())
+    ) {
+      return false;
+    }
+    if (filters.experienceType && stay.experienceType !== filters.experienceType) {
+      return false;
+    }
+    return true;
+  }).length;
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--background)" }}>
@@ -354,7 +377,19 @@ function BookingContent() {
             // Show all properties listing
             <>
               {/* Filter Form */}
-              <BookingFilterForm onFilter={setFilters} />
+              <BookingFilterForm
+                key={experience || "all-experiences"}
+                filters={filters}
+                onFilter={(nextFilters) => {
+                  setBaseFilters({
+                    location: nextFilters.location,
+                    checkIn: nextFilters.checkIn,
+                    checkOut: nextFilters.checkOut,
+                    guests: nextFilters.guests,
+                    category: nextFilters.category,
+                  });
+                }}
+              />
 
               {/* Results Section */}
               <motion.div
@@ -367,7 +402,8 @@ function BookingContent() {
                     Available Properties
                   </h2>
                   <p style={{ color: "var(--muted)" }} className="text-sm">
-                    Showing {filters.location ? "filtered" : "all"} properties
+                    Showing {filteredCount} properties
+                    {filters.experienceType && ` for ${filters.experienceType}`}
                     {filters.location && ` in ${filters.location}`}
                   </p>
                 </div>

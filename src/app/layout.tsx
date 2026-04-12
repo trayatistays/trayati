@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google";
+import { Inter, Montserrat, EB_Garamond } from "next/font/google";
 import { ClerkShell } from "@/components/clerk-shell";
+import { PublicSiteShell } from "@/components/public-site-shell";
 import { siteMetadata } from "@/lib/seo";
+import { socialLinks } from "@/data/social-links";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -15,6 +17,12 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const ebGaramond = EB_Garamond({
+  variable: "--font-eb-garamond",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({
@@ -22,10 +30,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Trayati Stays",
+    url: siteMetadata.metadataBase?.toString(),
+    logo: `${siteMetadata.metadataBase?.toString() ?? ""}/trayati-logo.jpg`,
+    sameAs: [socialLinks.instagram.url, socialLinks.facebook.url, socialLinks.whatsapp.url],
+    email: socialLinks.email,
+    telephone: socialLinks.phone,
+  };
+
   return (
-    <html lang="en" className={`${montserrat.variable} ${inter.variable} h-full`}>
+    <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} h-full`}>
       <body className="min-h-full antialiased">
-        <ClerkShell>{children}</ClerkShell>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <ClerkShell>
+          <PublicSiteShell>{children}</PublicSiteShell>
+        </ClerkShell>
       </body>
     </html>
   );

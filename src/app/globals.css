@@ -19,6 +19,7 @@
   --panel: rgba(245, 241, 232, 0.90);
   --panel-strong: rgba(245, 241, 232, 0.96);
   --border-soft: rgba(32, 60, 76, 0.12);
+  --cursor-clickable: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='18' cy='18' r='15' fill='%23162C38' fill-opacity='.92'/%3E%3Cpath d='M18 6l2.8 6.4 7 .5-5.4 4.4 1.8 6.7-6.2-3.8-6.2 3.8 1.8-6.7-5.4-4.4 7-.5z' fill='%23EDD9B0'/%3E%3Ccircle cx='18' cy='18' r='4.2' fill='%23C75B1A'/%3E%3C/g%3E%3C/svg%3E") 18 18, pointer;
 }
 
 @theme inline {
@@ -26,6 +27,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-display: var(--font-montserrat);
+  --font-serif: var(--font-eb-garamond);
 }
 
 * {
@@ -70,6 +72,17 @@ body::before {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+a[href],
+button,
+[role="button"],
+summary,
+input[type="submit"],
+input[type="button"],
+label[for],
+select {
+  cursor: var(--cursor-clickable);
 }
 
 button {
@@ -128,6 +141,65 @@ button {
   transform-style: preserve-3d;
 }
 
+.public-site-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.public-site-shell__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    url("/images/tribal-pattern-figures.jpg") left top / 280px repeat,
+    url("/images/tribal-pattern-symbols.jpg") right bottom / 240px repeat,
+    radial-gradient(circle at 10% 14%, rgba(164, 106, 45, 0.12), transparent 24%),
+    radial-gradient(circle at 84% 12%, rgba(95, 168, 168, 0.12), transparent 20%),
+    radial-gradient(circle at 72% 82%, rgba(32, 60, 76, 0.08), transparent 25%);
+  opacity: 0.11;
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  animation-name: marquee-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: var(--marquee-duration, 34s);
+  animation-direction: var(--marquee-direction, normal);
+}
+
+.marquee-track--hover-slow:hover {
+  animation-duration: var(--marquee-duration-hover, 60s);
+}
+
+.marquee-track--footer:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (max-width: 640px) {
+  .public-site-shell__bg {
+    background:
+      url("/images/tribal-pattern-figures.jpg") left top / 220px repeat,
+      url("/images/tribal-pattern-symbols.jpg") right bottom / 180px repeat,
+      radial-gradient(circle at 10% 14%, rgba(164, 106, 45, 0.10), transparent 24%),
+      radial-gradient(circle at 84% 12%, rgba(95, 168, 168, 0.1), transparent 20%),
+      radial-gradient(circle at 72% 82%, rgba(32, 60, 76, 0.06), transparent 25%);
+    opacity: 0.08;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html,
   html:focus-within {
@@ -141,5 +213,9 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none;
   }
 }

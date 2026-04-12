@@ -8,9 +8,10 @@ import { useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
 import { Navbar } from "@/components/navbar";
+import { ExperienceOverlay } from "@/components/experience-overlay";
 import { socialLinks } from "@/data/social-links";
 
-const keywords = ["Effortless", "Smart", "Personalised"];
+const keywords = ["Folklore Homestays", "Apartments & Condos", "Villas"];
 const destinations = ["Goa", "Jaipur", "Manali", "Udaipur", "Coorg"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [
@@ -43,6 +44,7 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
 export function HeroSection() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [experienceOpen, setExperienceOpen] = useState(false);
   const [activeOverlayItem, setActiveOverlayItem] = useState("About");
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -96,19 +98,30 @@ export function HeroSection() {
       />
 
       {/* Tiled Tribal Pattern with Text-Aware Masking */}
-      <div 
+      <div
         className="absolute inset-0 -z-10 opacity-[0.12]"
         style={{
-          backgroundImage: "url('/images/hero-pattern.jpg')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "320px",
+          backgroundImage: "url('/images/tribal-pattern-figures.jpg'), url('/images/tribal-pattern-symbols.jpg')",
+          backgroundRepeat: "repeat, repeat",
+          backgroundPosition: "left top, right bottom",
+          backgroundSize: "300px, 240px",
+          mixBlendMode: "multiply",
           WebkitMaskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
           maskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
         }}
       />
 
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-4 sm:px-6 sm:pt-5 lg:px-10">
-        <Navbar menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((v) => !v)} />
+        <Navbar
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((v) => !v)}
+          onOpenExperience={() => setExperienceOpen(true)}
+        />
+
+        <ExperienceOverlay
+          isOpen={experienceOpen}
+          onClose={() => setExperienceOpen(false)}
+        />
 
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
@@ -135,7 +148,7 @@ export function HeroSection() {
               </div>
 
               <h1 className="text-balance mt-6 max-w-5xl font-display text-[2.25rem] font-semibold leading-[1] tracking-[-0.055em] sm:mt-8 sm:text-[4rem] lg:text-[5.2rem] xl:text-[5.8rem]" style={{ color: "var(--primary)" }}>
-                we make discovering and booking stays
+                Where Every Stay Becomes a Story
               </h1>
 
               <div className="mt-4 flex min-h-[4.4rem] items-center font-display text-[3.35rem] font-semibold leading-none tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.7rem] xl:text-[6.15rem]">
@@ -146,9 +159,7 @@ export function HeroSection() {
                 className="text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
                 style={{ color: "var(--foreground-soft)" }}
               >
-                Whether you&apos;re planning a quick getaway, a business trip, or a
-                long vacation, Trayati Stays connects you with the best
-                properties at the best prices, all in one place.
+                We specialise in locally curated, authentic and heritage stays to personify your holiday with our sprinkled charm. Our experience and studies state that modern travellers crave authenticity over cookie-cutter hotels, yet finding verified stays scattered across OTAs feels impossible. Trayati Stays bridges that gap by listing only handpicked properties.
               </p>
 
               <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">

@@ -12,6 +12,7 @@ type FilterState = {
   checkOut: string;
   guests: number;
   category: string;
+  experienceType: string;
 };
 
 function formatPrice(n: number) {
@@ -34,9 +35,15 @@ export function BookingResults({ filters }: { filters: FilterState }) {
       ) {
         return false;
       }
+      if (
+        filters.experienceType &&
+        stay.experienceType !== filters.experienceType
+      ) {
+        return false;
+      }
       return true;
     });
-  }, [filters.location, stays]);
+  }, [filters.experienceType, filters.location, stays]);
 
   if (isLoading) {
     return <p style={{ color: "var(--muted)" }}>Loading stays...</p>;
@@ -114,6 +121,13 @@ export function BookingResults({ filters }: { filters: FilterState }) {
             </h3>
             <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
               {stay.city}, {stay.state}
+            </p>
+
+            <p
+              className="mb-3 text-[0.65rem] font-bold uppercase tracking-[0.2em]"
+              style={{ color: "var(--gold)" }}
+            >
+              {stay.experienceType}
             </p>
 
             {/* Rating & Price */}
