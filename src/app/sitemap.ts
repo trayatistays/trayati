@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllStays } from "@/lib/stays-store";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://trayati.example";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const stays = await getAllStays();

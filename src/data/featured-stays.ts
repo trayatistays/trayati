@@ -63,6 +63,7 @@ export type FeaturedStay = {
   address: string;
   description: string;
   rating: number;
+  reviewCount?: number;
   pricePerNight: number;
   basePrice: number;
   image: string;

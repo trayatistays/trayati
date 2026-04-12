@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { FeaturedStay } from "@/data/featured-stays";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://trayati.example";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -31,14 +31,14 @@ export const siteMetadata: Metadata = {
     description:
       "Discover premium villas, mountain retreats, heritage stays, and curated travel experiences across India's most soulful destinations.",
     url: siteUrl,
-    images: ["/trayati-logo.jpg"],
+    images: [{ url: "/og-banner.jpg", width: 1200, height: 630, alt: "Trayati Stays — Curated Boutique Stays Across India" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Trayati Stays | Luxury Stays Across India",
     description:
       "Discover premium villas, mountain retreats, heritage stays, and curated travel experiences across India's most soulful destinations.",
-    images: ["/trayati-logo.jpg"],
+    images: ["/og-banner.jpg"],
   },
 };
 
@@ -91,11 +91,13 @@ export function buildStayJsonLd(stay: FeaturedStay) {
       postalCode: stay.pin,
       addressCountry: stay.country,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: stay.rating,
-      reviewCount: 10,
-    },
+    aggregateRating: stay.rating
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: stay.rating,
+          reviewCount: stay.reviewCount ?? 10,
+        }
+      : undefined,
     priceRange: `INR ${stay.pricePerNight}`,
     amenityFeature: stay.amenities.map((amenity) => ({
       "@type": "LocationFeatureSpecification",

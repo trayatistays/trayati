@@ -4,6 +4,10 @@ import { PropertyPageClient } from "@/components/property-page-client";
 import { getStayById } from "@/lib/stays-store";
 import { buildStayJsonLd, buildStayMetadata } from "@/lib/seo";
 
+// Revalidate property pages from the CDN edge cache every hour.
+// This means zero Supabase calls for cached requests — huge performance gain.
+export const revalidate = 3600;
+
 interface PropertyPageProps {
   params: Promise<{ id: string }>;
 }

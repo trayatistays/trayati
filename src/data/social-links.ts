@@ -1,6 +1,6 @@
 export const socialLinks = {
   whatsapp: {
-    url: "https://wa.me/919044136283",
+    url: `https://wa.me/919044136283?text=${encodeURIComponent("Hi Trayati Stays! I found you online and I'm interested in booking a stay. Could you help me?")}`  ,
     label: "WhatsApp",
     icon: "FaWhatsapp",
   },

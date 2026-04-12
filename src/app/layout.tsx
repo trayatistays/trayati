@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat, EB_Garamond } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClerkShell } from "@/components/clerk-shell";
 import { PublicSiteShell } from "@/components/public-site-shell";
 import { siteMetadata } from "@/lib/seo";
@@ -51,6 +53,8 @@ export default function RootLayout({
         <ClerkShell>
           <PublicSiteShell>{children}</PublicSiteShell>
         </ClerkShell>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
