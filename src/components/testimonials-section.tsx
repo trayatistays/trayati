@@ -165,19 +165,19 @@ export function TestimonialsSection() {
                 Guest Stories
               </span>
               <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
-                Testimonials now move like the rest of the brand experience.
+                Voices of Our Travelers
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
-              The section now runs as a living carousel across the full page width. Hover slows it down, and clicking any review opens a focused detail panel.
+              Real stories from real guests who have experienced the magic of Trayati Stays.
             </p>
           </motion.div>
         </div>
 
-        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.08)", backgroundColor: "rgba(245,241,232,0.62)" }}>
-          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "url('/images/tribal-pattern-figures.jpg')", backgroundSize: "260px", backgroundRepeat: "repeat" }} />
-          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
-          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
+        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.10)" }}>
+          {/* edge fades matching brand parchment */}
+          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.92),transparent)] sm:w-24" />
+          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.92),transparent)] sm:w-24" />
 
           <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
             <div
@@ -194,7 +194,7 @@ export function TestimonialsSection() {
                   key={`${testimonial.id}-${index}`}
                   type="button"
                   onClick={() => setActiveItem(testimonial)}
-                  className="group w-[18rem] shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left transition duration-300 hover:-translate-y-1 sm:w-[22rem]"
+                  className="ultra-3d-hover group w-[18rem] shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left sm:w-[22rem]"
                   style={{
                     borderColor: "rgba(32,60,76,0.12)",
                     background:

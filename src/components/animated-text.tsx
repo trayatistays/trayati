@@ -25,7 +25,7 @@ export function AnimatedText({
   }, [interval, items.length]);
 
   return (
-    <span className={`inline-block ${className ?? ""}`}>
+    <span className={`inline-block max-w-full ${className ?? ""}`}>
       <AnimatePresence mode="wait">
         <motion.span
           key={items[index]}
@@ -33,7 +33,7 @@ export function AnimatedText({
           animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -18, scale: 1.04, filter: "blur(12px)" }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-block whitespace-nowrap"
+          className="inline-block max-w-full whitespace-normal text-balance sm:whitespace-nowrap"
         >
           {items[index]}
         </motion.span>

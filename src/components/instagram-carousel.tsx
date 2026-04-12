@@ -64,25 +64,10 @@ export function InstagramCarousel() {
 
   return (
     <section className="relative w-full px-0 py-16 sm:py-24">
-      <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(245,241,232,0.96), rgba(237,233,222,0.94) 48%, rgba(200,221,230,0.72) 100%)",
-            boxShadow: "0 30px 90px rgba(18,28,38,0.16)",
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: "url('/images/tribal-pattern-symbols.jpg')",
-            backgroundSize: "220px",
-            backgroundRepeat: "repeat",
-          }}
-        />
-        <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.98),transparent)] sm:w-20" />
-        <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(228,233,228,0.98),transparent)] sm:w-20" />
+      <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10" style={{ borderColor: "rgba(32,60,76,0.10)" }}>
+        {/* edge fade-out gradients matching brand parchment */}
+        <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.92),transparent)] sm:w-20" />
+        <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.92),transparent)] sm:w-20" />
 
         <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -90,12 +75,12 @@ export function InstagramCarousel() {
               Instagram Journal
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl" style={{ color: "var(--primary)" }}>
-              The moving visual diary of Trayati
+              The visual diary of Trayati
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 sm:text-base" style={{ color: "var(--foreground-soft)" }}>
               {usingFallback
-                ? "The carousel is ready now and will switch to your live Instagram posts as soon as the access token is added."
-                : "Live Instagram posts are flowing here automatically and linking straight back to your profile."}
+                ? ""
+                : ""}
             </p>
           </div>
 
@@ -103,11 +88,11 @@ export function InstagramCarousel() {
             href={socialLinks.instagram.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] transition duration-300 hover:-translate-y-1"
+            className="ultra-3d-hover inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
             style={{
               color: "var(--primary)",
-              borderColor: "rgba(32,60,76,0.14)",
-              backgroundColor: "rgba(245,241,232,0.82)",
+              borderColor: "rgba(32,60,76,0.18)",
+              backgroundColor: "rgba(245,241,232,0.88)",
             }}
           >
             Open Instagram
@@ -131,7 +116,7 @@ export function InstagramCarousel() {
                 href={item.permalink}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative block w-[14rem] shrink-0 overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
+                className="ultra-3d-hover group relative block w-[14rem] shrink-0 overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
                 style={{
                   borderColor: "rgba(32,60,76,0.12)",
                   background:

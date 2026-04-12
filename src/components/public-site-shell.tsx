@@ -8,20 +8,16 @@ const HIDDEN_FOOTER_PREFIXES = ["/admin"];
 export function PublicSiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideChrome = HIDDEN_FOOTER_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const isHome = pathname === "/";
 
   return (
-    <div className={hideChrome ? "min-h-screen" : "public-site-shell min-h-screen"}>
-      {hideChrome ? (
-        children
-      ) : (
-        <>
-          <div className="public-site-shell__bg" aria-hidden="true" />
-          <div className="relative z-10">
-            {children}
-            <SiteFooter />
-          </div>
-        </>
-      )}
+    <div className={`public-site-shell min-h-screen${isHome ? " public-site-shell--home" : ""}`}>
+      <div className="public-site-shell__bg" aria-hidden="true" />
+      <div className="public-site-shell__veil" aria-hidden="true" />
+      <div className="public-site-shell__content">
+        {children}
+        {!hideChrome && <SiteFooter />}
+      </div>
     </div>
   );
 }

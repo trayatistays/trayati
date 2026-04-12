@@ -87,29 +87,17 @@ export function HeroSection() {
       onMouseLeave={resetMouse}
       className="relative isolate min-h-[85vh] overflow-hidden"
     >
-      {/* Background accents */}
+      {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}
       <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(164, 106, 45, 0.18)" }}
-        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56"
+        style={{ transform: orbTransform, backgroundColor: "rgba(164, 106, 45, 0.14)" }}
+        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56 pointer-events-none"
       />
       <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(95, 168, 168, 0.20)" }}
-        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72"
+        style={{ transform: orbTransform, backgroundColor: "rgba(95, 168, 168, 0.14)" }}
+        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
       />
 
-      {/* Tiled Tribal Pattern with Text-Aware Masking */}
-      <div
-        className="absolute inset-0 -z-10 opacity-[0.12]"
-        style={{
-          backgroundImage: "url('/images/tribal-pattern-figures.jpg'), url('/images/tribal-pattern-symbols.jpg')",
-          backgroundRepeat: "repeat, repeat",
-          backgroundPosition: "left top, right bottom",
-          backgroundSize: "300px, 240px",
-          mixBlendMode: "multiply",
-          WebkitMaskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
-          maskImage: "radial-gradient(ellipse at 30% 40%, transparent 20%, black 85%)",
-        }}
-      />
+
 
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-4 sm:px-6 sm:pt-5 lg:px-10">
         <Navbar
@@ -151,7 +139,7 @@ export function HeroSection() {
                 Where Every Stay Becomes a Story
               </h1>
 
-              <div className="mt-4 flex min-h-[4.4rem] items-center font-display text-[3.35rem] font-semibold leading-none tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] lg:text-[5.7rem] xl:text-[6.15rem]">
+              <div className="mt-4 flex min-h-[5.4rem] w-full max-w-full items-center font-display text-[2.25rem] font-semibold leading-[0.95] tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] sm:leading-none lg:text-[5.7rem] xl:text-[6.15rem]">
                 <AnimatedText items={keywords} className="hero-word-shadow text-[var(--gold)]" />
               </div>
 

@@ -19,7 +19,7 @@
   --panel: rgba(245, 241, 232, 0.90);
   --panel-strong: rgba(245, 241, 232, 0.96);
   --border-soft: rgba(32, 60, 76, 0.12);
-  --cursor-clickable: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='18' cy='18' r='15' fill='%23162C38' fill-opacity='.92'/%3E%3Cpath d='M18 6l2.8 6.4 7 .5-5.4 4.4 1.8 6.7-6.2-3.8-6.2 3.8 1.8-6.7-5.4-4.4 7-.5z' fill='%23EDD9B0'/%3E%3Ccircle cx='18' cy='18' r='4.2' fill='%23C75B1A'/%3E%3C/g%3E%3C/svg%3E") 18 18, pointer;
+  --cursor-clickable: url("/images/custom-cursor.png") 18 18, pointer;
 }
 
 @theme inline {
@@ -45,8 +45,8 @@ html:focus-within {
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse at 12% 10%, rgba(95, 168, 168, 0.14), transparent 36%),
-    radial-gradient(ellipse at 88% 82%, rgba(164, 106, 45, 0.10), transparent 30%),
+    radial-gradient(ellipse at 14% 12%, rgba(95, 168, 168, 0.16), transparent 40%),
+    radial-gradient(ellipse at 86% 80%, rgba(164, 106, 45, 0.12), transparent 34%),
     radial-gradient(ellipse at 50% 50%, rgba(199, 91, 26, 0.04), transparent 50%),
     linear-gradient(160deg, #FAF7F0 0%, #F5F1E8 55%, #EEE9DD 100%);
   color: var(--foreground);
@@ -56,17 +56,25 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* ── Global tribal-pattern background: tiled, teal-tinted, clearly visible ── */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
-  opacity: 0.09;
+  /* Two pattern images tiled together across the full viewport */
   background-image:
-    linear-gradient(rgba(32, 60, 76, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(32, 60, 76, 0.07) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(circle at center, black 45%, transparent 92%);
+    url("/images/tribal-pattern-figures.jpg"),
+    url("/images/tribal-pattern-symbols.jpg");
+  background-position: left top, right bottom;
+  background-size: 280px 280px, 240px 240px;
+  background-repeat: repeat, repeat;
+  /* Teal-tinted watermark effect matching the screenshot */
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  /* shift black figures toward aqua-teal brand tone (--aqua: #5FA8A8) */
+  filter: sepia(1) saturate(1.4) hue-rotate(140deg) contrast(0.72) brightness(1.25);
 }
 
 a {
@@ -144,22 +152,42 @@ button {
 .public-site-shell {
   position: relative;
   isolation: isolate;
+  /* All page content floats above z-index 0 (body::before pattern) */
 }
 
 .public-site-shell__bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  background:
-    url("/images/tribal-pattern-figures.jpg") left top / 280px repeat,
-    url("/images/tribal-pattern-symbols.jpg") right bottom / 240px repeat,
-    radial-gradient(circle at 10% 14%, rgba(164, 106, 45, 0.12), transparent 24%),
-    radial-gradient(circle at 84% 12%, rgba(95, 168, 168, 0.12), transparent 20%),
-    radial-gradient(circle at 72% 82%, rgba(32, 60, 76, 0.08), transparent 25%);
-  opacity: 0.11;
-  mix-blend-mode: multiply;
-  mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+  display: none; /* Pattern is now handled by body::before globally */
+}
+
+.public-site-shell__veil {
+  display: none; /* Removed – content components carry their own backgrounds */
+}
+
+.public-site-shell__content {
+  position: relative;
+  z-index: 1;
+}
+
+.public-site-shell main {
+  background-color: transparent !important;
+}
+
+.ultra-3d-hover {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ultra-3d-hover:hover {
+  transform: perspective(1000px) translateY(-6px) scale(1.02) rotateX(4deg) rotateY(-3deg);
+  box-shadow: 
+    -15px 25px 50px rgba(0, 0, 0, 0.12),
+    0 10px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.ultra-3d-hover:active {
+  transform: perspective(1000px) translateY(-2px) scale(0.98) rotateX(0deg) rotateY(0deg);
 }
 
 .marquee-track {
@@ -171,7 +199,7 @@ button {
 }
 
 .marquee-track--hover-slow:hover {
-  animation-duration: var(--marquee-duration-hover, 60s);
+  animation-play-state: paused;
 }
 
 .marquee-track--footer:hover {
@@ -189,14 +217,9 @@ button {
 }
 
 @media (max-width: 640px) {
-  .public-site-shell__bg {
-    background:
-      url("/images/tribal-pattern-figures.jpg") left top / 220px repeat,
-      url("/images/tribal-pattern-symbols.jpg") right bottom / 180px repeat,
-      radial-gradient(circle at 10% 14%, rgba(164, 106, 45, 0.10), transparent 24%),
-      radial-gradient(circle at 84% 12%, rgba(95, 168, 168, 0.1), transparent 20%),
-      radial-gradient(circle at 72% 82%, rgba(32, 60, 76, 0.06), transparent 25%);
-    opacity: 0.08;
+  body::before {
+    background-size: 220px 220px, 180px 180px;
+    opacity: 0.07;
   }
 }
 

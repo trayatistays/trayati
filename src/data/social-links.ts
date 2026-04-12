@@ -1,6 +1,6 @@
 export const socialLinks = {
   whatsapp: {
-    url: "https://wa.me/919876543210", // Update with actual number
+    url: "https://wa.me/919044136283",
     label: "WhatsApp",
     icon: "FaWhatsapp",
   },
@@ -10,12 +10,12 @@ export const socialLinks = {
     icon: "FaInstagram",
   },
   facebook: {
-    url: "https://facebook.com/trayatistays",
+    url: "https://www.facebook.com/trayatistays",
     label: "Facebook",
     icon: "FaFacebook",
   },
-  email: "hello@trayatistays.com",
-  phone: "+91 9876 543 210",
+  email: "ishan@trayatistays.com",
+  phone: "+91 9044136283"
 };
 
 export const locations = [

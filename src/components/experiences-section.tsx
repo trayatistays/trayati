@@ -158,7 +158,7 @@ export function ExperiencesSection() {
 
   return (
     <>
-      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24" style={{ backgroundColor: "rgba(30,109,191,0.02)" }}>
+      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24">
         <div className="px-4 sm:px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -178,19 +178,19 @@ export function ExperiencesSection() {
                 Travel Stories & Insights
               </span>
               <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
-                Experience stories now flow as a continuous story rail.
+                Turn Trips Into Timeless Memories
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
-              This area now uses a moving full-width carousel instead of static bento cards, with hover-to-slow motion and click-to-open story details.
+              From hidden gems to popular escapes, discover stories that inspire your next journey.
             </p>
           </motion.div>
         </div>
 
-        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.08)" }}>
-          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url('/images/tribal-pattern-symbols.jpg')", backgroundSize: "240px", backgroundRepeat: "repeat" }} />
-          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
-          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.98),transparent)] sm:w-24" />
+        <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(32,60,76,0.10)" }}>
+          {/* edge fade–out gradients that match the brand parchment */}
+          <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.92),transparent)] sm:w-24" />
+          <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.92),transparent)] sm:w-24" />
 
           <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
             <div
@@ -208,7 +208,7 @@ export function ExperiencesSection() {
                   key={`${experience.id}-${index}`}
                   type="button"
                   onClick={() => setActiveItem(experience)}
-                  className="group w-[19rem] shrink-0 overflow-hidden rounded-[1.9rem] border text-left transition duration-300 hover:-translate-y-1 sm:w-[25rem]"
+                  className="ultra-3d-hover group w-[19rem] shrink-0 overflow-hidden rounded-[1.9rem] border text-left sm:w-[25rem]"
                   style={{
                     borderColor: "rgba(32,60,76,0.12)",
                     background:
