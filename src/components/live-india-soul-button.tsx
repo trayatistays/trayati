@@ -44,7 +44,7 @@ export function LiveIndiaSoulButton({ onClick }: LiveIndiaSoulButtonProps) {
         className="font-display text-[0.56rem] font-bold uppercase tracking-[0.18em] sm:text-[0.72rem]"
         style={{ color: "var(--primary)" }}
       >
-        Live India Soul
+        Live India's Soul
       </span>
 
       <div className="absolute inset-0 -z-10 rounded-full border opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ borderColor: "rgba(164, 106, 45, 0.3)" }} />

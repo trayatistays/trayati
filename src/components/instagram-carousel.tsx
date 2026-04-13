@@ -63,7 +63,7 @@ export function InstagramCarousel() {
   }, []);
 
   return (
-    <section className="relative w-full px-0 py-16 sm:py-24">
+    <section className="relative w-full px-0 py-10 sm:py-14">
       <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10" style={{ borderColor: "rgba(32,60,76,0.10)" }}>
         {/* edge fade-out gradients matching brand parchment */}
         <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.92),transparent)] sm:w-20" />

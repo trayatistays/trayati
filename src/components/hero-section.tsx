@@ -120,22 +120,16 @@ export function HeroSection() {
               style={{ transform: heroTransform }}
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
-              <div
-                className="gradient-stroke inline-flex w-fit max-w-full items-center gap-3 rounded-full px-3.5 py-2 text-xs shadow-[0_12px_30px_rgba(32,60,76,0.10)] backdrop-blur-2xl sm:px-4 sm:text-sm"
-                style={{
-                  backgroundColor: "rgba(245, 241, 232, 0.92)",
-                  color: "var(--foreground-soft)",
-                  border: "1px solid var(--border-soft)",
-                }}
+              <h1
+                className="text-balance mt-6 max-w-4xl font-display 
+             text-[1.8rem] 
+             sm:text-[2.4rem] 
+             md:text-[3rem] 
+             lg:text-[3.8rem] 
+             xl:text-[4.5rem] 
+             font-semibold leading-[1.1] tracking-[-0.02em]"
+                style={{ color: "var(--primary)" }}
               >
-                <span
-                  className="size-2 rounded-full shadow-[0_0_12px_rgba(74,107,68,0.5)]"
-                  style={{ backgroundColor: "var(--forest)" }}
-                />
-                Premium OTA for curated stays
-              </div>
-
-              <h1 className="text-balance mt-6 max-w-5xl font-display text-[2.25rem] font-semibold leading-[1] tracking-[-0.055em] sm:mt-8 sm:text-[4rem] lg:text-[5.2rem] xl:text-[5.8rem]" style={{ color: "var(--primary)" }}>
                 Where Every Stay Becomes a Story
               </h1>
 
@@ -158,15 +152,16 @@ export function HeroSection() {
                 >
                   Explore Properties
                 </Link>
-                <div
+                <Link
+                  href="/list-property"
                   className="gradient-stroke w-full rounded-full px-4 py-3 text-sm backdrop-blur-xl sm:w-auto"
                   style={{
                     backgroundColor: "rgba(245, 241, 232, 0.88)",
                     color: "var(--foreground-soft)",
                   }}
                 >
-                  Smart search, local stays, seamless booking
-                </div>
+                  List Your Property
+                </Link>
               </div>
             </motion.div>
           </div>

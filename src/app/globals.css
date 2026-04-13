@@ -192,6 +192,16 @@ button {
   transform: perspective(1000px) translateY(-2px) scale(0.98) rotateX(0deg) rotateY(0deg);
 }
 
+/* Footer link hover — bright CTA orange glow */
+.footer-link {
+  color: #fff;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--cta);
+}
+
 .marquee-track {
   animation-name: marquee-scroll;
   animation-timing-function: linear;

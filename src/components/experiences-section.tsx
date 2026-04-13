@@ -158,14 +158,14 @@ export function ExperiencesSection() {
 
   return (
     <>
-      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24">
+      <section className="relative w-full overflow-hidden px-0 py-10 sm:py-14">
         <div className="px-4 sm:px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="mb-10 flex flex-col gap-5 lg:mb-14 lg:flex-row lg:items-end lg:justify-between"
+            className="mb-8 flex flex-col gap-4 lg:mb-10 lg:flex-row lg:items-end lg:justify-between"
           >
             <div>
               <span

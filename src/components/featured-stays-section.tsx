@@ -176,7 +176,7 @@ function StayCard({
                 {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
               </span>
               <span
-                className="rounded-full px-4 py-2.5 text-sm font-semibold text-white/90 backdrop-blur-md"
+                className="rounded-full px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-md"
                 style={{
                   backgroundColor: "rgba(32,60,76,0.55)",
                   border: "1px solid rgba(245,241,232,0.2)",
@@ -189,10 +189,10 @@ function StayCard({
                   href={stay.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full px-4 py-2.5 text-sm font-medium text-white/72 backdrop-blur-md transition hover:text-white"
+                  className="rounded-full px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                   style={{
-                    backgroundColor: "rgba(32,60,76,0.45)",
-                    border: "1px solid rgba(245,241,232,0.16)",
+                    backgroundColor: "rgba(255, 255, 255, 1)",
+                    border: "1.5px solid rgba(255,255,255,0.7)",
                   }}
                 >
                   View on Map&nbsp;↗
@@ -207,10 +207,10 @@ function StayCard({
               </Link>
               <Link
                 href={`/property/${stay.id}`}
-                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white shadow-[0_8px_24px_rgba(32,60,76,0.35)] transition hover:scale-105 active:scale-97"
+                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
                 style={{
-                  backgroundColor: "rgba(32,60,76,0.75)",
-                  border: "1px solid rgba(245,241,232,0.3)",
+                  backgroundColor: "rgba(255, 255, 255, 1)",
+                  border: "1.5px solid rgba(255,255,255,0.65)",
                 }}
               >
                 View Details&nbsp;→
@@ -279,7 +279,7 @@ export function FeaturedStaysSection() {
   return (
     <>
       {/* Section header */}
-      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 pt-4 pb-6">
+      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 pt-3 pb-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -297,7 +297,7 @@ export function FeaturedStaysSection() {
               className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-[-0.04em] leading-[1.06] max-w-2xl"
               style={{ color: "var(--primary)" }}
             >
-              Curated for the intentional traveller.
+              Curated for the curious traveller.
             </h2>
             <p
               className="max-w-[44ch] text-sm sm:text-base leading-7 lg:text-right"
