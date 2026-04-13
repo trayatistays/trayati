@@ -7,15 +7,18 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
   type MotionValue,
 } from "framer-motion";
 import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
 import { useStays } from "@/hooks/use-stays";
 
 // ─── Constants ────────────────────────────────────────────────────
-// 125vh per card → 500vh total → 400vh effective scroll range with ["end end"] offset
-// Each card gets exactly 100vh of scroll (500vh - 100vh viewport = 400vh ÷ 4)
-const VH_PER_CARD = 125;
+// Reduced from 125vh → 110vh per card for snappier transitions
+const VH_PER_CARD = 110;
+
+// Spring config for buttery smoothness
+const SPRING_CONFIG = { stiffness: 120, damping: 30, mass: 0.5 };
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -28,23 +31,23 @@ function formatPrice(price: number) {
 // ─── Progress Dot ─────────────────────────────────────────────────
 function ProgressDot({
   index,
-  scrollYProgress,
+  scrollProgress,
   total,
 }: {
   index: number;
-  scrollYProgress: MotionValue<number>;
+  scrollProgress: MotionValue<number>;
   total: number;
 }) {
   const s = index / total;
   const e = (index + 1) / total;
   const buf = 0.04;
   const opacity = useTransform(
-    scrollYProgress,
+    scrollProgress,
     [Math.max(0, s - buf), s, Math.min(1, e - buf), Math.min(1, e)],
     [0.28, 1, 1, 0.28]
   );
   const scale = useTransform(
-    scrollYProgress,
+    scrollProgress,
     [Math.max(0, s - buf), s, Math.min(1, e - buf), Math.min(1, e)],
     [0.7, 1.5, 1.5, 0.7]
   );
@@ -63,61 +66,63 @@ function ProgressDot({
 }
 
 // ─── Stay Card ────────────────────────────────────────────────────
-// Dingbat-style stacking: each new card slides UP from below while
-// the current card scales to 0.9 — both within the same scroll window.
-// No fade/disappear: old cards just sit behind (lower z-index).
+// GPU-optimised: all animations use translate3d/scale (compositor-only).
+// No string percentages — numeric pixel values via viewport height.
 function StayCard({
   stay,
   index,
-  scrollYProgress,
+  scrollProgress,
   total,
 }: {
   stay: FeaturedStay;
   index: number;
-  scrollYProgress: MotionValue<number>;
+  scrollProgress: MotionValue<number>;
   total: number;
 }) {
   const isFirst = index === 0;
   const isLast = index === total - 1;
-  const segStart = index / total; // when THIS card becomes active
-  const segEnd = (index + 1) / total; // when NEXT card becomes active
+  const segStart = index / total;
+  const segEnd = (index + 1) / total;
 
-  // ── Scale down ──────────────────────────────────────────────────
-  // This card scales from 1 → 0.9 while the NEXT card is sliding in.
-  // For the last card: stays at 1.0 (no card coming after).
-  const scale = useTransform(
-    scrollYProgress,
+  // ── Scale down (numeric only — GPU composited) ────────────────
+  const rawScale = useTransform(
+    scrollProgress,
     isLast ? [0, 1] : [segStart, segEnd],
-    isLast ? [1, 1] : [1, 0.9]
+    isLast ? [1, 1] : [1, 0.92]
   );
+  const scale = useSpring(rawScale, SPRING_CONFIG);
 
-  // ── Slide in from below ──────────────────────────────────────────
-  // This card slides from y="100%" to y="0%" over the PREVIOUS card's segment.
-  // For card 0: already in place (no animation).
+  // ── Slide in from below (numeric vh → px at render) ───────────
   const prevSegStart = (index - 1) / total;
   const prevSegEnd = index / total;
-  const y = useTransform(
-    scrollYProgress,
+  const rawY = useTransform(
+    scrollProgress,
     isFirst ? [0, 1] : [prevSegStart, prevSegEnd],
-    isFirst ? ["0%", "0%"] : ["100%", "0%"]
+    isFirst ? [0, 0] : [100, 0] // percentage values
   );
+  const springY = useSpring(rawY, SPRING_CONFIG);
+  // Convert numeric % to CSS vh string for proper viewport-relative movement
+  const y = useTransform(springY, (v) => `${v}vh`);
 
-  // z-index: each successive card sits on top (3, 4, 5, 6 for N=4)
-  // No dynamic z-index needed — the slide-in naturally creates the stacking order.
   const zIndex = index + 1;
 
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center"
-      style={{ scale, y, zIndex }}
+      style={{
+        scale,
+        y: isFirst ? undefined : y,
+        zIndex,
+        willChange: "transform",
+      }}
     >
-      {/* Gutter around card (like dingbat.co.in) — cream BG shows through */}
-      <div className="relative w-full h-full p-4 sm:p-5 lg:p-6">
+      {/* Gutter around card */}
+      <div className="relative w-full h-full p-3 sm:p-4 lg:p-5">
         <div
-          className="relative w-full h-full overflow-hidden rounded-[2rem]"
+          className="relative w-full h-full overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]"
           style={{
-            boxShadow:
-              "0 40px 100px rgba(32,60,76,0.25), 0 3px 0 2px rgba(32,60,76,0.06), 0 6px 0 4px rgba(32,60,76,0.04)",
+            /* Single simpler shadow instead of 3-layer — much cheaper to paint */
+            boxShadow: "0 24px 60px rgba(32,60,76,0.22)",
           }}
         >
           <Image
@@ -134,18 +139,18 @@ function StayCard({
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
 
           {/* Counter */}
-          <div className="absolute top-6 left-7">
+          <div className="absolute top-5 left-5 sm:top-6 sm:left-7">
             <span className="font-display text-[0.6rem] font-bold uppercase tracking-[0.44em] text-white/50">
               {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(total).padStart(2, "0")}
             </span>
           </div>
 
-          {/* Tag badge */}
-          <div className="absolute top-5 right-6">
+          {/* Tag badge — removed backdrop-blur during scroll for perf */}
+          <div className="absolute top-4 right-5 sm:top-5 sm:right-6">
             <span
-              className="rounded-full px-4 py-2 text-[0.6rem] font-bold uppercase tracking-[0.28em] text-white backdrop-blur-md"
+              className="rounded-full px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.28em] text-white sm:px-4 sm:py-2"
               style={{
-                backgroundColor: "rgba(32,60,76,0.65)",
+                backgroundColor: "rgba(32,60,76,0.75)",
                 border: "1px solid rgba(245,241,232,0.22)",
               }}
             >
@@ -154,31 +159,31 @@ function StayCard({
           </div>
 
           {/* Content */}
-          <div className="absolute bottom-0 inset-x-0 p-7 sm:p-10 lg:p-12">
-            <p className="text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-white/55 mb-3">
+          <div className="absolute bottom-0 inset-x-0 p-5 sm:p-8 lg:p-12">
+            <p className="text-[0.55rem] sm:text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-white/55 mb-2 sm:mb-3">
               {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
             </p>
-            <h3 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-white tracking-[-0.03em] leading-[1.05]">
+            <h3 className="font-display text-2xl sm:text-4xl lg:text-[3.4rem] font-bold text-white tracking-[-0.03em] leading-[1.05]">
               {stay.title}
             </h3>
-            <p className="text-sm text-white/45 font-semibold mt-1.5 tracking-[0.1em]">
+            <p className="text-xs sm:text-sm text-white/45 font-semibold mt-1 sm:mt-1.5 tracking-[0.1em]">
               {stay.subtitle}
             </p>
-            <p className="mt-5 text-white/75 text-sm sm:text-base leading-7 max-w-[52ch]">
+            <p className="mt-3 sm:mt-5 text-white/75 text-xs sm:text-base leading-6 sm:leading-7 max-w-[52ch]">
               {stay.description}
             </p>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <div className="mt-4 sm:mt-7 flex flex-wrap items-center gap-2 sm:gap-3">
               <span
-                className="rounded-full px-5 py-2.5 text-sm font-bold text-white"
+                className="rounded-full px-4 py-2 text-xs sm:text-sm font-bold text-white sm:px-5 sm:py-2.5"
                 style={{ backgroundColor: "rgba(199,91,26,0.88)" }}
               >
                 {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
               </span>
               <span
-                className="rounded-full px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-md"
+                className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white sm:px-4 sm:py-2.5"
                 style={{
-                  backgroundColor: "rgba(32,60,76,0.55)",
+                  backgroundColor: "rgba(32,60,76,0.65)",
                   border: "1px solid rgba(245,241,232,0.2)",
                 }}
               >
@@ -189,7 +194,7 @@ function StayCard({
                   href={stay.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                  className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white transition hover:opacity-90 sm:px-4 sm:py-2.5"
                   style={{
                     backgroundColor: "rgba(255, 255, 255, 1)",
                     border: "1.5px solid rgba(255,255,255,0.7)",
@@ -200,14 +205,14 @@ function StayCard({
               )}
               <Link
                 href={`/booking?stayId=${stay.id}`}
-                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white shadow-[0_14px_36px_rgba(199,91,26,0.45)] transition hover:scale-105 active:scale-97"
+                className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white shadow-[0_14px_36px_rgba(199,91,26,0.45)] transition hover:scale-105 active:scale-97 sm:px-7 sm:py-2.5"
                 style={{ backgroundColor: "var(--cta)" }}
               >
                 Book This Stay
               </Link>
               <Link
                 href={`/property/${stay.id}`}
-                className="inline-flex rounded-full px-7 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:opacity-90 sm:px-7 sm:py-2.5"
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 1)",
                   border: "1.5px solid rgba(255,255,255,0.65)",
@@ -233,7 +238,8 @@ function RotatingBadge() {
         transition={{ repeat: Infinity, duration: 22, ease: "linear" }}
         className="relative size-32"
         style={{
-          filter: "drop-shadow(0 0 20px rgba(199,91,26,0.6)) drop-shadow(0 0 40px rgba(199,91,26,0.3))",
+          /* Simple opacity-based glow instead of expensive drop-shadow filter */
+          willChange: "transform",
         }}
       >
         <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -254,10 +260,10 @@ function RotatingBadge() {
           </text>
         </svg>
         <div
-          className="absolute inset-0 m-auto size-8 rounded-full shadow-lg"
+          className="absolute inset-0 m-auto size-8 rounded-full"
           style={{
             backgroundColor: "var(--gold)",
-            boxShadow: "0 0 30px rgba(199,91,26,0.8), 0 0 60px rgba(199,91,26,0.4)",
+            boxShadow: "0 0 20px rgba(199,91,26,0.6)",
           }}
         />
       </motion.div>
@@ -275,6 +281,9 @@ export function FeaturedStaysSection() {
     target: containerRef,
     offset: ["start start", "end end"],
   });
+
+  // Smooth the raw scroll progress with a spring for buttery feel
+  const smoothProgress = useSpring(scrollYProgress, SPRING_CONFIG);
 
   return (
     <>
@@ -325,7 +334,7 @@ export function FeaturedStaysSection() {
                 stay={stay}
                 index={i}
                 total={total}
-                scrollYProgress={scrollYProgress}
+                scrollProgress={smoothProgress}
               />
             ))}
           </div>
@@ -343,7 +352,7 @@ export function FeaturedStaysSection() {
                 key={i}
                 index={i}
                 total={total}
-                scrollYProgress={scrollYProgress}
+                scrollProgress={smoothProgress}
               />
             ))}
           </div>
