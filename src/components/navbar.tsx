@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineUserCircle, HiX } from "react-icons/hi";
 
 type NavbarProps = {
@@ -16,6 +16,7 @@ type NavbarProps = {
 export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps) {
   const { isSignedIn } = useUser();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileLinksOpen, setMobileLinksOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +27,11 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile links when main menu opens
+  useEffect(() => {
+    if (menuOpen) setMobileLinksOpen(false);
+  }, [menuOpen]);
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -30 }}
@@ -34,18 +40,19 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
       className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
     >
       <div className="navbar__inner">
+        {/* ── Logo ────────────────────────────────────────────── */}
         <Link
           href="/"
           className="navbar__logo"
           aria-label="Trayati Stays homepage"
         >
-          <div className="navbar__logo-icon">
+          <div className={`navbar__logo-icon ${scrolled ? "navbar__logo-icon--scrolled" : ""}`}>
             <Image
-              src="/trayati-logo.jpg"
-              alt="Trayati logo"
+              src="/Logo_transparent.png"
+              alt="Trayati Stays logo"
               fill
-              sizes="(max-width: 640px) 36px, 44px"
-              className="object-cover"
+              sizes="(max-width: 640px) 56px, (max-width: 1024px) 72px, 80px"
+              className="object-contain"
               priority
             />
           </div>
@@ -55,6 +62,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           </div>
         </Link>
 
+        {/* ── Desktop links (md+) ──────────────────────────── */}
         <nav className="navbar__links" aria-label="Main navigation">
           {onOpenExperience && (
             <button
@@ -81,7 +89,9 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           )}
         </nav>
 
+        {/* ── Actions ─────────────────────────────────────── */}
         <div className="navbar__actions">
+          {/* User button — hidden below sm */}
           {isSignedIn ? (
             <UserButton
               appearance={{
@@ -102,6 +112,22 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
             </SignInButton>
           )}
 
+          {/* Mobile quick-links toggle — visible below md */}
+          <button
+            type="button"
+            onClick={() => setMobileLinksOpen((v) => !v)}
+            className="navbar__quicklinks-btn sm:hidden"
+            aria-label={mobileLinksOpen ? "Close quick links" : "Open quick links"}
+            aria-expanded={mobileLinksOpen}
+          >
+            {mobileLinksOpen ? (
+              <HiX className="text-[1.1rem]" />
+            ) : (
+              <span className="navbar__quicklinks-label">Explore</span>
+            )}
+          </button>
+
+          {/* Hamburger — always visible */}
           <motion.button
             type="button"
             onClick={onToggleMenu}
@@ -123,6 +149,58 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           </motion.button>
         </div>
       </div>
+
+      {/* ── Mobile quick-links dropdown (below md) ──────────── */}
+      <AnimatePresence>
+        {mobileLinksOpen && (
+          <motion.div
+            key="mobile-links"
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="navbar__mobile-links md:hidden"
+          >
+            <div className="navbar__mobile-links-inner">
+              {onOpenExperience && (
+                <button
+                  type="button"
+                  onClick={() => { onOpenExperience(); setMobileLinksOpen(false); }}
+                  className="navbar__mobile-link"
+                >
+                  Live India&apos;s Soul
+                </button>
+              )}
+              <Link
+                href="/booking"
+                className="navbar__mobile-link"
+                onClick={() => setMobileLinksOpen(false)}
+              >
+                Book Now
+              </Link>
+              {isSignedIn ? (
+                <Link
+                  href="/list-property"
+                  className="navbar__mobile-link"
+                  onClick={() => setMobileLinksOpen(false)}
+                >
+                  List With Us
+                </Link>
+              ) : (
+                <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
+                  <button
+                    type="button"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileLinksOpen(false)}
+                  >
+                    List With Us
+                  </button>
+                </SignInButton>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

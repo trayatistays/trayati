@@ -291,11 +291,13 @@ type ExperienceRow = {
   id: string;
   title: string;
   description: string;
+  content: string;
   image: string;
   category: string;
   author: string;
   date: string;
   read_time: number | null;
+  featured: boolean;
   is_active: boolean;
   sort_order: number;
 };
@@ -315,11 +317,13 @@ export async function dbUpsertExperience(e: Experience & { isActive?: boolean; s
     id: e.id,
     title: e.title,
     description: e.description,
+    content: e.content ?? "",
     image: e.image,
     category: e.category,
     author: e.author ?? "",
     date: e.date,
     read_time: e.readTime ?? null,
+    featured: e.featured === true,
     is_active: (e as Record<string, unknown>).isActive !== false,
     sort_order: (e as Record<string, unknown>).sortOrder ?? 0,
   };
@@ -346,12 +350,13 @@ function dbRowToExperience(row: ExperienceRow): Experience {
     id: row.id,
     title: row.title,
     description: row.description,
+    content: row.content ?? "",
     image: row.image,
     category: row.category,
     author: row.author || undefined,
     readTime: row.read_time ?? undefined,
     date: row.date,
-    featured: false,
+    featured: row.featured === true,
   };
 }
 

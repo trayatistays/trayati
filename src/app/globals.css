@@ -13,7 +13,7 @@
   --cta-strong: #8B5A22;
   --button-primary: #4A6544;
   --button-primary-hover: #3E553A;
-  --footer-background: #6B1F1F;
+  --footer-background: #0a1930;
   --footer-foreground: #F5F1E9;
   --gold: #A46C2B;
   --gold-soft: #E8D5B8;
@@ -168,6 +168,12 @@ button {
   z-index: 1;
 }
 
+/* Inner pages: push all content below the fixed navbar.
+   Hero section overrides this with its own pt-28/pt-32/pt-36. */
+.public-site-shell__content > main:not(:first-child) {
+  padding-top: 7rem;
+}
+
 .public-site-shell main {
   background-color: transparent !important;
 }
@@ -234,11 +240,14 @@ button {
   z-index: 9999;
   background: transparent;
   transition: background 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  /* Define navbar height as a var so hero/pages can reference it */
+  --navbar-h: 7rem;
 }
 
 .navbar--scrolled {
   background: #6B1F1F;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  --navbar-h: 4.5rem;
 }
 
 .navbar__inner {
@@ -247,25 +256,28 @@ button {
   justify-content: space-between;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 1.25rem;
+  /* Vertical padding drives navbar height — reduced so logo isn't cramped */
+  padding: 0.35rem 1.25rem;
+  transition: padding 0.4s ease-in-out;
 }
 
 @media (min-width: 640px) {
   .navbar__inner {
-    padding: 1.1rem 2rem;
+    padding: 0.4rem 2rem;
   }
 }
 
 @media (min-width: 1024px) {
   .navbar__inner {
-    padding: 1.15rem 3rem;
+    padding: 0.4rem 3rem;
   }
 }
 
+/* ── Logo ─────────────────────────────────────────────────── */
 .navbar__logo {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
   text-decoration: none;
   transition: opacity 0.3s ease;
 }
@@ -274,34 +286,40 @@ button {
   opacity: 0.85;
 }
 
+/* Full logo — no circle crop, natural shape, transparent PNG */
 .navbar__logo-icon {
   position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(0, 0, 0, 0.15);
+  width: 90px;
+  height: 90px;
   flex-shrink: 0;
-  transition: width 0.4s ease-in-out, height 0.4s ease-in-out, border-color 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out, height 0.4s ease-in-out;
 }
 
 @media (min-width: 640px) {
   .navbar__logo-icon {
-    width: 44px;
-    height: 44px;
+    width: 110px;
+    height: 110px;
   }
 }
 
-.navbar--scrolled .navbar__logo-icon {
-  width: 32px;
-  height: 32px;
-  border-color: rgba(255, 255, 255, 0.3);
+@media (min-width: 1024px) {
+  .navbar__logo-icon {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+/* Shrink on scroll and switch blend modes to show white logo on dark background */
+.navbar__logo-icon--scrolled {
+  width: 64px  !important;
+  height: 64px !important;
+  filter: invert(1) brightness(1.5);
 }
 
 @media (min-width: 640px) {
-  .navbar--scrolled .navbar__logo-icon {
-    width: 36px;
-    height: 36px;
+  .navbar__logo-icon--scrolled {
+    width: 76px  !important;
+    height: 76px !important;
   }
 }
 
@@ -309,45 +327,46 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  transition: opacity 0.4s ease-in-out, max-width 0.4s ease-in-out;
+  transition: opacity 0.4s ease-in-out;
   overflow: hidden;
 }
 
+/* IM Fell English for brand name */
 .navbar__logo-name {
-  font-family: var(--font-montserrat);
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  color: #1A1A1A;
+  font-family: var(--font-im-fell), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  color: #FFFFFF;
   white-space: nowrap;
   transition: color 0.4s ease-in-out, font-size 0.4s ease-in-out;
 }
 
 @media (min-width: 640px) {
   .navbar__logo-name {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
   }
 }
 
 .navbar--scrolled .navbar__logo-name {
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 @media (min-width: 640px) {
   .navbar--scrolled .navbar__logo-name {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
   }
 }
 
 .navbar__logo-tagline {
   font-family: var(--font-montserrat);
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #8A8A8A;
+  color: #FFFFFF;
   white-space: nowrap;
   transition: color 0.4s ease-in-out, max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, margin-top 0.4s ease-in-out;
   max-height: 1.2rem;
@@ -356,12 +375,13 @@ button {
 }
 
 .navbar--scrolled .navbar__logo-tagline {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
   max-height: 0;
   opacity: 0;
   margin-top: 0;
 }
 
+/* ── Desktop Nav Links ──────────────────────────────────── */
 .navbar__links {
   display: none;
   align-items: center;
@@ -381,7 +401,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #1A1A1A;
+  color: #FBF9EC;
   text-decoration: none;
   padding: 0.25rem 0;
   background: none;
@@ -401,7 +421,7 @@ button {
   left: 0;
   width: 0;
   height: 2px;
-  background: #1A1A1A;
+  background: #FBF9EC;
   border-radius: 1px;
   transition: width 0.3s ease, background 0.4s ease-in-out;
 }
@@ -414,10 +434,11 @@ button {
   width: 100%;
 }
 
+/* ── Actions ────────────────────────────────────────────── */
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .navbar__user-btn {
@@ -456,6 +477,45 @@ button {
   border-color: rgba(255, 255, 255, 0.6);
 }
 
+/* ── Mobile Quick-Links Button ─────────────────────────── */
+.navbar__quicklinks-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 0.85rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.04);
+  color: #1A1A1A;
+  cursor: pointer;
+  font-family: var(--font-montserrat);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.4s ease-in-out;
+  white-space: nowrap;
+}
+
+.navbar__quicklinks-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.35);
+}
+
+.navbar--scrolled .navbar__quicklinks-btn {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.navbar__quicklinks-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Hamburger ──────────────────────────────────────────── */
 .navbar__menu-btn {
   display: flex;
   align-items: center;
@@ -463,16 +523,16 @@ button {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1.5px solid rgba(0, 0, 0, 0.2);
-  background: rgba(0, 0, 0, 0.04);
-  color: #1A1A1A;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
   cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease, color 0.4s ease-in-out;
 }
 
 .navbar__menu-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .navbar--scrolled .navbar__menu-btn {
@@ -485,6 +545,61 @@ button {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.6);
 }
+
+/* ── Mobile Quick-Links Dropdown ────────────────────────── */
+.navbar__mobile-links {
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(245, 241, 233, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.navbar--scrolled .navbar__mobile-links {
+  background: rgba(107, 31, 31, 0.97);
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar__mobile-links-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 1.25rem 0.75rem;
+}
+
+.navbar__mobile-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75rem;
+  font-family: var(--font-montserrat);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1A1A1A;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.navbar__mobile-link:hover {
+  background: rgba(74, 101, 68, 0.08);
+  color: var(--primary);
+}
+
+.navbar--scrolled .navbar__mobile-link {
+  color: #fff;
+}
+
+.navbar--scrolled .navbar__mobile-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
 
 @media (max-width: 640px) {
   body::before {

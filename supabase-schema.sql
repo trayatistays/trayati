@@ -56,11 +56,13 @@ create table if not exists public.experiences (
   id text primary key,
   title text not null,
   description text not null,
+  content text not null default '',
   image text not null default '',
   category text not null default '',
   author text not null default '',
   date text not null default '',
   read_time integer,
+  featured boolean not null default false,
   is_active boolean not null default true,
   sort_order integer not null default 0,
   created_at timestamptz not null default now(),
@@ -226,3 +228,11 @@ create trigger experiences_updated_at
 -- ========================================
 
 drop table if exists public.trayati_content cascade;
+
+-- ========================================
+-- MIGRATION: Add featured & content to experiences
+-- ========================================
+-- Run these ALTER statements if the columns don't exist yet:
+
+-- alter table public.experiences add column if not exists featured boolean not null default false;
+-- alter table public.experiences add column if not exists content text not null default '';

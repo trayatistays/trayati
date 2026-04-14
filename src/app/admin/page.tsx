@@ -564,7 +564,7 @@ function ExperiencesTab() {
   }
 
   if (creating || editing) {
-    return <SimpleForm title={editing ? "Edit Post" : "New Post"} initial={editing} fields={[{ key: "title", label: "Title *" }, { key: "image", label: "Cover Image", image: true }, { key: "category", label: "Category" }, { key: "author", label: "Author" }, { key: "date", label: "Date" }, { key: "readTime", label: "Read Time (min)", type: "number" }, { key: "description", label: "Description *", textarea: true }]} onSave={handleSave} onCancel={() => { setCreating(false); setEditing(null); }} />;
+    return <SimpleForm title={editing ? "Edit Post" : "New Post"} initial={editing} fields={[{ key: "title", label: "Title *" }, { key: "image", label: "Cover Image", image: true }, { key: "category", label: "Category" }, { key: "author", label: "Author" }, { key: "date", label: "Date" }, { key: "readTime", label: "Read Time (min)", type: "number" }, { key: "featured", label: "Featured on homepage", checkbox: true }, { key: "description", label: "Description *", textarea: true }, { key: "content", label: "Full Blog Content", textarea: true }]} onSave={handleSave} onCancel={() => { setCreating(false); setEditing(null); }} />;
   }
 
   return (
@@ -581,6 +581,9 @@ function ExperiencesTab() {
                 <h3 className="font-bold" style={{ color: "var(--foreground)" }}>{item.title as string}</h3>
                 <p className="truncate text-sm" style={{ color: "var(--muted)" }}>{item.description as string}</p>
                 <p className="text-xs" style={{ color: "var(--cta)" }}>{item.category as string} &middot; {item.author as string} &middot; {item.date as string}</p>
+                {(item.featured as boolean) && (
+                  <p className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>Featured</p>
+                )}
               </div>
               <div className="flex shrink-0 gap-2">
                 <button onClick={() => setEditing(item)} className="rounded-lg p-2 transition hover:opacity-70" style={{ color: "var(--primary)" }}><HiOutlinePencil className="h-5 w-5" /></button>
@@ -595,24 +598,27 @@ function ExperiencesTab() {
   );
 }
 
-function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: string; initial: Record<string, unknown> | null; fields: { key: string; label: string; type?: string; textarea?: boolean; image?: boolean }[]; onSave: (data: Record<string, unknown>) => void; onCancel: () => void }) {
+function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: string; initial: Record<string, unknown> | null; fields: { key: string; label: string; type?: string; textarea?: boolean; image?: boolean; checkbox?: boolean }[]; onSave: (data: Record<string, unknown>) => void; onCancel: () => void }) {
   const defaultForm: Record<string, unknown> = { id: `item-${Date.now()}` };
-  for (const f of fields) defaultForm[f.key] = f.type === "number" ? 0 : "";
-  if (!initial) { defaultForm.date = new Date().toISOString().slice(0, 10); defaultForm.rating = 5; defaultForm.readTime = 5; }
+  for (const f of fields) defaultForm[f.key] = f.checkbox ? false : f.type === "number" ? 0 : "";
+  if (!initial) { defaultForm.date = new Date().toISOString().slice(0, 10); defaultForm.rating = 5; defaultForm.readTime = 5; defaultForm.featured = false; }
   const [form, setForm] = useState<Record<string, unknown>>(initial ?? defaultForm);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   function update(key: string, value: unknown) { setForm((prev) => ({ ...prev, [key]: value })); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    try { await onSave(form); } finally { setSaving(false); }
+    setSaveError("");
+    try { await onSave(form); } catch (err) { setSaveError(err instanceof Error ? err.message : "Save failed"); } finally { setSaving(false); }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <h1 className="font-display text-2xl font-bold" style={{ color: "var(--foreground)" }}>{title}</h1>
+      {saveError && <p className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{saveError}</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => {
           if (f.image) {
@@ -621,12 +627,21 @@ function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: strin
             );
           }
           return (
-            <label key={f.key} className={f.textarea ? "block sm:col-span-2" : "block"}>
-              <span className="mb-1 block text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{f.label}</span>
-              {f.textarea ? (
-                <textarea value={(form[f.key] ?? "") as string} onChange={(e) => update(f.key, e.target.value)} className="min-h-24 w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
+            <label key={f.key} className={f.textarea || f.checkbox ? "block sm:col-span-2" : "block"}>
+              {f.checkbox ? (
+                <div className="flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-[rgba(245,241,233,1)]" style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(245,241,233,0.9)", color: "var(--foreground)" }}>
+                  <input type="checkbox" checked={Boolean(form[f.key])} onChange={(e) => update(f.key, e.target.checked)} className="h-4 w-4 rounded border-[var(--border-soft)] text-[var(--primary)] focus:ring-[var(--primary)]" />
+                  <span>{f.label}</span>
+                </div>
               ) : (
-                <input type={f.type ?? "text"} step={f.type === "number" ? "any" : undefined} value={(form[f.key] ?? "") as string | number} onChange={(e) => update(f.key, f.type === "number" ? Number(e.target.value) : e.target.value)} className="w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
+                <>
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{f.label}</span>
+                  {f.textarea ? (
+                    <textarea value={(form[f.key] ?? "") as string} onChange={(e) => update(f.key, e.target.value)} className={f.key === "content" ? "min-h-64 w-full rounded-lg border px-4 py-3 text-sm" : "min-h-24 w-full rounded-lg border px-4 py-3 text-sm"} style={{ borderColor: "var(--border-soft)" }} />
+                  ) : (
+                    <input type={f.type ?? "text"} step={f.type === "number" ? "any" : undefined} value={(form[f.key] ?? "") as string | number} onChange={(e) => update(f.key, f.type === "number" ? Number(e.target.value) : e.target.value)} className="w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
+                  )}
+                </>
               )}
             </label>
           );

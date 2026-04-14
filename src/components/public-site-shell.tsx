@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 
 const HIDDEN_FOOTER_PREFIXES = ["/admin"];
 
@@ -12,6 +13,8 @@ export function PublicSiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={`public-site-shell min-h-screen${isHome ? " public-site-shell--home" : ""}`}>
+      {!hideChrome && <SiteHeader />}
+      
       <div className="public-site-shell__bg" aria-hidden="true" />
       <div className="public-site-shell__veil" aria-hidden="true" />
       <div className="public-site-shell__content">

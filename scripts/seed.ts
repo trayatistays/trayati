@@ -95,11 +95,13 @@ async function seedExperiences() {
       id: e.id,
       title: e.title,
       description: e.description,
+      content: e.content ?? "",
       image: e.image,
       category: e.category,
       author: e.author ?? "",
       date: e.date,
       read_time: e.readTime ?? null,
+      featured: e.featured === true,
       is_active: true,
       sort_order: index,
     };

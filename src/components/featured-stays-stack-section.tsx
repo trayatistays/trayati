@@ -32,7 +32,7 @@ function StayCard({
 }) {
   const offset = index * CARD_OFFSET;
   const scale = 1 - index * CARD_SCALE_STEP;
-  const opacity = index === 0 ? 1 : index === 1 ? 0.75 : 0.5;
+  const opacity = 1;
 
   return (
     <motion.div

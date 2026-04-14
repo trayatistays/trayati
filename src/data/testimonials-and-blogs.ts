@@ -15,10 +15,11 @@ export type Experience = {
   id: string;
   title: string;
   description: string;
+  content?: string;
   image: string;
-  category: string; // e.g., "Travel Tips", "Destination Guide", "Story"
+  category: string;
   author?: string;
-  readTime?: number; // in minutes
+  readTime?: number;
   date: string;
   featured: boolean;
 };

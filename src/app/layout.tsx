@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Inter, Montserrat, EB_Garamond } from "next/font/google";
+import { Inter, Montserrat, EB_Garamond, IM_Fell_English, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClerkShell } from "@/components/clerk-shell";
@@ -26,6 +26,19 @@ const ebGaramond = EB_Garamond({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const imFellEnglish = IM_Fell_English({
+  variable: "--font-im-fell",
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({
@@ -45,7 +58,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} h-full`}>
+    <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} ${imFellEnglish.variable} ${playfairDisplay.variable} h-full`}>
       <body className="min-h-full antialiased">
         <script
           type="application/ld+json"

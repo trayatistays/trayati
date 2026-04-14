@@ -98,12 +98,13 @@ export const experienceSchema = z.object({
   id: z.string().trim().min(1),
   title: z.string().trim().min(1),
   description: z.string().trim().min(1),
+  content: z.string().default(""),
   image: z.string().trim().min(1),
   category: z.string().trim().min(1),
   author: z.string().trim().optional(),
   readTime: z.coerce.number().int().min(1).optional(),
   date: z.string().trim().min(1),
-  featured: z.coerce.boolean(),
+  featured: z.coerce.boolean().default(false),
 });
 
 export const testimonialSchema = z.object({
