@@ -99,13 +99,13 @@ export function HeroSection() {
 
 
 
-      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-4 sm:px-6 sm:pt-5 lg:px-10">
-        <Navbar
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((v) => !v)}
-          onOpenExperience={() => setExperienceOpen(true)}
-        />
+      <Navbar
+        menuOpen={menuOpen}
+        onToggleMenu={() => setMenuOpen((v) => !v)}
+        onOpenExperience={() => setExperienceOpen(true)}
+      />
 
+      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-20 sm:px-6 sm:pt-24 lg:px-10 lg:pt-28">
         <ExperienceOverlay
           isOpen={experienceOpen}
           onClose={() => setExperienceOpen(false)}

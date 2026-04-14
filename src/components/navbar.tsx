@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { HiOutlineUserCircle, HiX } from "react-icons/hi";
-
-import { LiveIndiaSoulButton } from "./live-india-soul-button";
 
 type NavbarProps = {
   menuOpen: boolean;
@@ -16,160 +15,113 @@ type NavbarProps = {
 
 export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps) {
   const { isSignedIn } = useUser();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative z-30 flex flex-wrap items-center justify-between gap-3 rounded-[1.6rem] border px-2.5 py-2.5 shadow-[0_20px_50px_rgba(74,101,68,0.12)] backdrop-blur-2xl sm:gap-4 sm:rounded-[2rem] sm:px-4 sm:py-3 lg:px-5"
-      style={{
-        borderColor: "var(--border-soft)",
-        backgroundColor: "rgba(245, 241, 233, 0.88)",
-      }}
+      className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
     >
-      <a
-        href="#top"
-        className="group flex min-w-0 flex-1 items-center gap-2 rounded-full px-1.5 py-1.5 transition duration-300 hover:bg-black/5 sm:gap-3 sm:px-2"
-        aria-label="Trayati Stays homepage"
-      >
-        <div
-          className="relative size-10 shrink-0 overflow-hidden rounded-full border shadow-[0_8px_20px_rgba(32,60,76,0.14)] sm:size-12"
-          style={{
-            borderColor: "rgba(164, 108, 43, 0.3)",
-            backgroundColor: "rgba(240, 236, 226, 0.98)",
-          }}
+      <div className="navbar__inner">
+        <Link
+          href="/"
+          className="navbar__logo"
+          aria-label="Trayati Stays homepage"
         >
-          <Image
-            src="/trayati-logo.jpg"
-            alt="Trayati logo"
-            fill
-            sizes="(max-width: 640px) 60px, 68px"
-            className="object-cover"
-            priority
-          />
-        </div>
-        <div className="min-w-0 leading-tight">
-          <p className="truncate font-display text-base font-semibold tracking-[-0.03em] sm:text-xl" style={{ color: "var(--primary)" }}>
-            Trayati Stays
-          </p>
-          <p
-            className="truncate text-[0.62rem] font-medium uppercase tracking-[0.18em] sm:text-xs sm:tracking-[0.24em]"
-            style={{ color: "var(--muted)" }}
-          >
-            Find Your Rhythm
-          </p>
-        </div>
-      </a>
+          <div className="navbar__logo-icon">
+            <Image
+              src="/trayati-logo.jpg"
+              alt="Trayati logo"
+              fill
+              sizes="(max-width: 640px) 36px, 44px"
+              className="object-cover"
+              priority
+            />
+          </div>
+          <div className="navbar__logo-text">
+            <p className="navbar__logo-name">Trayati Stays</p>
+            <p className="navbar__logo-tagline">Find Your Rhythm</p>
+          </div>
+        </Link>
 
-      <div className="order-3 basis-full sm:order-2 sm:basis-auto">
-        {onOpenExperience && (
-          <LiveIndiaSoulButton onClick={onOpenExperience} />
-        )}
-      </div>
-
-      <div className="order-2 ml-auto flex shrink-0 items-center gap-2 sm:order-3 sm:ml-0 sm:gap-3">
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Link
-            href="/booking"
-            className="inline-flex rounded-full bg-[var(--button-primary)] px-3 py-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_16px_36px_rgba(74,101,68,0.38)] transition duration-300 hover:bg-[var(--button-primary-hover)] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
-          >
-            <span className="sm:hidden">Book</span>
-            <span className="hidden sm:inline">Book Now</span>
-          </Link>
-        </motion.div>
-
-        {isSignedIn ? (
-          <motion.div
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="hidden lg:block"
-          >
-            <Link
-              href="/list-property"
-              className="inline-flex rounded-full border px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] shadow-[0_16px_36px_rgba(74,101,68,0.12)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
-              style={{
-                borderColor: "var(--cta)",
-                color: "var(--cta)",
-                backgroundColor: "rgba(245,241,233,0.88)",
-              }}
+        <nav className="navbar__links" aria-label="Main navigation">
+          {onOpenExperience && (
+            <button
+              type="button"
+              onClick={onOpenExperience}
+              className="navbar__link"
             >
+              Live India&apos;s Soul
+            </button>
+          )}
+          <Link href="/booking" className="navbar__link">
+            Book Now
+          </Link>
+          {isSignedIn ? (
+            <Link href="/list-property" className="navbar__link">
               List With Us
             </Link>
-          </motion.div>
-        ) : (
-          <motion.div
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="hidden lg:block"
-          >
+          ) : (
             <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
-              <button
-                type="button"
-                className="inline-flex rounded-full border px-3.5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] shadow-[0_16px_36px_rgba(74,101,68,0.12)] transition duration-300 sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.2em]"
-                style={{
-                  borderColor: "var(--cta)",
-                  color: "var(--cta)",
-                  backgroundColor: "rgba(245,241,233,0.88)",
-                }}
-              >
+              <button type="button" className="navbar__link">
                 List With Us
               </button>
             </SignInButton>
-          </motion.div>
-        )}
-
-        {isSignedIn ? (
-          <UserButton
-            appearance={{
-              elements: {
-                userButtonAvatarBox: "size-10 sm:size-11",
-              },
-            }}
-          />
-        ) : (
-          <SignInButton mode="modal">
-            <button
-              type="button"
-              className="hidden size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_rgba(74,101,68,0.12)] backdrop-blur-xl transition duration-300 sm:flex sm:size-12"
-              style={{
-                borderColor: "var(--border-soft)",
-                color: "var(--primary)",
-                backgroundColor: "rgba(240, 236, 226, 0.95)",
-              }}
-              aria-label="Sign in"
-            >
-              <HiOutlineUserCircle className="text-[1.5rem] sm:text-[1.7rem]" />
-            </button>
-          </SignInButton>
-        )}
-
-        <motion.button
-          type="button"
-          onClick={onToggleMenu}
-          whileHover={{ scale: 1.06, rotate: menuOpen ? 0 : 6 }}
-          whileTap={{ scale: 0.96 }}
-          className="flex size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_rgba(74,101,68,0.14)] backdrop-blur-xl transition duration-300 sm:size-14"
-          style={{
-            borderColor: "var(--border-soft)",
-            color: "var(--primary)",
-            backgroundColor: "rgba(240, 236, 226, 0.95)",
-          }}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? (
-            <HiX className="text-[1.35rem]" />
-          ) : (
-            <span className="flex flex-col gap-[0.22rem]">
-              <span className="block h-[2px] w-5 rounded-full bg-current" />
-              <span className="ml-auto block h-[2px] w-3 rounded-full bg-current" />
-              <span className="block h-[2px] w-5 rounded-full bg-current" />
-            </span>
           )}
-        </motion.button>
+        </nav>
+
+        <div className="navbar__actions">
+          {isSignedIn ? (
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "size-9 sm:size-10",
+                },
+              }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="navbar__user-btn"
+                aria-label="Sign in"
+              >
+                <HiOutlineUserCircle className="text-[1.35rem] sm:text-[1.5rem]" />
+              </button>
+            </SignInButton>
+          )}
+
+          <motion.button
+            type="button"
+            onClick={onToggleMenu}
+            whileHover={{ scale: 1.06, rotate: menuOpen ? 0 : 6 }}
+            whileTap={{ scale: 0.96 }}
+            className="navbar__menu-btn"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? (
+              <HiX className="text-[1.3rem]" />
+            ) : (
+              <span className="flex flex-col gap-[0.22rem]">
+                <span className="block h-[2px] w-5 rounded-full bg-current" />
+                <span className="ml-auto block h-[2px] w-3 rounded-full bg-current" />
+                <span className="block h-[2px] w-5 rounded-full bg-current" />
+              </span>
+            )}
+          </motion.button>
+        </div>
       </div>
     </motion.header>
   );
