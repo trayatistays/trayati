@@ -30,25 +30,35 @@ export function PropertyPageClient({ stay }: { stay: FeaturedStay }) {
   } as const;
 
   return (
-    <main className="bg-white">
-      <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+    <main style={{ backgroundColor: "var(--background)" }}>
+      <div
+        className="sticky top-0 z-40 border-b backdrop-blur-md"
+        style={{
+          borderColor: "var(--border-soft)",
+          backgroundColor: "rgba(245,241,233,0.85)",
+        }}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="inline-flex items-center gap-2 font-medium text-slate-600 transition hover:text-slate-900">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] transition hover:opacity-70"
+            style={{ color: "var(--primary)" }}
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Stays
           </Link>
-          <div className="flex items-center gap-2 text-amber-600">
-            <span className="font-bold">? {stay.rating.toFixed(1)}</span>
-            <span className="text-sm text-slate-600">{stay.type}</span>
+          <div className="flex items-center gap-2" style={{ color: "var(--cta)" }}>
+            <span className="font-bold">&#9733; {stay.rating.toFixed(1)}</span>
+            <span className="text-sm" style={{ color: "var(--muted)" }}>{stay.type}</span>
           </div>
         </div>
       </div>
 
       <motion.div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <div className="h-80 overflow-hidden rounded-[1.75rem] shadow-2xl sm:h-96 md:h-[32rem]">
-          <PropertyPhotoCarousel photos={stay.photos} title={`${stay.title} in ${stay.city}`} />
+        <div>
+          <PropertyPhotoCarousel photos={stay.photos.length > 0 ? stay.photos : stay.image ? [stay.image] : []} title={`${stay.title} in ${stay.city}`} />
         </div>
       </motion.div>
 
@@ -56,14 +66,26 @@ export function PropertyPageClient({ stay }: { stay: FeaturedStay }) {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
           <div className="space-y-12 lg:col-span-2">
             <motion.div variants={itemVariants}>
-              <div className="mb-4"><span className="inline-block rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">{stay.tag}</span></div>
-              <h1 className="mb-3 text-4xl font-bold tracking-[-0.04em] text-slate-900 md:text-5xl">{stay.title} in {stay.city}, {stay.state}</h1>
-              <p className="text-lg font-medium text-slate-600">{stay.subtitle}</p>
-              <p className="mt-2 text-base text-slate-500">{stay.location}</p>
+              <div className="mb-4">
+                <span
+                  className="inline-block rounded-full px-4 py-2 text-sm font-bold"
+                  style={{ backgroundColor: "rgba(164,108,43,0.12)", color: "var(--cta)" }}
+                >
+                  {stay.tag}
+                </span>
+              </div>
+              <h1
+                className="mb-3 font-display text-4xl font-bold tracking-[-0.04em] md:text-5xl"
+                style={{ color: "var(--foreground)" }}
+              >
+                {stay.title} in {stay.city}, {stay.state}
+              </h1>
+              <p className="text-lg font-medium" style={{ color: "var(--foreground-soft)" }}>{stay.subtitle}</p>
+              <p className="mt-2 text-base" style={{ color: "var(--muted)" }}>{stay.location}</p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="prose prose-slate max-w-none">
-              <p className="text-lg leading-relaxed text-slate-700">{stay.description}</p>
+            <motion.div variants={itemVariants}>
+              <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>{stay.description}</p>
             </motion.div>
 
             <motion.div variants={itemVariants}><PropertyRoomDetails roomTypes={stay.roomTypes} /></motion.div>
@@ -75,12 +97,36 @@ export function PropertyPageClient({ stay }: { stay: FeaturedStay }) {
         </div>
       </motion.div>
 
-      <motion.section className="bg-gradient-to-b from-slate-50 to-white py-16" variants={containerVariants} initial="hidden" animate="visible">
+      <motion.section
+        className="py-16"
+        style={{ backgroundColor: "var(--background-soft)" }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={itemVariants} className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"><h3 className="mb-2 text-lg font-bold text-slate-900">Verified Stay</h3><p className="text-sm text-slate-600">{stay.address}, {stay.city}, {stay.state} {stay.pin}</p></div>
-            <div className="rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"><h3 className="mb-2 text-lg font-bold text-slate-900">Location-Focused Booking</h3><p className="text-sm text-slate-600">Optimized for travelers searching {stay.city}, {stay.state} stays.</p></div>
-            <div className="rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"><h3 className="mb-2 text-lg font-bold text-slate-900">Flexible Planning</h3><p className="text-sm text-slate-600">Reserve now and confirm the details around your dates and room choice.</p></div>
+            <div
+              className="rounded-xl border p-6 transition hover:shadow-lg"
+              style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(245,241,233,0.9)" }}
+            >
+              <h3 className="mb-2 text-lg font-bold" style={{ color: "var(--foreground)" }}>Verified Stay</h3>
+              <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>{stay.address}, {stay.city}, {stay.state} {stay.pin}</p>
+            </div>
+            <div
+              className="rounded-xl border p-6 transition hover:shadow-lg"
+              style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(245,241,233,0.9)" }}
+            >
+              <h3 className="mb-2 text-lg font-bold" style={{ color: "var(--foreground)" }}>Location-Focused Booking</h3>
+              <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>Optimized for travelers searching {stay.city}, {stay.state} stays.</p>
+            </div>
+            <div
+              className="rounded-xl border p-6 transition hover:shadow-lg"
+              style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(245,241,233,0.9)" }}
+            >
+              <h3 className="mb-2 text-lg font-bold" style={{ color: "var(--foreground)" }}>Flexible Planning</h3>
+              <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>Reserve now and confirm the details around your dates and room choice.</p>
+            </div>
           </motion.div>
         </div>
       </motion.section>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { dbCreateSubmission, dbGetAllSubmissions } from "@/lib/db";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -7,8 +7,6 @@ export async function POST(request: Request) {
     userName?: string;
     userEmail?: string;
     property?: unknown;
-    status?: string;
-    submittedAt?: string;
   };
 
   if (!body.clerkUserId || !body.userName || !body.userEmail || !body.property) {
@@ -18,58 +16,33 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
+  try {
+    const id = `submission-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const submission = await dbCreateSubmission({
+      id,
+      clerkUserId: body.clerkUserId,
+      userName: body.userName,
+      userEmail: body.userEmail,
+      propertyPayload: body.property as Record<string, unknown>,
+      status: "pending",
+    });
+    return NextResponse.json({ success: true, id: submission.id }, { status: 201 });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Database not configured" },
+      { error: error instanceof Error ? error.message : "Failed to save submission" },
       { status: 500 },
     );
   }
-
-  const id = `submission-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-  const { error } = await supabase.from("property_submissions").insert({
-    id,
-    clerk_user_id: body.clerkUserId,
-    user_name: body.userName,
-    user_email: body.userEmail,
-    property_payload: body.property,
-    status: "pending",
-    submitted_at: new Date().toISOString(),
-  });
-
-  if (error) {
-    console.error("Supabase insert error:", error);
-    return NextResponse.json(
-      { error: "Failed to save property submission" },
-      { status: 500 },
-    );
-  }
-
-  return NextResponse.json({ success: true, id }, { status: 201 });
 }
 
 export async function GET() {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
+  try {
+    const submissions = await dbGetAllSubmissions();
+    return NextResponse.json({ submissions });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Database not configured" },
+      { error: error instanceof Error ? error.message : "Failed to fetch submissions" },
       { status: 500 },
     );
   }
-
-  const { data, error } = await supabase
-    .from("property_submissions")
-    .select("*")
-    .order("submitted_at", { ascending: false });
-
-  if (error) {
-    console.error("Supabase select error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch submissions" },
-      { status: 500 },
-    );
-  }
-
-  return NextResponse.json({ submissions: data });
 }

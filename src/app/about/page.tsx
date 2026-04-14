@@ -40,16 +40,16 @@ export default function AboutPage() {
       title: "Apartments & Condos",
       description: "Independent, automated, hassle-free. Smart locks, self check-in, modern comforts in heritage locations. Perfect for digital nomads or families wanting privacy.",
       icon: HiBuildingOffice2,
-      color: "var(--primary)",
-      bg: "rgba(30,109,191,0.08)",
+      color: "var(--secondary)",
+      bg: "rgba(13,58,82,0.08)",
     },
     {
       id: "villas",
       title: "Villas",
       description: "Private luxury escapes. Gated compounds, pools, sprawling lawns—your own palace with staff on call. Heritage havelis turned boutique estates or modern villas.",
       icon: HiBuildingLibrary,
-      color: "var(--aqua, #35C0C4)",
-      bg: "rgba(53,192,196,0.08)",
+      color: "var(--aqua, var(--secondary))",
+      bg: "rgba(13,58,82,0.08)",
     },
   ];
 
@@ -75,7 +75,7 @@ export default function AboutPage() {
             <span>Back to Explorer</span>
           </Link>
           <div className="flex items-center gap-1.5 pointer-events-none">
-            <span className="w-2 h-2 rounded-full bg-cta animate-pulse" />
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "var(--cta)" }} />
             <span className="text-[0.6rem] font-bold uppercase tracking-[0.1em] opacity-40">About Trayati</span>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function AboutPage() {
       </section>
 
       {/* Specialization Section */}
-      <section className="py-20 bg-primary/5 border-y" style={{ borderColor: "var(--border-soft)" }}>
+      <section className="py-20 border-y" style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(74,101,68,0.04)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -125,7 +125,7 @@ export default function AboutPage() {
             className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden group shadow-2xl"
           >
             {/* Using a placeholder for brand image style */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/5 to-cta/10 transition-transform duration-1000 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(74,101,68,0.2)] via-[rgba(74,101,68,0.05)] to-[rgba(164,108,43,0.1)] transition-transform duration-1000 group-hover:scale-105" />
             <div className="absolute inset-0 flex items-center justify-center p-12 text-center">
               <RiDoubleQuotesL className="absolute top-10 left-10 text-6xl opacity-10" style={{ color: "var(--primary)" }} />
               <p className="text-2xl sm:text-3xl font-display font-medium leading-normal italic" style={{ color: "var(--primary)" }}>
@@ -217,7 +217,7 @@ export default function AboutPage() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="rounded-[3rem] p-10 sm:p-20 text-center relative overflow-hidden"
-            style={{ backgroundColor: "var(--primary)", boxShadow: "0 40px 100px rgba(30,109,191,0.25)" }}
+            style={{ backgroundColor: "var(--secondary)", boxShadow: "0 40px 100px rgba(13,58,82,0.25)" }}
           >
             {/* Pattern background */}
             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,1) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
@@ -233,7 +233,7 @@ export default function AboutPage() {
               
               <Link
                 href="/booking"
-                className="inline-flex items-center gap-4 bg-white px-10 py-5 rounded-full text-sm font-bold uppercase tracking-[0.2em] transition hover:bg-white/90 hover:scale-105 active:scale-95 text-primary"
+                className="inline-flex items-center gap-4 rounded-full bg-[var(--button-primary)] px-10 py-5 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-95"
               >
                 <span>Start Your Journey</span>
                 <HiArrowRight className="text-lg" />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Montserrat, EB_Garamond } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -51,7 +52,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <ClerkShell>
-          <PublicSiteShell>{children}</PublicSiteShell>
+          <Suspense>
+            <PublicSiteShell>{children}</PublicSiteShell>
+          </Suspense>
         </ClerkShell>
         <Analytics />
         <SpeedInsights />

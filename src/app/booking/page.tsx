@@ -23,7 +23,7 @@ function BookingContent() {
   const searchParams = useSearchParams();
   const stayId = searchParams.get("stayId");
   const experience = (searchParams.get("experience") ?? "") as ExperienceType | "";
-  const { stays } = useStays();
+  const { stays, isLoading, error } = useStays();
   const selectedStay = stayId ? stays.find((s) => s.id === stayId) : null;
 
   const [baseFilters, setBaseFilters] = useState<Omit<FilterState, "experienceType">>({
@@ -69,7 +69,7 @@ function BookingContent() {
         className="sticky top-0 z-20 border-b backdrop-blur-xl"
         style={{
           borderColor: "var(--border-soft)",
-          backgroundColor: "rgba(245,241,232,0.95)",
+          backgroundColor: "rgba(245,241,233,0.95)",
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -92,11 +92,11 @@ function BookingContent() {
       <div className="absolute inset-0 pointer-events-none h-96">
         <div
           className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20"
-          style={{ backgroundColor: "rgba(95, 168, 168, 0.3)" }}
+          style={{ backgroundColor: "rgba(13,58,82,0.3)" }}
         />
         <div
           className="absolute top-32 left-1/3 w-80 h-80 rounded-full blur-3xl opacity-15"
-          style={{ backgroundColor: "rgba(199, 91, 26, 0.2)" }}
+          style={{ backgroundColor: "rgba(164,108,43,0.2)" }}
         />
       </div>
 
@@ -109,6 +109,14 @@ function BookingContent() {
           transition={{ duration: 0.6 }}
           className="space-y-8"
         >
+          {stayId && isLoading ? (
+            <p style={{ color: "var(--muted)" }}>Loading property details...</p>
+          ) : stayId && error ? (
+            <p className="text-red-600">{error}</p>
+          ) : stayId && !selectedStay ? (
+            <p style={{ color: "var(--muted)" }}>That property could not be found.</p>
+          ) : null}
+
           {selectedStay ? (
             // Show selected property details
             <div className="space-y-8">
@@ -149,13 +157,13 @@ function BookingContent() {
                   <div className="flex items-center gap-4">
                     <span
                       className="rounded-full px-4 py-2 text-sm font-bold"
-                      style={{ backgroundColor: "rgba(30,109,191,0.15)", color: "var(--primary)" }}
+                      style={{ backgroundColor: "rgba(74,101,68,0.15)", color: "var(--primary)" }}
                     >
                       ★ {selectedStay.rating.toFixed(1)}
                     </span>
                     <span
                       className="rounded-full px-4 py-2 text-sm font-bold"
-                      style={{ backgroundColor: "rgba(199,91,26,0.15)", color: "var(--cta)" }}
+                      style={{ backgroundColor: "rgba(164,108,43,0.15)", color: "var(--cta)" }}
                     >
                       ₹{selectedStay.pricePerNight.toLocaleString()}/night
                     </span>
@@ -201,14 +209,14 @@ function BookingContent() {
                               borderColor:
                                 selectedRoomId === room.id
                                   ? "var(--primary)"
-                                  : "rgba(80,150,220,0.2)",
+                                  : "rgba(74,101,68,0.2)",
                               backgroundColor:
                                 selectedRoomId === room.id
-                                  ? "rgba(30,109,191,0.1)"
-                                  : "rgba(245,241,232,0.6)",
+                                  ? "rgba(74,101,68,0.1)"
+                                  : "rgba(245,241,233,0.6)",
                               boxShadow:
                                 selectedRoomId === room.id
-                                  ? "0 4px 20px rgba(30,109,191,0.15)"
+                                  ? "0 4px 20px rgba(74,101,68,0.15)"
                                   : "none",
                             }}
                           >
@@ -270,7 +278,7 @@ function BookingContent() {
                     className="rounded-2xl p-6 space-y-6"
                     style={{
                       backgroundColor: "rgba(245,241,232,0.9)",
-                      border: "1px solid rgba(80,150,220,0.2)",
+                        border: "1px solid rgba(74,101,68,0.2)",
                       boxShadow: "0 10px 40px rgba(32,60,76,0.08)",
                     }}
                   >
@@ -282,7 +290,7 @@ function BookingContent() {
                         type="date"
                         className="w-full px-4 py-2 rounded-lg border text-sm"
                         style={{
-                          borderColor: "rgba(80,150,220,0.2)",
+                          borderColor: "rgba(74,101,68,0.2)",
                           backgroundColor: "rgba(255,255,255,0.6)",
                         }}
                       />
@@ -296,7 +304,7 @@ function BookingContent() {
                         type="date"
                         className="w-full px-4 py-2 rounded-lg border text-sm"
                         style={{
-                          borderColor: "rgba(80,150,220,0.2)",
+                          borderColor: "rgba(74,101,68,0.2)",
                           backgroundColor: "rgba(255,255,255,0.6)",
                         }}
                       />
@@ -312,7 +320,7 @@ function BookingContent() {
                         defaultValue="1"
                         className="w-full px-4 py-2 rounded-lg border text-sm"
                         style={{
-                          borderColor: "rgba(80,150,220,0.2)",
+                          borderColor: "rgba(74,101,68,0.2)",
                           backgroundColor: "rgba(255,255,255,0.6)",
                         }}
                       />
@@ -324,10 +332,10 @@ function BookingContent() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="p-3 rounded-lg"
-                        style={{
-                          backgroundColor: "rgba(30,109,191,0.1)",
-                          border: "1px solid rgba(80,150,220,0.3)",
-                        }}
+                         style={{
+                           backgroundColor: "rgba(74,101,68,0.1)",
+                           border: "1px solid rgba(74,101,68,0.3)",
+                         }}
                       >
                         {(() => {
                           const selectedRoom = selectedStay.roomTypes.find(
@@ -359,10 +367,9 @@ function BookingContent() {
                     <ReserveNowButton
                       stayId={selectedStay.id}
                       roomId={selectedRoomId}
-                      className="w-full rounded-full py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105"
+                      className="w-full rounded-full bg-[var(--button-primary)] py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)]"
                       style={{
-                        backgroundColor: "var(--cta)",
-                        boxShadow: "0 8px 24px rgba(199,91,26,0.3)",
+                        boxShadow: "0 8px 24px rgba(74,101,68,0.3)",
                       }}
                     />
 
@@ -373,7 +380,7 @@ function BookingContent() {
                 </motion.div>
               </motion.div>
             </div>
-          ) : (
+          ) : !stayId ? (
             // Show all properties listing
             <>
               {/* Filter Form */}
@@ -410,7 +417,7 @@ function BookingContent() {
                 <BookingResults filters={filters} />
               </motion.div>
             </>
-          )}
+          ) : null}
         </motion.div>
       </div>
 
@@ -423,7 +430,7 @@ function BookingContent() {
         className="mt-20 py-12 text-center border-t"
         style={{
           borderColor: "var(--border-soft)",
-          backgroundColor: "rgba(245,241,232,0.5)",
+          backgroundColor: "rgba(245,241,233,0.5)",
         }}
       >
         <p className="font-display text-xl font-bold mb-4">Can&apos;t find what you&apos;re looking for?</p>
@@ -432,10 +439,9 @@ function BookingContent() {
         </p>
         <Link
           href="/contact"
-          className="inline-block rounded-full px-8 py-3 text-sm font-bold uppercase tracking-[0.2em] text-white transition"
+          className="inline-block rounded-full bg-[var(--button-primary)] px-8 py-3 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:bg-[var(--button-primary-hover)]"
           style={{
-            backgroundColor: "var(--cta)",
-            boxShadow: "0 12px 30px rgba(199,91,26,0.35)",
+            boxShadow: "0 12px 30px rgba(74,101,68,0.35)",
           }}
         >
           Contact Us

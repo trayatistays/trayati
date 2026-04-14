@@ -4,7 +4,12 @@ import { getAllStays } from "@/lib/stays-store";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const stays = await getAllStays();
+  let stays: { id: string }[] = [];
+  try {
+    stays = await getAllStays();
+  } catch {
+    stays = [];
+  }
   const staticRoutes = [
     { route: "", changeFrequency: "daily" as const, priority: 1 },
     { route: "/blogs", changeFrequency: "weekly" as const, priority: 0.8 },

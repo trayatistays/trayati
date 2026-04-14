@@ -10,12 +10,13 @@ import {
   useSpring,
   type MotionValue,
 } from "framer-motion";
-import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
+import type { FeaturedStay } from "@/data/featured-stays";
 import { useStays } from "@/hooks/use-stays";
+import supabaseImageLoader from "@/lib/supabase-image-loader";
 
 // ─── Constants ────────────────────────────────────────────────────
-// Reduced from 125vh → 110vh per card for snappier transitions
-const VH_PER_CARD = 110;
+// Native sticky container spacing. Extra 30vh gives a brief hold before next card overlaps.
+const VH_SPACING = 30;
 
 // Spring config for buttery smoothness
 const SPRING_CONFIG = { stiffness: 120, damping: 30, mass: 0.5 };
@@ -38,19 +39,20 @@ function ProgressDot({
   scrollProgress: MotionValue<number>;
   total: number;
 }) {
-  const s = index / total;
-  const e = (index + 1) / total;
-  const buf = 0.04;
+  const step = total > 1 ? 1 / (total - 1) : 1;
+  const s = index * step;
+  
   const opacity = useTransform(
     scrollProgress,
-    [Math.max(0, s - buf), s, Math.min(1, e - buf), Math.min(1, e)],
-    [0.28, 1, 1, 0.28]
+    [s - step * 0.4, s, s + step * 0.4],
+    [0.28, 1, 0.28]
   );
   const scale = useTransform(
     scrollProgress,
-    [Math.max(0, s - buf), s, Math.min(1, e - buf), Math.min(1, e)],
-    [0.7, 1.5, 1.5, 0.7]
+    [s - step * 0.4, s, s + step * 0.4],
+    [0.7, 1.5, 0.7]
   );
+  
   return (
     <motion.div
       style={{
@@ -66,165 +68,152 @@ function ProgressDot({
 }
 
 // ─── Stay Card ────────────────────────────────────────────────────
-// GPU-optimised: all animations use translate3d/scale (compositor-only).
-// No string percentages — numeric pixel values via viewport height.
+// Native position:sticky stacking for buttery smooth, natural scroll feel.
 function StayCard({
   stay,
   index,
-  scrollProgress,
   total,
 }: {
   stay: FeaturedStay;
   index: number;
-  scrollProgress: MotionValue<number>;
   total: number;
 }) {
-  const isFirst = index === 0;
   const isLast = index === total - 1;
-  const segStart = index / total;
-  const segEnd = (index + 1) / total;
-
-  // ── Scale down (numeric only — GPU composited) ────────────────
-  const rawScale = useTransform(
-    scrollProgress,
-    isLast ? [0, 1] : [segStart, segEnd],
-    isLast ? [1, 1] : [1, 0.92]
-  );
-  const scale = useSpring(rawScale, SPRING_CONFIG);
-
-  // ── Slide in from below (numeric vh → px at render) ───────────
-  const prevSegStart = (index - 1) / total;
-  const prevSegEnd = index / total;
-  const rawY = useTransform(
-    scrollProgress,
-    isFirst ? [0, 1] : [prevSegStart, prevSegEnd],
-    isFirst ? [0, 0] : [100, 0] // percentage values
-  );
-  const springY = useSpring(rawY, SPRING_CONFIG);
-  // Convert numeric % to CSS vh string for proper viewport-relative movement
-  const y = useTransform(springY, (v) => `${v}vh`);
-
+  const ref = useRef<HTMLDivElement>(null);
   const zIndex = index + 1;
 
+  // Track scroll of THIS SPECIFIC container
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+
+  // Scale down as the user scrolls past it
+  const rawScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const scale = useSpring(rawScale, SPRING_CONFIG);
+
   return (
-    <motion.div
-      className="absolute inset-0 flex items-center justify-center"
+    <div
+      ref={ref}
+      className="relative w-full"
       style={{
-        scale,
-        y: isFirst ? undefined : y,
+        height: isLast ? "100vh" : `calc(100vh + ${VH_SPACING}vh)`,
         zIndex,
-        willChange: "transform",
       }}
     >
-      {/* Gutter around card */}
-      <div className="relative w-full h-full p-3 sm:p-4 lg:p-5">
-        <div
-          className="relative w-full h-full overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]"
-          style={{
-            /* Single simpler shadow instead of 3-layer — much cheaper to paint */
-            boxShadow: "0 24px 60px rgba(32,60,76,0.22)",
-          }}
-        >
-          <Image
-            src={stay.image}
-            alt={stay.alt}
-            fill
-            className="object-cover"
-            priority={isFirst}
-            sizes="(max-width: 768px) 100vw, 90vw"
-          />
+      <motion.div
+        className="sticky top-0 flex h-screen w-full items-center justify-center"
+        style={{
+          scale: isLast ? 1 : scale,
+          willChange: "transform",
+        }}
+      >
+        {/* Gutter around card */}
+        <div className="relative w-full h-full p-3 sm:p-4 lg:p-5">
+          <div
+            className="relative w-full h-full overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]"
+            style={{
+              boxShadow: "0 24px 60px rgba(74,101,68,0.22)",
+            }}
+          >
+            <Image
+              src={stay.image}
+              alt={stay.alt}
+              fill
+              className="object-cover"
+              priority={index === 0}
+              sizes="(max-width: 768px) 100vw, 90vw"
+              loader={supabaseImageLoader}
+            />
 
-          {/* Dark gradient overlays for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/22 to-black/08" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+            {/* Dark gradient overlays for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/22 to-black/08" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[rgba(74,101,68,0.50)] via-transparent to-transparent" />
 
-          {/* Counter */}
-          <div className="absolute top-5 left-5 sm:top-6 sm:left-7">
-            <span className="font-display text-[0.6rem] font-bold uppercase tracking-[0.44em] text-white/50">
-              {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(total).padStart(2, "0")}
-            </span>
-          </div>
-
-          {/* Tag badge — removed backdrop-blur during scroll for perf */}
-          <div className="absolute top-4 right-5 sm:top-5 sm:right-6">
-            <span
-              className="rounded-full px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.28em] text-white sm:px-4 sm:py-2"
-              style={{
-                backgroundColor: "rgba(32,60,76,0.75)",
-                border: "1px solid rgba(245,241,232,0.22)",
-              }}
-            >
-              {stay.tag}
-            </span>
-          </div>
-
-          {/* Content */}
-          <div className="absolute bottom-0 inset-x-0 p-5 sm:p-8 lg:p-12">
-            <p className="text-[0.55rem] sm:text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-white/55 mb-2 sm:mb-3">
-              {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
-            </p>
-            <h3 className="font-display text-2xl sm:text-4xl lg:text-[3.4rem] font-bold text-white tracking-[-0.03em] leading-[1.05]">
-              {stay.title}
-            </h3>
-            <p className="text-xs sm:text-sm text-white/45 font-semibold mt-1 sm:mt-1.5 tracking-[0.1em]">
-              {stay.subtitle}
-            </p>
-            <p className="mt-3 sm:mt-5 text-white/75 text-xs sm:text-base leading-6 sm:leading-7 max-w-[52ch]">
-              {stay.description}
-            </p>
-
-            <div className="mt-4 sm:mt-7 flex flex-wrap items-center gap-2 sm:gap-3">
-              <span
-                className="rounded-full px-4 py-2 text-xs sm:text-sm font-bold text-white sm:px-5 sm:py-2.5"
-                style={{ backgroundColor: "rgba(199,91,26,0.88)" }}
-              >
-                {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+            {/* Counter */}
+            <div className="absolute top-5 left-5 sm:top-6 sm:left-7">
+              <span className="font-display text-[0.6rem] font-bold uppercase tracking-[0.44em] text-white/50">
+                {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(total).padStart(2, "0")}
               </span>
+            </div>
+
+            {/* Tag badge */}
+            <div className="absolute top-4 right-5 sm:top-5 sm:right-6">
               <span
-                className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white sm:px-4 sm:py-2.5"
+                className="rounded-full px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.28em] text-white sm:px-4 sm:py-2"
                 style={{
-                  backgroundColor: "rgba(32,60,76,0.65)",
-                  border: "1px solid rgba(245,241,232,0.2)",
+                  backgroundColor: "rgba(74,101,68,0.75)",
+                  border: "1px solid rgba(245,241,233,0.22)",
                 }}
               >
-                ★&nbsp;{stay.rating.toFixed(1)}
+                {stay.tag}
               </span>
-              {stay.googleMapsUrl && (
-                <a
-                  href={stay.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white transition hover:opacity-90 sm:px-4 sm:py-2.5"
+            </div>
+
+            {/* Content */}
+            <div className="absolute bottom-0 inset-x-0 p-5 sm:p-8 lg:p-12">
+              <p className="text-[0.55rem] sm:text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-white/55 mb-2 sm:mb-3">
+                {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
+              </p>
+              <h3 className="font-display text-2xl sm:text-4xl lg:text-[3.4rem] font-bold text-white tracking-[-0.03em] leading-[1.05]">
+                {stay.title}
+              </h3>
+              <p className="text-xs sm:text-sm text-white/45 font-semibold mt-1 sm:mt-1.5 tracking-[0.1em]">
+                {stay.subtitle}
+              </p>
+              <p className="mt-3 sm:mt-5 text-white/75 text-xs sm:text-base leading-6 sm:leading-7 max-w-[52ch]">
+                {stay.description}
+              </p>
+
+              <div className="mt-4 sm:mt-7 flex flex-wrap items-center gap-2 sm:gap-3">
+                <span
+                  className="rounded-full px-4 py-2 text-xs sm:text-sm font-bold text-white sm:px-5 sm:py-2.5"
+                  style={{ backgroundColor: "rgba(164, 108, 43, 0.88)" }}
+                >
+                  {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+                </span>
+                <span
+                  className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white sm:px-4 sm:py-2.5"
+                  style={{ boxShadow: "0 0 20px rgba(164,108,43,0.6)" }}
+                >
+                  ★&nbsp;{stay.rating.toFixed(1)}
+                </span>
+                {stay.googleMapsUrl && (
+                  <a
+                    href={stay.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white transition hover:opacity-90 sm:px-4 sm:py-2.5"
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 1)",
+                      border: "1.5px solid rgba(255,255,255,0.7)",
+                    }}
+                  >
+                    View on Map&nbsp;↗
+                  </a>
+                )}
+                <Link
+                  href={`/booking?stayId=${stay.id}`}
+                  className="inline-flex rounded-full bg-[var(--button-primary)] px-5 py-2 text-xs font-bold text-white shadow-[0_14px_36px_rgba(74,101,68,0.45)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-97 sm:px-7 sm:py-2.5 sm:text-sm"
+                >
+                  Book This Stay
+                </Link>
+                <Link
+                  href={`/property/${stay.id}`}
+                  className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:opacity-90 sm:px-7 sm:py-2.5"
                   style={{
                     backgroundColor: "rgba(255, 255, 255, 1)",
-                    border: "1.5px solid rgba(255,255,255,0.7)",
+                    border: "1.5px solid rgba(255,255,255,0.65)",
                   }}
                 >
-                  View on Map&nbsp;↗
-                </a>
-              )}
-              <Link
-                href={`/booking?stayId=${stay.id}`}
-                className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white shadow-[0_14px_36px_rgba(199,91,26,0.45)] transition hover:scale-105 active:scale-97 sm:px-7 sm:py-2.5"
-                style={{ backgroundColor: "var(--cta)" }}
-              >
-                Book This Stay
-              </Link>
-              <Link
-                href={`/property/${stay.id}`}
-                className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:opacity-90 sm:px-7 sm:py-2.5"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 1)",
-                  border: "1.5px solid rgba(255,255,255,0.65)",
-                }}
-              >
-                View Details&nbsp;→
-              </Link>
+                  View Details&nbsp;→
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -251,7 +240,7 @@ function RotatingBadge() {
           </defs>
           <text
             fontSize="10"
-            fill="rgba(199,91,26,0.95)"
+            fill="rgba(164,108,43,0.95)"
             fontWeight="900"
             letterSpacing="2.2"
             style={{ fontFamily: "var(--font-montserrat)" }}
@@ -274,8 +263,8 @@ function RotatingBadge() {
 // ─── Main Export ──────────────────────────────────────────────────
 export function FeaturedStaysSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { stays } = useStays();
-  const activeStays = stays.length ? stays : featuredStays;
+  const { stays, isLoading, error } = useStays();
+  const activeStays = stays.filter((stay) => stay.isFeatured === true);
   const total = activeStays.length;
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -284,6 +273,34 @@ export function FeaturedStaysSection() {
 
   // Smooth the raw scroll progress with a spring for buttery feel
   const smoothProgress = useSpring(scrollYProgress, SPRING_CONFIG);
+
+  if (isLoading && total === 0) {
+    return (
+      <section className="px-6 pb-10 pt-6 sm:px-10 lg:px-16">
+        <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>
+          Loading featured stays...
+        </p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="px-6 pb-10 pt-6 sm:px-10 lg:px-16">
+        <p className="text-sm text-red-600">{error}</p>
+      </section>
+    );
+  }
+
+  if (total === 0) {
+    return (
+      <section className="px-6 pb-10 pt-6 sm:px-10 lg:px-16">
+        <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>
+          No featured stays selected yet.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -320,60 +337,56 @@ export function FeaturedStaysSection() {
       </section>
 
       {/* Sticky scroll zone */}
-      <div
-        ref={containerRef}
-        style={{ height: `${total * VH_PER_CARD}vh` }}
-        className="relative mt-4"
-      >
-        <div className="sticky top-0 h-screen overflow-hidden">
-          {/* Cards */}
-          <div className="relative w-full h-full">
-            {activeStays.map((stay, i) => (
-              <StayCard
-                key={stay.id}
-                stay={stay}
-                index={i}
-                total={total}
-                scrollProgress={smoothProgress}
-              />
-            ))}
-          </div>
+      <div ref={containerRef} className="relative mt-4 w-full">
+        {/* Cards */}
+        {activeStays.map((stay, i) => (
+          <StayCard
+            key={stay.id}
+            stay={stay}
+            index={i}
+            total={total}
+          />
+        ))}
 
-          {/* Rotating badge */}
-          <RotatingBadge />
+        {/* Global sticky UI overlays (badges, dots, scroll hints) */}
+        <div className="absolute inset-0 pointer-events-none z-[100]">
+          <div className="sticky top-0 h-screen w-full overflow-hidden">
+            {/* Rotating badge */}
+            <RotatingBadge />
 
-          {/* Progress dots */}
-          <div
-            className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3"
-            style={{ right: "clamp(0.75rem, 3vw, 2rem)" }}
-          >
-            {activeStays.map((_, i) => (
-              <ProgressDot
-                key={i}
-                index={i}
-                total={total}
-                scrollProgress={smoothProgress}
-              />
-            ))}
-          </div>
-
-          {/* Scroll hint */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none">
-            <span
-              className="text-[0.58rem] uppercase tracking-[0.3em]"
-              style={{ color: "rgba(32,60,76,0.4)" }}
+            {/* Progress dots */}
+            <div
+              className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3"
+              style={{ right: "clamp(0.75rem, 3vw, 2rem)" }}
             >
-              Scroll to explore
-            </span>
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 1.7, ease: "easeInOut" }}
-              className="w-px h-7"
-              style={{
-                background:
-                  "linear-gradient(to bottom, rgba(32,60,76,0.35), transparent)",
-              }}
-            />
+              {activeStays.map((_, i) => (
+                <ProgressDot
+                  key={i}
+                  index={i}
+                  total={total}
+                  scrollProgress={smoothProgress}
+                />
+              ))}
+            </div>
+
+            {/* Scroll hint */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
+              <span
+                className="text-[0.58rem] uppercase tracking-[0.3em]"
+                style={{ color: "rgba(74,101,68,0.4)" }}
+              >
+                Scroll to explore
+              </span>
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 1.7, ease: "easeInOut" }}
+                className="w-px h-7"
+                style={{
+                  background:
+                    "linear-gradient(to bottom, rgba(74,101,68,0.35), transparent)",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

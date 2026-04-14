@@ -68,9 +68,9 @@ export function ContactForm({
       onSubmit={handleSubmit}
       className="rounded-[2rem] border p-8 sm:p-10 backdrop-blur-xl max-w-2xl mx-auto"
       style={{
-        borderColor: "rgba(80,150,220,0.3)",
-        backgroundColor: "rgba(245,241,232,0.95)",
-        boxShadow: "0 20px 60px rgba(32,60,76,0.1), inset 0 1px 0 rgba(255,255,255,0.5)",
+        borderColor: "rgba(74,101,68,0.3)",
+        backgroundColor: "rgba(245,241,233,0.95)",
+        boxShadow: "0 20px 60px rgba(74,101,68,0.1), inset 0 1px 0 rgba(255,255,255,0.5)",
       }}
     >
       <h2 className="font-display text-3xl font-bold mb-8 tracking-[-0.03em]">
@@ -90,7 +90,7 @@ export function ContactForm({
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="rounded-[1rem] px-4 py-3 text-sm outline-none transition border"
             style={{
-              borderColor: "rgba(80,150,220,0.3)",
+              borderColor: "rgba(74,101,68,0.2)",
               backgroundColor: "rgba(255,255,255,0.8)",
               color: "var(--foreground)",
             }}
@@ -110,7 +110,7 @@ export function ContactForm({
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="rounded-[1rem] px-4 py-3 text-sm outline-none transition border"
             style={{
-              borderColor: "rgba(80,150,220,0.3)",
+              borderColor: "rgba(74,101,68,0.2)",
               backgroundColor: "rgba(255,255,255,0.8)",
               color: "var(--foreground)",
             }}
@@ -129,7 +129,7 @@ export function ContactForm({
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             className="rounded-[1rem] px-4 py-3 text-sm outline-none transition border"
             style={{
-              borderColor: "rgba(80,150,220,0.3)",
+              borderColor: "rgba(74,101,68,0.2)",
               backgroundColor: "rgba(255,255,255,0.8)",
               color: "var(--foreground)",
             }}
@@ -149,7 +149,7 @@ export function ContactForm({
             onChange={(e) => setForm({ ...form, message: e.target.value })}
             className="rounded-[1rem] px-4 py-3 text-sm outline-none transition border resize-none"
             style={{
-              borderColor: "rgba(80,150,220,0.3)",
+              borderColor: "rgba(74,101,68,0.2)",
               backgroundColor: "rgba(255,255,255,0.8)",
               color: "var(--foreground)",
             }}
@@ -164,10 +164,13 @@ export function ContactForm({
         whileTap={{ scale: 0.98 }}
         type="submit"
         disabled={loading}
-        className="w-full mt-8 rounded-full py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition disabled:opacity-50"
+        className={`mt-8 w-full rounded-full py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition disabled:opacity-50 ${
+          loading
+            ? "bg-[rgba(74,101,68,0.5)]"
+            : "bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)]"
+        }`}
         style={{
-          backgroundColor: loading ? "rgba(32,60,76,0.5)" : "var(--cta)",
-          boxShadow: "0 12px 30px rgba(199,91,26,0.35)",
+          boxShadow: "0 12px 30px rgba(74,101,68,0.35)",
         }}
       >
         {loading ? "Sending..." : success ? "Message Sent! ✓" : "Send Message"}
@@ -182,7 +185,7 @@ export function ContactForm({
           className="mt-4 rounded-full px-4 py-2 text-center text-sm font-semibold"
           style={{
             backgroundColor: "rgba(74, 107, 68, 0.15)",
-            color: "var(--forest)",
+            color: "var(--primary)",
           }}
         >
           Thank you! We&apos;ll get back to you soon.

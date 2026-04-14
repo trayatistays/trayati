@@ -143,7 +143,7 @@ export function ExperienceOverlay({
               onClose();
             }
           }}
-          className="fixed inset-0 z-50 overflow-y-auto bg-[rgba(245,241,232,0.72)] backdrop-blur-md"
+          className="fixed inset-0 z-50 overflow-y-auto bg-[rgba(245,241,233,0.72)] backdrop-blur-md"
         >
           <motion.div
             ref={dialogRef}
@@ -185,7 +185,7 @@ export function ExperienceOverlay({
                 onClick={onClose}
                 className="flex size-11 shrink-0 items-center justify-center rounded-full border transition hover:scale-105 sm:size-12"
                 style={{
-                  borderColor: "rgba(32, 60, 76, 0.14)",
+                  borderColor: "rgba(74, 101, 68, 0.14)",
                   color: "var(--primary)",
                   backgroundColor: "rgba(255,255,255,0.5)",
                 }}
@@ -221,7 +221,7 @@ export function ExperienceOverlay({
               </motion.div>
 
               <div className="hidden lg:block">
-                <div className="sticky top-12 overflow-hidden rounded-[2rem] border p-3 shadow-[0_28px_80px_rgba(32,60,76,0.12)]">
+                <div className="sticky top-12 overflow-hidden rounded-[2rem] border p-3 shadow-[0_28px_80px_rgba(74,101,68,0.12)]">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeExperience.id}
@@ -239,7 +239,7 @@ export function ExperienceOverlay({
                         className="object-cover"
                         priority={isOpen}
                       />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,44,56,0.04),rgba(22,44,56,0.42))]" />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(74,101,68,0.04),rgba(74,101,68,0.42))]" />
                       <div className="absolute inset-x-5 bottom-5 rounded-[1.2rem] border p-4 backdrop-blur-md">
                         <p
                           className="text-[0.65rem] font-semibold uppercase tracking-[0.28em]"

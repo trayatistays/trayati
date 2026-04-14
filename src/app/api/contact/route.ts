@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
-import { addContactSubmission, getContactSubmissions } from "@/lib/contact-store";
+import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { Resend } from "resend";
 
 export async function GET() {
-  const submissions = await getContactSubmissions();
-  return NextResponse.json({ submissions });
+  try {
+    const supabase = requireSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("contact_messages")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json({ submissions: data });
+  } catch {
+    return NextResponse.json({ submissions: [] });
+  }
 }
 
 export async function POST(request: Request) {
@@ -23,17 +33,24 @@ export async function POST(request: Request) {
     );
   }
 
-  const submission = await addContactSubmission({
-    id: crypto.randomUUID(),
-    name: body.name.trim(),
-    email: body.email.trim(),
-    phone: body.phone?.trim() ?? "",
-    message: body.message.trim(),
-    source: body.source ?? "contact",
-    createdAt: new Date().toISOString(),
-  });
+  try {
+    const supabase = requireSupabaseAdmin();
+    const { error } = await supabase.from("contact_messages").insert({
+      name: body.name.trim(),
+      email: body.email.trim(),
+      phone: body.phone?.trim() ?? "",
+      message: body.message.trim(),
+      source: body.source ?? "contact",
+    });
 
-  // Send email notification via Resend (silently skips if key not configured)
+    if (error) throw error;
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to save message" },
+      { status: 500 },
+    );
+  }
+
   if (process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
@@ -44,27 +61,26 @@ export async function POST(request: Request) {
         subject: `New ${body.source ?? "contact"} enquiry from ${body.name.trim()}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:auto;padding:24px">
-            <h2 style="color:#203C4C;margin-bottom:4px">New Enquiry — Trayati Stays</h2>
-            <p style="color:#6B7280;font-size:12px;margin-bottom:24px;text-transform:uppercase;letter-spacing:0.1em">
+            <h2 style="color:#4A6544;margin-bottom:4px">New Enquiry — Trayati Stays</h2>
+            <p style="color:#8A8A8A;font-size:12px;margin-bottom:24px;text-transform:uppercase;letter-spacing:0.1em">
               Source: ${body.source ?? "contact form"}
             </p>
             <table style="width:100%;border-collapse:collapse">
-              <tr><td style="padding:8px 0;color:#6B7280;font-size:13px;width:80px">Name</td><td style="padding:8px 0;font-weight:600">${body.name.trim()}</td></tr>
-              <tr><td style="padding:8px 0;color:#6B7280;font-size:13px">Email</td><td style="padding:8px 0;font-weight:600"><a href="mailto:${body.email.trim()}" style="color:#C75B1A">${body.email.trim()}</a></td></tr>
-              ${body.phone ? `<tr><td style="padding:8px 0;color:#6B7280;font-size:13px">Phone</td><td style="padding:8px 0;font-weight:600"><a href="tel:${body.phone.trim()}" style="color:#C75B1A">${body.phone.trim()}</a></td></tr>` : ""}
+              <tr><td style="padding:8px 0;color:#8A8A8A;font-size:13px;width:80px">Name</td><td style="padding:8px 0;font-weight:600">${body.name.trim()}</td></tr>
+              <tr><td style="padding:8px 0;color:#8A8A8A;font-size:13px">Email</td><td style="padding:8px 0;font-weight:600"><a href="mailto:${body.email.trim()}" style="color:#A46C2B">${body.email.trim()}</a></td></tr>
+              ${body.phone ? `<tr><td style="padding:8px 0;color:#8A8A8A;font-size:13px">Phone</td><td style="padding:8px 0;font-weight:600"><a href="tel:${body.phone.trim()}" style="color:#A46C2B">${body.phone.trim()}</a></td></tr>` : ""}
             </table>
-            <div style="margin-top:20px;padding:16px;background:#F5F1E8;border-radius:12px;border-left:3px solid #C75B1A">
-              <p style="margin:0;white-space:pre-line;color:#1F2937">${body.message.trim()}</p>
+            <div style="margin-top:20px;padding:16px;background:#F5F1E9;border-radius:12px;border-left:3px solid #A46C2B">
+              <p style="margin:0;white-space:pre-line;color:#1A1A1A">${body.message.trim()}</p>
             </div>
-            <p style="margin-top:24px;font-size:12px;color:#9CA3AF">Reply directly to this email to respond to ${body.name.trim()}.</p>
+            <p style="margin-top:24px;font-size:12px;color:#8A8A8A">Reply directly to this email to respond to ${body.name.trim()}.</p>
           </div>
         `,
       });
     } catch (e) {
-      // Email failure should never block the user's form submission
       console.warn("[Trayati] Resend notification failed:", e);
     }
   }
 
-  return NextResponse.json({ submission }, { status: 201 });
+  return NextResponse.json({ success: true }, { status: 201 });
 }

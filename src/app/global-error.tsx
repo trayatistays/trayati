@@ -11,13 +11,12 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log to error monitoring service when available
     console.error("[Trayati] Unhandled error:", error);
   }, [error]);
 
   return (
     <html>
-      <body style={{ margin: 0, backgroundColor: "#F5F1E8", fontFamily: "system-ui, sans-serif" }}>
+      <body style={{ margin: 0, backgroundColor: "#F5F1E9", fontFamily: "system-ui, sans-serif" }}>
         <main
           style={{
             minHeight: "100vh",
@@ -38,8 +37,8 @@ export default function GlobalError({
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.3em",
-                backgroundColor: "rgba(199,91,26,0.1)",
-                color: "#C75B1A",
+                backgroundColor: "rgba(164,108,43,0.1)",
+                color: "#A46C2B",
                 marginBottom: "1.5rem",
               }}
             >
@@ -50,7 +49,7 @@ export default function GlobalError({
               style={{
                 fontSize: "2.5rem",
                 fontWeight: 800,
-                color: "#203C4C",
+                color: "#4A6544",
                 letterSpacing: "-0.03em",
                 marginBottom: "1rem",
                 lineHeight: 1.1,
@@ -59,13 +58,19 @@ export default function GlobalError({
               Oops — unexpected detour
             </h1>
 
-            <p style={{ color: "#4B5563", marginBottom: "2.5rem", lineHeight: 1.6 }}>
+            <p style={{ color: "#5C5C5C", marginBottom: "2.5rem", lineHeight: 1.6 }}>
               Something went wrong on our end. Our team has been notified.
               Please try again or head back home.
             </p>
 
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
               <button
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.backgroundColor = "#3E553A";
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.backgroundColor = "#4A6544";
+                }}
                 onClick={reset}
                 style={{
                   display: "inline-flex",
@@ -78,10 +83,10 @@ export default function GlobalError({
                   textTransform: "uppercase",
                   letterSpacing: "0.2em",
                   color: "white",
-                  backgroundColor: "#C75B1A",
+                  backgroundColor: "#4A6544",
                   border: "none",
                   cursor: "pointer",
-                  boxShadow: "0 12px 30px rgba(199,91,26,0.35)",
+                  boxShadow: "0 12px 30px rgba(74,101,68,0.35)",
                 }}
               >
                 Try Again
@@ -98,13 +103,13 @@ export default function GlobalError({
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.2em",
-                  color: "#203C4C",
-                  border: "1px solid rgba(32,60,76,0.15)",
-                  backgroundColor: "rgba(245,241,232,0.9)",
+                  color: "#4A6544",
+                  border: "1px solid rgba(74,101,68,0.15)",
+                  backgroundColor: "rgba(245,241,233,0.9)",
                   textDecoration: "none",
                 }}
               >
-                ← Back Home
+                &larr; Back Home
               </Link>
             </div>
           </div>

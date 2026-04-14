@@ -10,11 +10,11 @@ export default function NotFound() {
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20"
-          style={{ backgroundColor: "rgba(95,168,168,0.4)" }}
+          style={{ backgroundColor: "rgba(13,58,82,0.4)" }}
         />
         <div
           className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-15"
-          style={{ backgroundColor: "rgba(199,91,26,0.3)" }}
+          style={{ backgroundColor: "rgba(164,108,43,0.3)" }}
         />
       </div>
 
@@ -35,7 +35,7 @@ export default function NotFound() {
           <div
             className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.3em] mb-6"
             style={{
-              backgroundColor: "rgba(199,91,26,0.1)",
+              backgroundColor: "rgba(164,108,43,0.1)",
               color: "var(--cta)",
             }}
           >
@@ -58,10 +58,9 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--button-primary)] px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-95"
               style={{
-                backgroundColor: "var(--cta)",
-                boxShadow: "0 12px 30px rgba(199,91,26,0.35)",
+                boxShadow: "0 12px 30px rgba(74,101,68,0.35)",
               }}
             >
               ← Back Home
@@ -72,7 +71,7 @@ export default function NotFound() {
               style={{
                 borderColor: "var(--border-soft)",
                 color: "var(--primary)",
-                backgroundColor: "rgba(245,241,232,0.8)",
+                backgroundColor: "rgba(245,241,233,0.8)",
               }}
             >
               Browse Stays →

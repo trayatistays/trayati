@@ -4,23 +4,40 @@ import { experienceTypes } from "@/data/experience-types";
 const stringArray = z.array(z.string().trim().min(1)).default([]);
 
 const amenitiesDetailSchema = z.object({
-  parking: z.boolean(),
-  heaterOnRequest: z.boolean(),
-  tv: z.boolean(),
-  fridge: z.boolean(),
-  washingMachine: z.boolean(),
-  powerBackup: z.boolean(),
-  airConditioning: z.boolean(),
-  geyser: z.boolean(),
-  kitchen: z.boolean(),
-  garden: z.boolean(),
-  balcony: z.boolean(),
-  lounge: z.boolean(),
-  studyArea: z.boolean(),
-  fireplace: z.boolean(),
-  pool: z.boolean(),
-  spa: z.boolean(),
-});
+  parking: z.boolean().default(false),
+  heaterOnRequest: z.boolean().default(false),
+  tv: z.boolean().default(false),
+  fridge: z.boolean().default(false),
+  washingMachine: z.boolean().default(false),
+  powerBackup: z.boolean().default(false),
+  airConditioning: z.boolean().default(false),
+  geyser: z.boolean().default(false),
+  kitchen: z.boolean().default(false),
+  garden: z.boolean().default(false),
+  balcony: z.boolean().default(false),
+  lounge: z.boolean().default(false),
+  studyArea: z.boolean().default(false),
+  fireplace: z.boolean().default(false),
+  pool: z.boolean().default(false),
+  spa: z.boolean().default(false),
+}).default(() => ({
+  parking: false,
+  heaterOnRequest: false,
+  tv: false,
+  fridge: false,
+  washingMachine: false,
+  powerBackup: false,
+  airConditioning: false,
+  geyser: false,
+  kitchen: false,
+  garden: false,
+  balcony: false,
+  lounge: false,
+  studyArea: false,
+  fireplace: false,
+  pool: false,
+  spa: false,
+}));
 
 const mealOptionSchema = z.object({
   type: z.enum(["breakfast", "lunch", "dinner", "packed"]),
@@ -74,6 +91,7 @@ export const staySchema = z.object({
   amenitiesDetail: amenitiesDetailSchema,
   mealOptions: z.array(mealOptionSchema).default([]),
   cancellationPolicies: z.array(cancellationPolicySchema).default([]),
+  isFeatured: z.coerce.boolean().default(false),
 });
 
 export const experienceSchema = z.object({

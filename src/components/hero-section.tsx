@@ -12,7 +12,7 @@ import { ExperienceOverlay } from "@/components/experience-overlay";
 import { socialLinks } from "@/data/social-links";
 
 const keywords = ["Folklore Homestays", "Apartments & Condos", "Villas"];
-const destinations = ["Goa", "Jaipur", "Manali", "Udaipur", "Coorg"];
+const destinations = ["Kasar Devi", "Dharamsala", "Jaisalmer", "Varkala"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [
   { label: "WhatsApp", href: socialLinks.whatsapp.url, icon: FaWhatsapp },
@@ -21,22 +21,22 @@ const socials = [
 ];
 const overlayImages: Record<string, { src: string; title: string; subtitle: string }> = {
   About: {
-    src: "/menu-about.jpg",
+    src: "/menu-about.webp",
     title: "About Trayati Stays",
     subtitle: "Mountain panoramas and an intentional stay experience.",
   },
   Blogs: {
-    src: "/menu-blogs.jpg",
+    src: "/menu-blogs.webp",
     title: "Blogs and Stories",
     subtitle: "Property stories, destination ideas, and travel inspiration.",
   },
   Connect: {
-    src: "/menu-connect.jpg",
+    src: "/menu-connect.webp",
     title: "Connect With Us",
     subtitle: "Conversations shaped around views, warmth, and hospitality.",
   },
   Solutions: {
-    src: "/menu-solutions.jpg",
+    src: "/menu-solutions.webp",
     title: "Tailored Solutions",
     subtitle: "A smarter way to present and discover memorable stays.",
   },
@@ -89,11 +89,11 @@ export function HeroSection() {
     >
       {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}
       <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(164, 106, 45, 0.14)" }}
+        style={{ transform: orbTransform, backgroundColor: "rgba(164, 108, 43, 0.14)" }}
         className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56 pointer-events-none"
       />
       <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(95, 168, 168, 0.14)" }}
+        style={{ transform: orbTransform, backgroundColor: "rgba(13, 58, 82, 0.14)" }}
         className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
       />
 
@@ -147,8 +147,7 @@ export function HeroSection() {
               <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <Link
                   href="/booking"
-                  className="w-full rounded-full px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(199,91,26,0.40)] sm:w-auto transition hover:scale-105 active:scale-98"
-                  style={{ backgroundColor: "var(--cta)" }}
+                  className="w-full rounded-full bg-[var(--button-primary)] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(74,101,68,0.40)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-98 sm:w-auto"
                 >
                   Explore Properties
                 </Link>
@@ -178,9 +177,9 @@ export function HeroSection() {
             className="absolute inset-0 z-40 overflow-y-auto rounded-[2rem]"
             aria-hidden={!menuOpen}
           >
-            <div className="absolute inset-0" style={{ backgroundColor: "rgba(245, 241, 232, 0.97)" }} />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(95,168,168,0.16),transparent_24%),radial-gradient(circle_at_80%_18%,rgba(164,106,45,0.10),transparent_20%)]" />
-            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(32,60,76,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(32,60,76,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
+            <div className="absolute inset-0" style={{ backgroundColor: "rgba(245, 241, 233, 0.97)" }} />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(13,58,82,0.10),transparent_24%),radial-gradient(circle_at_80%_18%,rgba(164,108,43,0.08),transparent_20%)]" />
+            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(74,101,68,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(74,101,68,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
 
             <div className="relative flex min-h-full flex-col px-4 py-4 sm:px-8 sm:py-6 lg:px-12">
               <div className="flex items-center justify-center pt-2">
@@ -193,10 +192,10 @@ export function HeroSection() {
                 {/* Preview card */}
                 <div className="flex flex-col items-center justify-center gap-6 md:items-end md:gap-8">
                   <div
-                    className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(32,60,76,0.14)] backdrop-blur-xl"
+                    className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(74,101,68,0.14)] backdrop-blur-xl"
                     style={{
                       borderColor: "var(--border-soft)",
-                      backgroundColor: "rgba(245, 241, 232, 0.92)",
+                      backgroundColor: "rgba(245, 241, 233, 0.92)",
                     }}
                   >
                     <div className="relative aspect-[4/5] overflow-hidden rounded-[1.35rem]" style={{ backgroundColor: "rgba(220, 215, 200, 1)" }}>
@@ -215,12 +214,12 @@ export function HeroSection() {
                           className="object-cover"
                         />
                       </motion.div>
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(32,60,76,0.55)_100%)]" />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(74,101,68,0.55)_100%)]" />
                       <div
                         className="absolute inset-x-4 bottom-4 rounded-[1.25rem] border p-3 backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-4"
                         style={{
                           borderColor: "var(--border-soft)",
-                          backgroundColor: "rgba(245, 241, 232, 0.90)",
+                          backgroundColor: "rgba(245, 241, 233, 0.90)",
                         }}
                       >
                         <p className="text-xs uppercase tracking-[0.28em]" style={{ color: "var(--muted)" }}>
@@ -244,7 +243,7 @@ export function HeroSection() {
                         href={href}
                         whileHover={{ scale: 1.08, y: -2 }}
                         whileTap={{ scale: 0.96 }}
-                        className="flex size-11 items-center justify-center rounded-full border text-base shadow-[0_8px_20px_rgba(32,60,76,0.12)] transition duration-300"
+                        className="flex size-11 items-center justify-center rounded-full border text-base shadow-[0_8px_20px_rgba(74,101,68,0.12)] transition duration-300"
                         style={{
                           borderColor: "var(--border-soft)",
                           backgroundColor: "rgba(240, 236, 226, 0.96)",
@@ -286,7 +285,7 @@ export function HeroSection() {
                             onClick={() => handleMenuClick(item)}
                             whileHover={{
                               borderColor: "var(--border-soft)",
-                              backgroundColor: "rgba(32, 60, 76, 0.06)",
+                              backgroundColor: "rgba(74, 101, 68, 0.06)",
                               color: "var(--cta)",
                             }}
                             className="group w-full flex items-center justify-between rounded-full border px-4 py-3 text-2xl capitalize tracking-[-0.05em] transition duration-300 bg-transparent sm:border-transparent sm:bg-transparent sm:px-0 sm:py-1 sm:text-5xl"
@@ -300,8 +299,8 @@ export function HeroSection() {
                               <span
                                 className="absolute inset-3 rounded-full border opacity-0 transition duration-300 group-hover:inset-0 group-hover:opacity-100"
                                 style={{
-                                  borderColor: "rgba(164, 106, 45, 0.4)",
-                                  backgroundColor: "rgba(164, 106, 45, 0.14)",
+                                  borderColor: "rgba(164, 108, 43, 0.4)",
+                                  backgroundColor: "rgba(164, 108, 43, 0.14)",
                                 }}
                               />
                               <span

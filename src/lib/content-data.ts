@@ -1,59 +1,62 @@
 import "server-only";
 
-import {
-  experiences,
-  testimonials,
-  type Experience,
-  type Testimonial,
-} from "@/data/testimonials-and-blogs";
 import type { FeaturedStay } from "@/data/featured-stays";
-import { getAllStays } from "@/lib/stays-store";
-import {
-  deleteContentItem,
-  getCollection,
-  upsertContentItem,
-  type ContentCollection,
-} from "@/lib/content-store";
+import type { Experience, Testimonial } from "@/data/testimonials-and-blogs";
+import { dbGetAllStays, dbGetAllTestimonials, dbGetAllExperiences, dbUpsertStay, dbUpsertTestimonial, dbUpsertExperience, dbDeleteStay, dbDeleteTestimonial, dbDeleteExperience, dbGetAllReservations } from "@/lib/db";
+
+type ContentCollection = "stays" | "experiences" | "testimonials" | "reservations";
 
 type ContentMap = {
   stays: FeaturedStay;
   experiences: Experience;
   testimonials: Testimonial;
-  reservations: {
-    id: string;
-    [key: string]: unknown;
-  };
+  reservations: Record<string, unknown>;
 };
 
 export async function getContentCollection<C extends ContentCollection>(
   collection: C,
 ): Promise<ContentMap[C][]> {
-  if (collection === "stays") {
-    return (await getAllStays()) as ContentMap[C][];
+  switch (collection) {
+    case "stays":
+      return (await dbGetAllStays()) as ContentMap[C][];
+    case "testimonials":
+      return (await dbGetAllTestimonials()) as ContentMap[C][];
+    case "experiences":
+      return (await dbGetAllExperiences()) as ContentMap[C][];
+    case "reservations":
+      return (await dbGetAllReservations()) as unknown as ContentMap[C][];
+    default:
+      return [];
   }
-
-  if (collection === "experiences") {
-    return (await getCollection("experiences", experiences)) as ContentMap[C][];
-  }
-
-  if (collection === "testimonials") {
-    return (await getCollection("testimonials", testimonials)) as ContentMap[C][];
-  }
-
-  return (await getCollection("reservations", [])) as ContentMap[C][];
 }
 
 export async function saveContentItem<C extends ContentCollection>(
   collection: C,
   item: ContentMap[C] & { id: string },
 ) {
-  const fallback = await getContentCollection(collection);
-  return upsertContentItem(collection, item, fallback);
+  switch (collection) {
+    case "stays":
+      return dbUpsertStay(item as FeaturedStay);
+    case "testimonials":
+      return dbUpsertTestimonial(item as Testimonial);
+    case "experiences":
+      return dbUpsertExperience(item as Experience);
+    default:
+      throw new Error(`Cannot save to collection: ${collection}`);
+  }
 }
 
 export async function removeContentItem(collection: ContentCollection, id: string) {
-  const fallback = await getContentCollection(collection);
-  return deleteContentItem(collection, id, fallback);
+  switch (collection) {
+    case "stays":
+      return dbDeleteStay(id);
+    case "testimonials":
+      return dbDeleteTestimonial(id);
+    case "experiences":
+      return dbDeleteExperience(id);
+    default:
+      throw new Error(`Cannot delete from collection: ${collection}`);
+  }
 }
 
 export function isContentCollection(input: string): input is ContentCollection {

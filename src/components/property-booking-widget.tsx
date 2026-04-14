@@ -9,103 +9,119 @@ interface PropertyBookingWidgetProps {
 }
 
 export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
-  const minPrice = Math.min(...stay.roomTypes.map((r) => r.pricePerNight));
-  const maxPrice = Math.max(...stay.roomTypes.map((r) => r.pricePerNight));
+  const roomPrices = stay.roomTypes.map((r) => r.pricePerNight);
+  const minPrice = roomPrices.length > 0 ? Math.min(...roomPrices) : stay.pricePerNight;
+  const maxPrice = roomPrices.length > 0 ? Math.max(...roomPrices) : stay.pricePerNight;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="sticky top-8 rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden"
+      className="sticky top-8 overflow-hidden rounded-2xl border"
+      style={{
+        borderColor: "var(--border-soft)",
+        backgroundColor: "rgba(245,241,233,0.98)",
+        boxShadow: "0 10px 40px rgba(74,101,68,0.08)",
+      }}
     >
-      <div className="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-8">
-        <div className="mb-2 text-sm text-white/80 font-semibold tracking-wide">
+      <div
+        className="px-6 py-8"
+        style={{
+          background: "linear-gradient(135deg, var(--secondary), var(--primary))",
+        }}
+      >
+        <div className="mb-2 text-sm font-semibold tracking-wide" style={{ color: "rgba(255,255,255,0.8)" }}>
           From
         </div>
-        <div className="flex items-baseline gap-1 mb-6">
-          <span className="text-4xl font-bold text-white">₹{minPrice.toLocaleString()}</span>
-          <span className="text-white/80 font-semibold">/night</span>
+        <div className="mb-6 flex items-baseline gap-1">
+          <span className="text-4xl font-bold text-white">
+            &#8377;{minPrice.toLocaleString()}
+          </span>
+          <span className="font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>/night</span>
         </div>
 
         {minPrice !== maxPrice && (
-          <div className="text-xs text-white/70 mb-6">
-            up to ₹{maxPrice.toLocaleString()} for premium rooms
+          <div className="mb-6 text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
+            up to &#8377;{maxPrice.toLocaleString()} for premium rooms
           </div>
         )}
 
         <div className="space-y-3">
           <motion.div
-            className="flex items-center gap-2 text-white text-sm"
+            className="flex items-center gap-2 text-sm text-white"
             whileHover={{ x: 5 }}
           >
-            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
             </svg>
             <span>{stay.roomTypes.length} room types</span>
           </motion.div>
 
           <motion.div
-            className="flex items-center gap-2 text-white text-sm"
+            className="flex items-center gap-2 text-sm text-white"
             whileHover={{ x: 5 }}
           >
-            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M5.05 4.05a1 1 0 111.414 1.414L5.414 6.828A1 1 0 015.05 4.05zm5 0a1 1 0 111.414 1.414L10.414 6.828a1 1 0 01-1.364-1.414L10.05 4.05zm5 0a1 1 0 111.414 1.414L15.414 6.828a1 1 0 01-1.364-1.414L15.05 4.05zm2.828 4.95a1 1 0 111.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zm0 5a1 1 0 111.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zM5.05 15.95a1 1 0 011.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zM5.05 10.05a1 1 0 011.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zm5 0a1 1 0 011.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zm5 0a1 1 0 011.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414zm-4.95 5a1 1 0 011.414-1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414z"
-                clipRule="evenodd"
-              />
+            <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Check availability</span>
           </motion.div>
 
           <motion.div
-            className="flex items-center gap-2 text-white text-sm"
+            className="flex items-center gap-2 text-sm text-white"
             whileHover={{ x: 5 }}
           >
-            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M9.243 3.03a1 1 0 08-.486 1.944H5.25a.75.75 0 00-.75.75v9a.75.75 0 00.75.75h9.243a.75.75 0 001.581-.191.75.75 0 00-.731-.75H5.25v-9a.75.75 0 00-.75-.75h3.493a1 1 0 00.486-1.944H5.25A2.25 2.25 0 003 9v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25V9a2.25 2.25 0 00-2.25-2.25h-3.757z"
-                clipRule="evenodd"
-              />
+            <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Free cancellation</span>
           </motion.div>
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-3">
+      <div className="space-y-3 px-6 py-6">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex items-center gap-2 text-sm" style={{ color: "var(--foreground-soft)" }}>
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                 clipRule="evenodd"
               />
             </svg>
-            <span>★ {stay.rating.toFixed(1)} rating</span>
+            <span style={{ color: "var(--primary)" }}>&#9733; {stay.rating.toFixed(1)} rating</span>
           </div>
         </div>
 
         <ReserveNowButton
           stayId={stay.id}
-          className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg text-center transition-all shadow-lg hover:shadow-xl"
+          className="block w-full rounded-lg bg-[var(--button-primary)] px-4 py-3 text-center font-bold text-white transition-all hover:bg-[var(--button-primary-hover)] hover:shadow-xl"
         />
 
-        <button className="w-full border-2 border-amber-600 text-amber-600 hover:bg-amber-50 font-semibold py-2 px-4 rounded-lg transition-colors">
+        <button
+          className="w-full rounded-lg border-2 py-2 px-4 font-semibold transition-colors"
+          style={{
+            borderColor: "var(--cta)",
+            color: "var(--cta)",
+          }}
+        >
           View Rooms
         </button>
 
-        <p className="text-xs text-slate-500 text-center">
+        <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
           No payment required until you confirm
         </p>
       </div>
 
-      {/* Contact Info */}
-      <div className="border-t border-slate-200 px-6 py-4 bg-slate-50">
-        <p className="text-xs font-semibold text-slate-600 mb-3">
+      <div
+        className="border-t px-6 py-4"
+        style={{
+          borderColor: "var(--border-soft)",
+          backgroundColor: "var(--background-soft)",
+        }}
+      >
+        <p className="mb-3 text-xs font-semibold" style={{ color: "var(--foreground-soft)" }}>
           Questions? Contact us
         </p>
         <div className="space-y-2">
@@ -114,12 +130,13 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
               href={stay.googleMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-amber-600 hover:text-amber-700 font-medium"
+              className="block text-sm font-medium"
+              style={{ color: "var(--cta)" }}
             >
-              📍 View on Map
+              &#128205; View on Map
             </a>
           )}
-          <p className="text-sm text-slate-600">
+          <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>
             {stay.city}, {stay.state}
           </p>
         </div>

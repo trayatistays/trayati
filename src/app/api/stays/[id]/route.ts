@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { deleteStay, getStayById, updateStay } from "@/lib/stays-store";
+import { dbGetStayById, dbUpsertStay, dbDeleteStay } from "@/lib/db";
 import { staySchema } from "@/lib/schemas";
 
 export async function GET(
@@ -9,13 +9,24 @@ export async function GET(
   context: RouteContext<"/api/stays/[id]">,
 ) {
   const { id } = await context.params;
-  const stay = await getStayById(id);
 
-  if (!stay) {
-    return NextResponse.json({ error: "Stay not found." }, { status: 404 });
+  try {
+    const stay = await dbGetStayById(id);
+    if (!stay) {
+      return NextResponse.json({ error: "Stay not found." }, { status: 404 });
+    }
+    return NextResponse.json({ stay }, {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        CDNCacheControl: "public, max-age=3600, stale-while-revalidate=86400",
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unable to load stay." },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json({ stay });
 }
 
 export async function PUT(
@@ -36,11 +47,7 @@ export async function PUT(
     );
   }
 
-  const stay = await updateStay(id, parsed.data);
-
-  if (!stay) {
-    return NextResponse.json({ error: "Stay not found." }, { status: 404 });
-  }
+  const stay = await dbUpsertStay({ ...parsed.data, id });
 
   return NextResponse.json({ stay });
 }
@@ -54,7 +61,7 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
-  const deleted = await deleteStay(id);
+  const deleted = await dbDeleteStay(id);
 
   if (!deleted) {
     return NextResponse.json({ error: "Stay not found." }, { status: 404 });

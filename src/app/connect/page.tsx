@@ -12,21 +12,21 @@ export default function ConnectPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-20 border-b backdrop-blur-xl"
-        style={{
-          borderColor: "var(--border-soft)",
-          backgroundColor: "rgba(245,241,232,0.95)",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] transition hover:opacity-70"
-            style={{ color: "var(--primary)" }}
-          >
-            ← Back
-          </Link>
-        </div>
-      </motion.div>
+          style={{
+            borderColor: "var(--border-soft)",
+            backgroundColor: "rgba(245,241,233,0.95)",
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] transition hover:opacity-70"
+              style={{ color: "var(--primary)" }}
+            >
+              &larr; Back
+            </Link>
+          </div>
+        </motion.div>
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -68,8 +68,8 @@ export default function ConnectPage() {
                 transition={{ delay: idx * 0.1, duration: 0.5 }}
                 className="rounded-[1.5rem] border p-6 backdrop-blur-xl"
                 style={{
-                  borderColor: "rgba(80,150,220,0.2)",
-                  backgroundColor: "rgba(245,241,232,0.9)",
+                  borderColor: "rgba(74,101,68,0.2)",
+                  backgroundColor: "rgba(245,241,233,0.9)",
                 }}
               >
                 <h3 className="font-display text-xl font-bold mb-2">{item.title}</h3>

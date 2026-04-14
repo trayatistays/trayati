@@ -154,7 +154,7 @@ export function ExperienceItem({
             <div className="flex items-start gap-4">
               <h3
                 className="font-sans text-[2.15rem] font-medium leading-none tracking-[-0.06em] sm:text-[3.2rem] lg:text-[4.25rem]"
-                style={{ color: isActive || isDesktop ? "var(--cta)" : "#1f2329" }}
+                style={{ color: isActive || isDesktop ? "var(--cta)" : "var(--foreground)" }}
               >
                 {experience.title}
               </h3>
@@ -164,7 +164,7 @@ export function ExperienceItem({
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 className="hidden rounded-full border p-3 lg:inline-flex"
                 style={{
-                  borderColor: "rgba(32, 60, 76, 0.14)",
+                  borderColor: "rgba(74, 101, 68, 0.14)",
                   color: "var(--primary)",
                 }}
               >
@@ -213,7 +213,7 @@ export function ExperienceItem({
             >
               <ul
                 className="space-y-2 text-sm leading-relaxed sm:text-[1rem]"
-                style={{ color: "#2d3138" }}
+                style={{ color: "var(--foreground-soft)" }}
               >
                 {experience.bullets.map((bullet) => (
                   <li key={bullet}>{bullet}</li>

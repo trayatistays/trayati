@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import supabaseImageLoader from "@/lib/supabase-image-loader";
 
 interface PropertyPhotoCarouselProps {
   photos: string[];
@@ -13,114 +12,107 @@ export function PropertyPhotoCarousel({
   photos,
   title,
 }: PropertyPhotoCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  if (!photos || photos.length === 0) {
+    return (
+      <div
+        className="flex min-h-80 w-full items-center justify-center rounded-lg"
+        style={{ backgroundColor: "var(--background-soft)" }}
+      >
+        <p className="text-sm" style={{ color: "var(--muted)" }}>No photos available</p>
+      </div>
+    );
+  }
 
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
-  };
+  const previewPhotos = photos.slice(0, 5);
+  const remainingPhotos = photos.slice(5);
 
   return (
-    <div className="w-full h-full rounded-2xl overflow-hidden bg-slate-100 relative group">
-      {/* Main Image Container */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative w-full h-full"
-        >
-          <Image
-            src={photos[currentIndex]}
-            alt={`${title} - Photo ${currentIndex + 1}`}
-            fill
-            className="object-cover"
+    <div className="space-y-3 sm:space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+        <div className="grid auto-rows-[minmax(220px,1fr)] gap-3 sm:auto-rows-[minmax(260px,1fr)] sm:gap-4">
+          <PhotoTile
+            src={previewPhotos[0]}
+            alt={`${title} photo 1`}
             priority
+            className="min-h-[280px] sm:min-h-[420px]"
           />
-        </motion.div>
-      </AnimatePresence>
+        </div>
 
-      {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
-
-      {/* Navigation Buttons */}
-      <button
-        onClick={handlePrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
-        aria-label="Previous photo"
-      >
-        <svg
-          className="w-5 h-5 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-
-      <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-20"
-        aria-label="Next photo"
-      >
-        <svg
-          className="w-5 h-5 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-
-      {/* Photo Counter & Thumbnail Navigation */}
-      <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/60 to-black/20">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-white text-sm font-semibold">
-            {currentIndex + 1} / {photos.length}
-          </span>
-          <div className="flex gap-2">
-            {photos.map((_, idx) => (
-              <motion.button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`rounded-full transition-all ${
-                  idx === currentIndex
-                    ? "bg-white px-3 py-1.5"
-                    : "bg-white/40 hover:bg-white/60 px-2 py-1"
-                }`}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span
-                  className={`text-xs font-bold ${
-                    idx === currentIndex ? "text-slate-900" : "text-white"
-                  }`}
-                >
-                  {idx + 1}
-                </span>
-              </motion.button>
+        {previewPhotos.length > 1 ? (
+          <div className="grid gap-3 sm:grid-rows-2 sm:gap-4">
+            {previewPhotos.slice(1, 3).map((photo, index) => (
+              <PhotoTile
+                key={`${photo}-${index + 1}`}
+                src={photo}
+                alt={`${title} photo ${index + 2}`}
+                className="min-h-[180px] sm:min-h-0"
+              />
             ))}
           </div>
-        </div>
+        ) : null}
       </div>
+
+      {previewPhotos.length > 3 ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
+          {previewPhotos.slice(3).map((photo, index) => (
+            <PhotoTile
+              key={`${photo}-${index + 4}`}
+              src={photo}
+              alt={`${title} photo ${index + 4}`}
+              className="aspect-[4/3]"
+            />
+          ))}
+
+          {Array.from({ length: Math.max(0, 5 - previewPhotos.length) }).map((_, index) => (
+            <div
+              key={`placeholder-${index}`}
+              className="hidden rounded-lg lg:block"
+              style={{ backgroundColor: "var(--background-soft)" }}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {remainingPhotos.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {remainingPhotos.map((photo, index) => (
+            <PhotoTile
+              key={`${photo}-${index + 6}`}
+              src={photo}
+              alt={`${title} photo ${index + 6}`}
+              className="aspect-[4/3]"
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function PhotoTile({
+  src,
+  alt,
+  className,
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  priority?: boolean;
+}) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-lg ${className ?? "aspect-[4/3]"}`}
+      style={{ backgroundColor: "var(--background-soft)" }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className="object-cover"
+        priority={priority}
+        loader={supabaseImageLoader}
+      />
     </div>
   );
 }

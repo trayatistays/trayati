@@ -77,6 +77,7 @@ export type FeaturedStay = {
   amenitiesDetail: AmenitiesDetail;
   mealOptions: MealOption[];
   cancellationPolicies: CancellationPolicy[];
+  isFeatured?: boolean;
 };
 
 export const featuredStays: FeaturedStay[] = [
@@ -96,7 +97,7 @@ export const featuredStays: FeaturedStay[] = [
     rating: 4.9,
     pricePerNight: 12500,
     basePrice: 12500,
-    image: "/samar-villa.png",
+    image: "/samar-villa.webp",
     alt: "Samar Villa – Himalayan panorama from Kasar Devi, Uttarakhand",
     tag: "Private Villa",
     type: "Private Villa",
@@ -109,10 +110,10 @@ export const featuredStays: FeaturedStay[] = [
       "Bonfire area",
     ],
     photos: [
-      "/samar-villa.png",
-      "/property-view.jpg",
-      "/property-bedroom.jpg",
-      "/property-balcony.jpg",
+      "/samar-villa.webp",
+      "/property-view.webp",
+      "/property-bedroom.webp",
+      "/property-balcony.webp",
     ],
     roomTypes: [
       {
@@ -202,6 +203,7 @@ export const featuredStays: FeaturedStay[] = [
         daysBeforeCheckin: 0,
       },
     ],
+    isFeatured: true,
   },
   {
     id: "orchid-nest-retreat",
@@ -218,7 +220,7 @@ export const featuredStays: FeaturedStay[] = [
     rating: 4.8,
     pricePerNight: 9800,
     basePrice: 9800,
-    image: "/property-exterior.jpg",
+    image: "/property-exterior.webp",
     alt: "Orchid Nest – Mountain cottage in Dharamsala, Himachal Pradesh",
     tag: "Mountain Cottage",
     type: "Cottage",
@@ -231,10 +233,10 @@ export const featuredStays: FeaturedStay[] = [
       "Cultural tours",
     ],
     photos: [
-      "/property-exterior.jpg",
-      "/property-view.jpg",
-      "/property-bedroom.jpg",
-      "/property-lounge.jpg",
+      "/property-exterior.webp",
+      "/property-view.webp",
+      "/property-bedroom.webp",
+      "/property-lounge.webp",
     ],
     roomTypes: [
       {
@@ -312,6 +314,7 @@ export const featuredStays: FeaturedStay[] = [
         daysBeforeCheckin: 3,
       },
     ],
+    isFeatured: true,
   },
   {
     id: "saffron-haveli",
@@ -328,7 +331,7 @@ export const featuredStays: FeaturedStay[] = [
     rating: 4.7,
     pricePerNight: 14200,
     basePrice: 14200,
-    image: "/property-lounge.jpg",
+    image: "/property-lounge.webp",
     alt: "Saffron Haveli – Heritage stay in Jaisalmer fort",
     tag: "Heritage Haveli",
     type: "Heritage Property",
@@ -341,10 +344,10 @@ export const featuredStays: FeaturedStay[] = [
       "Cultural performances",
     ],
     photos: [
-      "/property-lounge.jpg",
-      "/property-view.jpg",
-      "/property-exterior.jpg",
-      "/property-bedroom.jpg",
+      "/property-lounge.webp",
+      "/property-view.webp",
+      "/property-exterior.webp",
+      "/property-bedroom.webp",
     ],
     roomTypes: [
       {
@@ -428,6 +431,7 @@ export const featuredStays: FeaturedStay[] = [
         daysBeforeCheckin: 3,
       },
     ],
+    isFeatured: true,
   },
   {
     id: "blue-tide-villa",
@@ -444,7 +448,7 @@ export const featuredStays: FeaturedStay[] = [
     rating: 4.8,
     pricePerNight: 16500,
     basePrice: 16500,
-    image: "/property-balcony.jpg",
+    image: "/property-balcony.webp",
     alt: "Blue Tide Villa – Beachfront villa in Varkala, Kerala",
     tag: "Beachfront Villa",
     type: "Beach Villa",
@@ -457,10 +461,10 @@ export const featuredStays: FeaturedStay[] = [
       "Beach access",
     ],
     photos: [
-      "/property-balcony.jpg",
-      "/property-view.jpg",
-      "/property-bedroom.jpg",
-      "/property-exterior.jpg",
+      "/property-balcony.webp",
+      "/property-view.webp",
+      "/property-bedroom.webp",
+      "/property-exterior.webp",
     ],
     roomTypes: [
       {
@@ -550,5 +554,6 @@ export const featuredStays: FeaturedStay[] = [
         daysBeforeCheckin: 3,
       },
     ],
+    isFeatured: true,
   },
 ];

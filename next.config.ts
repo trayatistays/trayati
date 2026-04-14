@@ -2,12 +2,39 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   compress: true,
-  poweredByHeader: false, // don't advertise Next.js to scanners
+  poweredByHeader: false,
+
+  cacheComponents: true,
+
+  cacheLife: {
+    stays: {
+      stale: 300,
+      revalidate: 3600,
+      expire: 86400,
+    },
+    testimonials: {
+      stale: 300,
+      revalidate: 3600,
+      expire: 86400,
+    },
+    experiences: {
+      stale: 300,
+      revalidate: 3600,
+      expire: 86400,
+    },
+    instagram: {
+      stale: 300,
+      revalidate: 1800,
+      expire: 43200,
+    },
+  },
 
   images: {
-    formats: ["image/avif", "image/webp"], // 40-50% smaller than JPEG
+    formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    qualities: [25, 50, 75, 100],
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
@@ -21,7 +48,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Security headers on every response
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
@@ -39,12 +65,47 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Immutable long-cache for static images (1 year)
         source: "/images/(.*)",
         headers: [
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/uploads/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/:all*(jpg|jpeg|png|webp|avif)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=31536000",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=2678400, stale-while-revalidate=86400",
           },
         ],
       },

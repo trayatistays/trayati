@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cacheLife } from "next/cache";
 import { PropertyPageClient } from "@/components/property-page-client";
-import { getStayById } from "@/lib/stays-store";
+import { getStayById } from "@/lib/stays-api";
+import { getAllStays } from "@/lib/stays-store";
 import { buildStayJsonLd, buildStayMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 
-// Revalidate property pages from the CDN edge cache every hour.
-// This means zero Supabase calls for cached requests — huge performance gain.
-export const revalidate = 3600;
+const STAYS_CACHE_PROFILE = {
+  stale: 300,
+  revalidate: 3600,
+  expire: 86400,
+};
 
-interface PropertyPageProps {
-  params: Promise<{ id: string }>;
+export async function generateStaticParams() {
+  "use cache";
+  cacheLife(STAYS_CACHE_PROFILE);
+
+  const stays = await getAllStays();
+  return stays.map((stay) => ({ id: stay.id }));
 }
 
-export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const stay = await getStayById(id);
 
@@ -26,7 +34,7 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
   return buildStayMetadata(stay);
 }
 
-export default async function PropertyPage({ params }: PropertyPageProps) {
+export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const stay = await getStayById(id);
 
@@ -45,4 +53,3 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     </>
   );
 }
-

@@ -21,3 +21,15 @@ export function getSupabaseAdmin() {
 
   return cachedClient;
 }
+
+export function requireSupabaseAdmin() {
+  const client = getSupabaseAdmin();
+
+  if (client) {
+    return client;
+  }
+
+  throw new Error(
+    "Supabase admin credentials are not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY before using admin or content APIs.",
+  );
+}

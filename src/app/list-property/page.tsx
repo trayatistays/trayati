@@ -309,7 +309,7 @@ export default function ListPropertyPage() {
             transition={{ duration: 0.5 }}
             className="mb-8 rounded-2xl border p-6 shadow-lg"
             style={{
-              backgroundColor: "rgba(245,241,232,0.88)",
+              backgroundColor: "rgba(245,241,233,0.88)",
               borderColor: "var(--border-soft)",
             }}
           >
@@ -328,7 +328,7 @@ export default function ListPropertyPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: "rgba(245,241,232,0.88)",
+                backgroundColor: "rgba(245,241,233,0.88)",
                 borderColor: "var(--border-soft)",
               }}
             >
@@ -427,7 +427,7 @@ export default function ListPropertyPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: "rgba(245,241,232,0.88)",
+                backgroundColor: "rgba(245,241,233,0.88)",
                 borderColor: "var(--border-soft)",
               }}
             >
@@ -519,7 +519,7 @@ export default function ListPropertyPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: "rgba(245,241,232,0.88)",
+                backgroundColor: "rgba(245,241,233,0.88)",
                 borderColor: "var(--border-soft)",
               }}
             >
@@ -534,8 +534,8 @@ export default function ListPropertyPage() {
                     onClick={() => toggleAmenity(amenity)}
                     className="rounded-full border px-4 py-2 text-sm font-medium transition-all"
                     style={{
-                      borderColor: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--border-soft)",
-                      backgroundColor: selectedAmenities.includes(amenity) ? "rgba(199,91,26,0.1)" : "transparent",
+                  borderColor: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--border-soft)",
+                  backgroundColor: selectedAmenities.includes(amenity) ? "rgba(164,108,43,0.1)" : "transparent",
                       color: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--primary)",
                     }}
                   >
@@ -552,7 +552,7 @@ export default function ListPropertyPage() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: "rgba(245,241,232,0.88)",
+                backgroundColor: "rgba(245,241,233,0.88)",
                 borderColor: "var(--border-soft)",
               }}
             >
@@ -609,7 +609,7 @@ export default function ListPropertyPage() {
               transition={{ duration: 0.5, delay: 0.5 }}
               className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: "rgba(245,241,232,0.88)",
+                backgroundColor: "rgba(245,241,233,0.88)",
                 borderColor: "var(--border-soft)",
               }}
             >
@@ -766,7 +766,7 @@ export default function ListPropertyPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-md rounded-2xl border p-8 text-center shadow-2xl"
-            style={{ backgroundColor: "rgba(245,241,232,0.98)", borderColor: "var(--border-soft)" }}
+            style={{ backgroundColor: "rgba(245,241,233,0.98)", borderColor: "var(--border-soft)" }}
           >
             <div className="mb-4 flex justify-center">
               <div className="flex size-16 items-center justify-center rounded-full bg-green-100">

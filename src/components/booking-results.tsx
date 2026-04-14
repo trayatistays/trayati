@@ -82,16 +82,16 @@ export function BookingResults({ filters }: { filters: FilterState }) {
           whileHover={{ y: -8, transition: { duration: 0.3 } }}
           className="group rounded-[1.5rem] border overflow-hidden backdrop-blur-xl cursor-pointer"
           style={{
-            borderColor: "rgba(80,150,220,0.2)",
-            backgroundColor: "rgba(245,241,232,0.9)",
-            boxShadow: "0 10px 40px rgba(32,60,76,0.08)",
+            borderColor: "rgba(74,101,68,0.2)",
+            backgroundColor: "rgba(245,241,233,0.9)",
+            boxShadow: "0 10px 40px rgba(74,101,68,0.08)",
             transition: "box-shadow 0.3s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = "0 20px 60px rgba(32,60,76,0.15)";
+            e.currentTarget.style.boxShadow = "0 20px 60px rgba(74,101,68,0.15)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 10px 40px rgba(32,60,76,0.08)";
+            e.currentTarget.style.boxShadow = "0 10px 40px rgba(74,101,68,0.08)";
           }}
         >
           {/* Image */}
@@ -106,7 +106,7 @@ export function BookingResults({ filters }: { filters: FilterState }) {
               <span
                 className="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-white backdrop-blur-md"
                 style={{
-                  backgroundColor: "rgba(199,91,26,0.8)",
+                  backgroundColor: "rgba(164,108,43,0.8)",
                 }}
               >
                 {stay.tag}
@@ -134,13 +134,13 @@ export function BookingResults({ filters }: { filters: FilterState }) {
             <div className="flex items-center gap-3 mb-4 text-sm font-semibold">
               <span
                 className="rounded-full px-3 py-1.5"
-                style={{ backgroundColor: "rgba(30,109,191,0.15)", color: "var(--primary)" }}
+                style={{ backgroundColor: "rgba(74,101,68,0.15)", color: "var(--primary)" }}
               >
                 ★ {stay.rating.toFixed(1)}
               </span>
               <span
                 className="rounded-full px-3 py-1.5"
-                style={{ backgroundColor: "rgba(199,91,26,0.15)", color: "var(--cta)" }}
+                style={{ backgroundColor: "rgba(164,108,43,0.15)", color: "var(--cta)" }}
               >
                 {formatPrice(stay.pricePerNight)}/night
               </span>
@@ -157,19 +157,18 @@ export function BookingResults({ filters }: { filters: FilterState }) {
                 href={`/property/${stay.id}`}
                 className="flex-1 rounded-full py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 active:scale-95"
                 style={{
-                  backgroundColor: "rgba(32,60,76,0.75)",
-                  border: "1px solid rgba(245,241,232,0.3)",
-                  boxShadow: "0 8px 24px rgba(32,60,76,0.2)",
+                  backgroundColor: "rgba(74,101,68,0.75)",
+                  border: "1px solid rgba(245,241,233,0.3)",
+                  boxShadow: "0 8px 24px rgba(74,101,68,0.2)",
                 }}
               >
                 Details
               </Link>
               <Link
                 href={`/booking?stayId=${stay.id}`}
-                className="flex-1 rounded-full py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 active:scale-95"
+                className="flex-1 rounded-full bg-[var(--button-primary)] py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-95"
                 style={{
-                  backgroundColor: "var(--cta)",
-                  boxShadow: "0 8px 24px rgba(199,91,26,0.3)",
+                  boxShadow: "0 8px 24px rgba(74,101,68,0.3)",
                 }}
               >
                 Book Now

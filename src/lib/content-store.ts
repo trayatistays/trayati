@@ -1,11 +1,7 @@
 import "server-only";
 
-import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import {
-  deleteLocalItem,
-  readLocalCollection,
-  upsertLocalItem,
-} from "@/lib/local-content-store";
+import { requireSupabaseAdmin } from "@/lib/supabase-admin";
+import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 
 const CONTENT_TABLE = "trayati_content";
 
@@ -22,15 +18,21 @@ type ContentRow<T> = {
   updated_at?: string;
 };
 
+const CONTENT_CACHE_PROFILE = {
+  stale: 300,
+  revalidate: 3600,
+  expire: 86400,
+};
+
 export async function getCollection<T>(
   collection: ContentCollection,
-  fallback: T[],
 ) {
-  const supabase = getSupabaseAdmin();
+  "use cache";
 
-  if (!supabase) {
-    return readLocalCollection(collection, fallback);
-  }
+  cacheLife(CONTENT_CACHE_PROFILE);
+  cacheTag(`collection-${collection}`);
+
+  const supabase = requireSupabaseAdmin();
 
   const { data, error } = await supabase
     .from(CONTENT_TABLE)
@@ -39,8 +41,7 @@ export async function getCollection<T>(
     .order("updated_at", { ascending: false });
 
   if (error) {
-    console.error(`Unable to load ${collection} from Supabase`, error);
-    return readLocalCollection(collection, fallback);
+    throw new Error(`Unable to load ${collection}: ${error.message}`);
   }
 
   return ((data ?? []) as ContentRow<T>[]).map((row) => row.payload);
@@ -49,14 +50,13 @@ export async function getCollection<T>(
 export async function getContentItem<T>(
   collection: ContentCollection,
   id: string,
-  fallback: T[],
 ) {
-  const supabase = getSupabaseAdmin();
+  "use cache";
 
-  if (!supabase) {
-    const items = await readLocalCollection(collection, fallback);
-    return items.find((item) => itemHasId(item, id)) ?? null;
-  }
+  cacheLife(CONTENT_CACHE_PROFILE);
+  cacheTag(`collection-${collection}`, `item-${collection}-${id}`);
+
+  const supabase = requireSupabaseAdmin();
 
   const { data, error } = await supabase
     .from(CONTENT_TABLE)
@@ -66,9 +66,7 @@ export async function getContentItem<T>(
     .maybeSingle();
 
   if (error) {
-    console.error(`Unable to load ${collection}:${id} from Supabase`, error);
-    const items = await readLocalCollection(collection, fallback);
-    return items.find((item) => itemHasId(item, id)) ?? null;
+    throw new Error(`Unable to load ${collection}:${id}: ${error.message}`);
   }
 
   return (data?.payload as T | undefined) ?? null;
@@ -77,13 +75,8 @@ export async function getContentItem<T>(
 export async function upsertContentItem<T extends { id: string }>(
   collection: ContentCollection,
   item: T,
-  fallback: T[] = [],
 ) {
-  const supabase = getSupabaseAdmin();
-
-  if (!supabase) {
-    return upsertLocalItem(collection, item, fallback);
-  }
+  const supabase = requireSupabaseAdmin();
 
   const { error } = await supabase.from(CONTENT_TABLE).upsert(
     {
@@ -96,9 +89,11 @@ export async function upsertContentItem<T extends { id: string }>(
   );
 
   if (error) {
-    console.error(`Unable to upsert ${collection} in Supabase`, error);
-    return upsertLocalItem(collection, item, fallback);
+    throw new Error(`Unable to save ${collection}:${item.id}: ${error.message}`);
   }
+
+  revalidateTag(`collection-${collection}`, "max");
+  revalidateTag(`item-${collection}-${item.id}`, "max");
 
   return item;
 }
@@ -106,13 +101,14 @@ export async function upsertContentItem<T extends { id: string }>(
 export async function deleteContentItem(
   collection: ContentCollection,
   id: string,
-  fallback: { id: string }[] = [],
 ) {
-  const supabase = getSupabaseAdmin();
+  const existingItem = await getContentItem<{ id: string }>(collection, id);
 
-  if (!supabase) {
-    return deleteLocalItem(collection, id, fallback);
+  if (!existingItem) {
+    return false;
   }
+
+  const supabase = requireSupabaseAdmin();
 
   const { error } = await supabase
     .from(CONTENT_TABLE)
@@ -121,18 +117,11 @@ export async function deleteContentItem(
     .eq("id", id);
 
   if (error) {
-    console.error(`Unable to delete ${collection} from Supabase`, error);
-    return deleteLocalItem(collection, id, fallback);
+    throw new Error(`Unable to delete ${collection}:${id}: ${error.message}`);
   }
 
-  return true;
-}
+  revalidateTag(`collection-${collection}`, "max");
+  revalidateTag(`item-${collection}-${id}`, "max");
 
-function itemHasId<T>(item: T, id: string) {
-  return (
-    typeof item === "object" &&
-    item !== null &&
-    "id" in item &&
-    (item as { id?: unknown }).id === id
-  );
+  return true;
 }

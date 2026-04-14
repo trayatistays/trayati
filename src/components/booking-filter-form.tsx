@@ -34,9 +34,9 @@ export function BookingFilterForm({
       transition={{ duration: 0.5 }}
       className="rounded-[2rem] border p-6 sm:p-8 backdrop-blur-xl"
       style={{
-        borderColor: "rgba(80,150,220,0.3)",
-        backgroundColor: "rgba(245,241,232,0.95)",
-        boxShadow: "0 20px 60px rgba(32,60,76,0.1), inset 0 1px 0 rgba(255,255,255,0.5)",
+        borderColor: "rgba(74,101,68,0.2)",
+        backgroundColor: "rgba(245,241,233,0.95)",
+        boxShadow: "0 20px 60px rgba(74,101,68,0.1), inset 0 1px 0 rgba(255,255,255,0.5)",
       }}
     >
       <h2 className="font-display text-2xl sm:text-3xl font-bold mb-8 tracking-[-0.03em]">
@@ -164,7 +164,7 @@ export function BookingFilterForm({
                 className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition border"
                 style={{
                   borderColor: filters.category === cat.value ? "var(--cta)" : "var(--border-soft)",
-                  backgroundColor: filters.category === cat.value ? "rgba(199,91,26,0.1)" : "rgba(255,255,255,0.6)",
+                  backgroundColor: filters.category === cat.value ? "rgba(164,108,43,0.1)" : "rgba(255,255,255,0.6)",
                   color: filters.category === cat.value ? "var(--cta)" : "var(--foreground)",
                 }}
               >

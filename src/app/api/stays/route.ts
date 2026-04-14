@@ -1,12 +1,29 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { createStay, getAllStays } from "@/lib/stays-store";
+import { dbGetAllStays, dbUpsertStay } from "@/lib/db";
 import { staySchema } from "@/lib/schemas";
 
+const STAYS_CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=86400";
+
 export async function GET() {
-  const stays = await getAllStays();
-  return NextResponse.json({ stays });
+  try {
+    const stays = await dbGetAllStays(true);
+    return NextResponse.json(
+      { stays },
+      {
+        headers: {
+          "Cache-Control": STAYS_CACHE_CONTROL,
+          CDNCacheControl: "public, max-age=3600, stale-while-revalidate=86400",
+        },
+      },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unable to load stays." },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -23,6 +40,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const stay = await createStay(parsed.data);
+  const stay = await dbUpsertStay(parsed.data);
   return NextResponse.json({ stay }, { status: 201 });
 }

@@ -7,45 +7,30 @@ import { HiMiniArrowUpRight } from "react-icons/hi2";
 import type { InstagramMediaItem } from "@/lib/instagram";
 import { socialLinks } from "@/data/social-links";
 
-const fallbackItems: InstagramMediaItem[] = [
-  {
-    id: "trayati-instagram-fallback-1",
-    mediaUrl: "/samar-villa.png",
-    permalink: socialLinks.instagram.url,
-    caption: "Samar Villa in the Kumaon hills",
-    alt: "Samar Villa with mountain views",
-  },
-  {
-    id: "trayati-instagram-fallback-2",
-    mediaUrl: "/property-exterior.jpg",
-    permalink: socialLinks.instagram.url,
-    caption: "Exterior details from a Trayati stay",
-    alt: "Exterior of a Trayati stay",
-  },
-  {
-    id: "trayati-instagram-fallback-3",
-    mediaUrl: "/property-view.jpg",
-    permalink: socialLinks.instagram.url,
-    caption: "View from a curated Trayati property",
-    alt: "Scenic view from a Trayati property",
-  },
-  {
-    id: "trayati-instagram-fallback-4",
-    mediaUrl: "/property-bedroom.jpg",
-    permalink: socialLinks.instagram.url,
-    caption: "A restful bedroom at a Trayati stay",
-    alt: "Bedroom inside a Trayati property",
-  },
-];
-
 export function InstagramCarousel() {
-  const [items, setItems] = useState<InstagramMediaItem[]>([...fallbackItems, ...fallbackItems]);
+  const [items, setItems] = useState<InstagramMediaItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = sessionStorage.getItem("trayati-instagram");
+      if (!raw) return [];
+      const { data, ts } = JSON.parse(raw) as { data: { items: InstagramMediaItem[]; usingFallback: boolean }; ts: number };
+      const STALE_MS = 15 * 60 * 1000;
+      if (Date.now() - ts < STALE_MS && data.items.length > 0) {
+        return [...data.items, ...data.items];
+      }
+    } catch {}
+    return [];
+  });
   const [usingFallback, setUsingFallback] = useState(true);
 
   useEffect(() => {
+    if (items.length > 0) return;
+
     let active = true;
 
-    void fetch("/api/instagram-feed", { cache: "no-store" })
+    void fetch("/api/instagram-feed", {
+      headers: { Accept: "application/json" },
+    })
       .then((response) => (response.ok ? response.json() : null))
       .then((payload: { items?: InstagramMediaItem[]; usingFallback?: boolean } | null) => {
         if (!active || !payload?.items?.length) {
@@ -54,20 +39,29 @@ export function InstagramCarousel() {
 
         setItems([...payload.items, ...payload.items]);
         setUsingFallback(Boolean(payload.usingFallback));
+        try {
+          sessionStorage.setItem("trayati-instagram", JSON.stringify({
+            data: { items: payload.items, usingFallback: payload.usingFallback },
+            ts: Date.now(),
+          }));
+        } catch {}
       })
       .catch(() => undefined);
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [items.length]);
+
+  if (!items.length) {
+    return null;
+  }
 
   return (
-    <section className="relative w-full px-0 py-10 sm:py-14">
-      <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10" style={{ borderColor: "rgba(32,60,76,0.10)" }}>
-        {/* edge fade-out gradients matching brand parchment */}
-        <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,232,0.92),transparent)] sm:w-20" />
-        <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,232,0.92),transparent)] sm:w-20" />
+      <section className="relative w-full px-0 py-10 sm:py-14">
+      <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
+        <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
+        <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
 
         <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -91,8 +85,8 @@ export function InstagramCarousel() {
             className="ultra-3d-hover inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
             style={{
               color: "var(--primary)",
-              borderColor: "rgba(32,60,76,0.18)",
-              backgroundColor: "rgba(245,241,232,0.88)",
+              borderColor: "rgba(74,101,68,0.18)",
+              backgroundColor: "rgba(245,241,233,0.88)",
             }}
           >
             Open Instagram
@@ -118,10 +112,10 @@ export function InstagramCarousel() {
                 rel="noreferrer"
                 className="ultra-3d-hover group relative block w-[14rem] shrink-0 overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
                 style={{
-                  borderColor: "rgba(32,60,76,0.12)",
+                  borderColor: "rgba(74,101,68,0.12)",
                   background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,232,0.78))",
-                  boxShadow: "0 18px 40px rgba(32,60,76,0.08)",
+                    "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,233,0.78))",
+                  boxShadow: "0 18px 40px rgba(74,101,68,0.08)",
                 }}
               >
                 <div className="relative aspect-[4/5] overflow-hidden">
@@ -131,10 +125,10 @@ export function InstagramCarousel() {
                     fill
                     sizes="(max-width: 640px) 224px, 288px"
                     className="object-cover transition duration-700 group-hover:scale-110"
-                    unoptimized={item.mediaUrl.startsWith("http")}
+                    unoptimized
                   />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(22,44,56,0.76)_100%)]" />
-                  <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(199,91,26,0.88)" }}>
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(74,101,68,0.76)_100%)]" />
+                  <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(164,108,43,0.88)" }}>
                     <FaInstagram />
                   </div>
                   <div className="absolute inset-x-4 bottom-4">

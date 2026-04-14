@@ -1,5 +1,7 @@
-import { featuredStays } from "@/data/featured-stays";
+import "server-only";
+
 import { socialLinks } from "@/data/social-links";
+import { getAllStays } from "@/lib/stays-store";
 
 export type InstagramMediaItem = {
   id: string;
@@ -20,17 +22,16 @@ type InstagramGraphResponse = {
   }>;
 };
 
-const fallbackInstagramItems: InstagramMediaItem[] = featuredStays
-  .slice(0, 6)
-  .map((stay, index) => ({
-    id: `fallback-${stay.id}-${index}`,
-    mediaUrl: stay.image,
-    permalink: socialLinks.instagram.url,
-    caption: `${stay.title} at ${stay.location}`,
-    alt: stay.alt,
-  }));
-
 export async function getInstagramFeed(limit = 8): Promise<InstagramMediaItem[]> {
+  const fallbackInstagramItems = (await getAllStays())
+    .slice(0, limit)
+    .map((stay, index) => ({
+      id: `fallback-${stay.id}-${index}`,
+      mediaUrl: stay.image,
+      permalink: socialLinks.instagram.url,
+      caption: `${stay.title} at ${stay.location}`,
+      alt: stay.alt,
+    }));
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
 
   if (!accessToken) {
