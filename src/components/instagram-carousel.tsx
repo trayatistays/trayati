@@ -58,8 +58,8 @@ export function InstagramCarousel() {
   }
 
   return (
-      <section className="relative w-full px-0 py-10 sm:py-14">
-      <div className="relative w-full overflow-hidden border-y px-4 py-8 sm:px-6 sm:py-10 lg:px-10" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
+      <section className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
+      <div className="relative w-full overflow-hidden border-y px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
         <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
         <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
 

@@ -314,7 +314,7 @@ export function FeaturedStaysSection() {
   const activeStays = stays.length ? stays : featuredStays;
   const topFeatured = activeStays
     .filter((s) => s.isFeatured)
-    .slice(0, 4);
+    .slice(0, 2);
   const total = topFeatured.length;
 
   const { scrollYProgress } = useScroll({
@@ -336,7 +336,7 @@ export function FeaturedStaysSection() {
 
   return (
     <>
-      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 pt-4 pb-6">
+      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 pt-16 pb-8 sm:pt-24 sm:pb-12 lg:pt-28 lg:pb-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

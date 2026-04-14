@@ -92,7 +92,7 @@ export function HeroSection() {
         className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
       />
 
-      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-0 pt-28 sm:px-6 sm:pt-32 lg:px-10 lg:pt-36">
+      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
 
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
