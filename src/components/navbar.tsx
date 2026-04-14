@@ -116,7 +116,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           <button
             type="button"
             onClick={() => setMobileLinksOpen((v) => !v)}
-            className="navbar__quicklinks-btn lg:hidden"
+            className="navbar__quicklinks-btn md:hidden"
             aria-label={mobileLinksOpen ? "Close quick links" : "Open quick links"}
             aria-expanded={mobileLinksOpen}
           >

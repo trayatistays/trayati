@@ -98,7 +98,7 @@ export function SiteHeader() {
             {/* Preview card */}
             <div className="flex flex-col items-center justify-center gap-6 md:items-end md:gap-8">
               <div
-                className="w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(74,101,68,0.14)] backdrop-blur-xl"
+                className="hidden md:block w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(74,101,68,0.14)] backdrop-blur-xl"
                 style={{
                   borderColor: "var(--border-soft)",
                   backgroundColor: "rgba(245, 241, 233, 0.92)",

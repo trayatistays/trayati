@@ -89,7 +89,7 @@ export function SiteFooter() {
             className="text-[0.65rem] uppercase tracking-[0.22em]"
             style={{ color: "var(--footer-foreground)" }}
           >
-            Elevate the way you stay
+            FIND YOUR RHYTHM
           </p>
         </div>
       </motion.div>

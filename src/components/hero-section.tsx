@@ -104,14 +104,14 @@ export function HeroSection() {
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1
-                className="text-balance mt-6 max-w-4xl font-display 
-             text-[1.8rem] 
-             sm:text-[2.4rem] 
-             md:text-[3rem] 
-             lg:text-[3.8rem] 
-             xl:text-[4.5rem] 
+                className="text-balance mt-6 max-w-4xl 
+             text-[1.65rem] 
+             sm:text-[2.25rem] 
+             md:text-[2.85rem] 
+             lg:text-[3.65rem] 
+             xl:text-[4.35rem] 
              font-semibold leading-[1.1] tracking-[-0.02em]"
-                style={{ color: "#FFFFFF" }}
+                style={{ color: "#FFFFFF", fontFamily: "var(--font-playfair)" }}
               >
                 we curate
               </h1>
