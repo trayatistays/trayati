@@ -111,18 +111,18 @@ export function HeroSection() {
              lg:text-[3.8rem] 
              xl:text-[4.5rem] 
              font-semibold leading-[1.1] tracking-[-0.02em]"
-                style={{ color: "var(--primary)" }}
+                style={{ color: "#FFFFFF" }}
               >
                 we curate
               </h1>
 
-              <div className="mt-4 flex min-h-[5.4rem] w-full max-w-full items-center font-display text-[2.25rem] font-semibold leading-[0.95] tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] sm:leading-none lg:text-[5.7rem] xl:text-[6.15rem]">
+              <div className="mt-4 flex min-h-[5.4rem] w-full max-w-full items-center text-[2.25rem] font-semibold leading-[0.95] tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] sm:leading-none lg:text-[5.7rem] xl:text-[6.15rem]" style={{ fontFamily: '"Trajan Pro 3 Semibold", "Trajan Pro 3", serif', fontWeight: 600 }}>
                 <AnimatedText items={keywords} className="hero-word-shadow text-[var(--gold)]" />
               </div>
 
               <p
                 className="text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
-                style={{ color: "var(--foreground-soft)" }}
+                style={{ color: "#FFFFFF" }}
               >
                 Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir’s 100-year-old Mudhouse to Kasar Devi’s luxury villas, we preserve living history and promote authenticity.
               </p>
@@ -130,7 +130,8 @@ export function HeroSection() {
               <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <Link
                   href="/booking"
-                  className="w-full rounded-full bg-[var(--button-primary)] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(74,101,68,0.40)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-98 sm:w-auto"
+                  className="w-full rounded-full bg-[var(--button-primary)] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] shadow-[0_18px_40px_rgba(74,101,68,0.40)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-98 sm:w-auto"
+                  style={{ color: "#FFFFFF" }}
                 >
                   Explore Properties
                 </Link>
