@@ -1,11 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
+import heroPoster from "@/assets/hero-poster.webp";
 import { socialLinks } from "@/data/social-links";
 
 const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments and Condominiums"];
@@ -39,9 +40,9 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
   },
 };
 export function HeroSection() {
-  const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { stiffness: 110, damping: 18, mass: 0.8 });
@@ -52,15 +53,28 @@ export function HeroSection() {
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShouldLoadVideo(true);
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!shouldLoadVideo) return;
+
     const video = videoRef.current;
     if (!video) return;
+
     if (video.readyState >= 2) {
       setVideoLoaded(true);
     }
+
     const handleCanPlay = () => setVideoLoaded(true);
     video.addEventListener("canplay", handleCanPlay);
+
     return () => video.removeEventListener("canplay", handleCanPlay);
-  }, []);
+  }, [shouldLoadVideo]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     const { currentTarget, clientX, clientY } = event;
@@ -85,16 +99,30 @@ export function HeroSection() {
     >
       {/* Background Video */}
       <div className="absolute inset-0 -z-20">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
-        >
-          <source src="/background-video.mp4" type="video/mp4" />
-        </video>
+        <Image
+          src={heroPoster}
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          placeholder="blur"
+          sizes="100vw"
+          className={`absolute inset-0 object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-0" : "opacity-100"}`}
+        />
+        {shouldLoadVideo ? (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={heroPoster.src}
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
+          >
+            <source src="/background-video.mp4" type="video/mp4" />
+          </video>
+        ) : null}
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
