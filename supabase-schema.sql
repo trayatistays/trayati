@@ -29,6 +29,7 @@ create table if not exists public.stays (
   amenities_detail jsonb not null default '{}'::jsonb,
   meal_options jsonb not null default '[]'::jsonb,
   cancellation_policies jsonb not null default '[]'::jsonb,
+  booking_link text not null default '',
   is_active boolean not null default true,
   sort_order integer not null default 0,
   created_at timestamptz not null default now(),
@@ -103,6 +104,7 @@ create table if not exists public.reservations (
   clerk_user_id text not null default '',
   user_name text not null default '',
   user_email text not null default '',
+  property_name text not null default '',
   check_in date not null,
   check_out date not null,
   guests integer not null default 1,
@@ -236,3 +238,11 @@ drop table if exists public.trayati_content cascade;
 
 -- alter table public.experiences add column if not exists featured boolean not null default false;
 -- alter table public.experiences add column if not exists content text not null default '';
+
+-- ========================================
+-- MIGRATION: Add booking_link to stays and property_name to reservations
+-- ========================================
+-- Run these ALTER statements if the columns don't exist yet:
+
+-- alter table public.stays add column if not exists booking_link text not null default '';
+-- alter table public.reservations add column if not exists property_name text not null default '';

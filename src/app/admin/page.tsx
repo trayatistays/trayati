@@ -259,7 +259,7 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
     id: `stay-${Date.now()}`, title: "", subtitle: "Trayati Stays", location: "", city: "", state: "", country: "India",
     pin: "", address: "", googleMapsUrl: "", description: "", rating: 0, pricePerNight: 0,
     basePrice: 0, image: "", alt: "", tag: "", type: "", experienceType: "Folklore Homestays",
-    isFeatured: false,
+    isFeatured: false, bookingLink: "",
     amenities: [], photos: [], roomTypes: [], amenitiesDetail: {
       parking: false, heaterOnRequest: false, tv: false, fridge: false, washingMachine: false,
       powerBackup: false, airConditioning: false, geyser: false, kitchen: false, garden: false,
@@ -288,7 +288,8 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
           { key: "location", label: "Location *" }, { key: "tag", label: "Tag *" },
           { key: "city", label: "City *" }, { key: "state", label: "State *" },
           { key: "pin", label: "Pin Code *" }, { key: "country", label: "Country *" },
-          { key: "address", label: "Address *" }, { key: "googleMapsUrl", label: "Google Maps URL" },
+          { key: "address", label: "Address *" },           { key: "googleMapsUrl", label: "Google Maps URL" },
+          { key: "bookingLink", label: "Booking Link (redirect URL after reservation)" },
           { key: "pricePerNight", label: "Price Per Night *" }, { key: "basePrice", label: "Base Price *" },
           { key: "rating", label: "Rating" },
           { key: "type", label: "Property Type *" },
@@ -752,12 +753,54 @@ function SubmissionsTab() {
 function ReservationsTab() {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewing, setViewing] = useState<Record<string, unknown> | null>(null);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch("/api/admin/reservations").then((r) => r.json()).then((d) => { setItems(d.reservations ?? []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     fetch("/api/admin/reservations").then((r) => r.json()).then((d) => { setItems(d.reservations ?? []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
+  async function handleStatusUpdate(id: string, status: string) {
+    await api("/api/admin/reservations", { method: "PUT", body: JSON.stringify({ id, status }) });
+    load();
+    setViewing(null);
+  }
+
   const statusColors: Record<string, string> = { pending: "#D82323", confirmed: "var(--primary)", cancelled: "var(--muted)", requested: "#D82323" };
+
+  if (viewing) {
+    return (
+      <div>
+        <button onClick={() => setViewing(null)} className="mb-4 text-sm font-semibold" style={{ color: "var(--muted)" }}>&larr; Back to reservations</button>
+        <div className="rounded-xl border p-6" style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(245,241,233,0.9)" }}>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold" style={{ color: "var(--foreground)" }}>{(viewing.propertyName as string) || (viewing.stayId as string) || "Unknown Property"}</h2>
+            <span className="rounded-full px-3 py-1 text-xs font-bold uppercase" style={{ color: statusColors[viewing.status as string] ?? "var(--muted)", backgroundColor: "rgba(74,101,68,0.1)" }}>{viewing.status as string}</span>
+          </div>
+          <div className="mb-4 grid gap-3 sm:grid-cols-2">
+            <p className="text-sm"><strong>Guest Name:</strong> {(viewing.userName as string) || "N/A"}</p>
+            <p className="text-sm"><strong>Guest Email:</strong> {(viewing.userEmail as string) || "N/A"}</p>
+            <p className="text-sm"><strong>Check-in:</strong> {viewing.checkIn as string}</p>
+            <p className="text-sm"><strong>Check-out:</strong> {viewing.checkOut as string}</p>
+            <p className="text-sm"><strong>Guests:</strong> {viewing.guests as number}</p>
+            <p className="text-sm"><strong>Property:</strong> {(viewing.propertyName as string) || (viewing.stayId as string) || "N/A"}</p>
+            <p className="text-sm"><strong>Booked on:</strong> {new Date(viewing.createdAt as string || viewing.created_at as string).toLocaleDateString()}</p>
+            <p className="text-sm"><strong>Clerk User ID:</strong> <span className="break-all text-xs">{viewing.clerkUserId as string || viewing.clerk_user_id as string || "N/A"}</span></p>
+          </div>
+          {viewing.status === "pending" && (
+            <div className="flex gap-3">
+              <button onClick={() => handleStatusUpdate(viewing.id as string, "confirmed")} className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white" style={{ backgroundColor: "var(--primary)" }}><HiOutlineCheck className="h-4 w-4" /> Confirm</button>
+              <button onClick={() => handleStatusUpdate(viewing.id as string, "cancelled")} className="flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-bold text-red-600" style={{ borderColor: "red" }}><HiOutlineXMark className="h-4 w-4" /> Cancel</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -772,7 +815,16 @@ function ReservationsTab() {
                   <span className="rounded-full px-2 py-0.5 text-[0.65rem] font-bold uppercase" style={{ color: statusColors[item.status as string] ?? "var(--muted)", backgroundColor: "rgba(74,101,68,0.1)" }}>{item.status as string}</span>
                 </div>
                 <p className="text-sm" style={{ color: "var(--muted)" }}>{item.checkIn as string} → {item.checkOut as string} &middot; {item.guests as number} guests</p>
-                <p className="text-xs" style={{ color: "var(--muted)" }}>{(item.userName as string) || "Guest"}</p>
+                <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>{(item.userName as string) || "Guest"} &middot; {(item.userEmail as string) || "No email"}</p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <button onClick={() => setViewing(item)} className="rounded-lg p-2 transition hover:opacity-70" style={{ color: "var(--primary)" }}><HiOutlineEye className="h-5 w-5" /></button>
+                {item.status === "pending" && (
+                  <>
+                    <button onClick={() => handleStatusUpdate(item.id as string, "confirmed")} className="rounded-lg p-2 transition hover:opacity-70" style={{ color: "var(--primary)" }}><HiOutlineCheck className="h-5 w-5" /></button>
+                    <button onClick={() => handleStatusUpdate(item.id as string, "cancelled")} className="rounded-lg p-2 text-red-500 transition hover:opacity-70"><HiOutlineXMark className="h-5 w-5" /></button>
+                  </>
+                )}
               </div>
             </div>
           ))}

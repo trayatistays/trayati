@@ -1,10 +1,12 @@
 "use client";
 
-import { SignInButton, useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { SignInButton, useUser, useAuth } from "@clerk/nextjs";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 type ReserveNowButtonProps = {
   stayId: string;
+  stayTitle?: string;
+  bookingLink?: string;
   roomId?: string | null;
   checkIn?: string;
   checkOut?: string;
@@ -15,6 +17,7 @@ type ReserveNowButtonProps = {
 
 export function ReserveNowButton({
   stayId,
+  bookingLink,
   roomId,
   checkIn,
   checkOut,
@@ -23,10 +26,13 @@ export function ReserveNowButton({
   style,
 }: ReserveNowButtonProps) {
   const { isSignedIn } = useUser();
+  const { isLoaded } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingReserve, setPendingReserve] = useState(false);
+  const hasRedirected = useRef(false);
 
-  async function reserve() {
+  const reserve = useCallback(async () => {
     setIsSubmitting(true);
     setMessage(null);
 
@@ -47,39 +53,68 @@ export function ReserveNowButton({
         }),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as { error?: string; bookingLink?: string };
       if (!response.ok) {
         throw new Error(data.error ?? "Unable to reserve this stay.");
       }
 
-      setMessage("Reservation request received. We will confirm availability soon.");
+      setMessage("Reservation created! Redirecting to booking...");
+
+      const redirectUrl = data.bookingLink || bookingLink;
+      if (redirectUrl) {
+        setTimeout(() => {
+          window.open(redirectUrl, "_blank", "noopener,noreferrer");
+        }, 800);
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to reserve this stay.");
     } finally {
       setIsSubmitting(false);
     }
+  }, [stayId, roomId, checkIn, checkOut, guests, bookingLink]);
+
+  useEffect(() => {
+    if (isSignedIn && pendingReserve && !hasRedirected.current) {
+      hasRedirected.current = true;
+      setPendingReserve(false);
+      reserve();
+    }
+  }, [isSignedIn, pendingReserve, reserve]);
+
+  if (!isLoaded) {
+    return (
+      <button className={className} style={style} type="button" disabled>
+        Loading...
+      </button>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <SignInButton mode="modal">
+        <button
+          className={className}
+          style={style}
+          type="button"
+          onClick={() => setPendingReserve(true)}
+        >
+          Reserve Now
+        </button>
+      </SignInButton>
+    );
   }
 
   return (
     <div>
-      {!isSignedIn && (
-        <SignInButton mode="modal">
-          <button className={className} style={style} type="button">
-            Reserve Now
-          </button>
-        </SignInButton>
-      )}
-      {isSignedIn && (
-        <button
-          className={className}
-          disabled={isSubmitting}
-          onClick={reserve}
-          style={style}
-          type="button"
-        >
-          {isSubmitting ? "Requesting..." : "Reserve Now"}
-        </button>
-      )}
+      <button
+        className={className}
+        disabled={isSubmitting}
+        onClick={reserve}
+        style={style}
+        type="button"
+      >
+        {isSubmitting ? "Reserving..." : "Reserve Now"}
+      </button>
       {message && (
         <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
           {message}

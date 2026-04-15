@@ -50,6 +50,7 @@ type StayRow = {
   amenities_detail: unknown;
   meal_options: unknown;
   cancellation_policies: unknown;
+  booking_link: string;
   is_active: boolean;
   sort_order: number;
   created_at: string;
@@ -176,6 +177,7 @@ export function dbRowToStay(row: StayRow): FeaturedStay {
     mealOptions: ensureArray<FeaturedStay["mealOptions"][number]>(row.meal_options),
     cancellationPolicies: ensureArray<FeaturedStay["cancellationPolicies"][number]>(row.cancellation_policies),
     isFeatured: amenitiesDetail.featured === true,
+    bookingLink: row.booking_link || undefined,
   };
 }
 
@@ -211,6 +213,7 @@ function stayToDbRow(stay: FeaturedStay & { isActive?: boolean; sortOrder?: numb
     amenities_detail: JSON.stringify(amenitiesDetail),
     meal_options: JSON.stringify(stay.mealOptions ?? []),
     cancellation_policies: JSON.stringify(stay.cancellationPolicies ?? []),
+    booking_link: stay.bookingLink ?? "",
     is_active: (stay as Record<string, unknown>).isActive !== false,
     sort_order: (stay as Record<string, unknown>).sortOrder ?? 0,
   };
@@ -480,6 +483,7 @@ export type Reservation = {
   clerkUserId: string;
   userName: string;
   userEmail: string;
+  propertyName: string;
   checkIn: string;
   checkOut: string;
   guests: number;

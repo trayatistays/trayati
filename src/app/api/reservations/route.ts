@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { dbCreateReservation } from "@/lib/db";
+import { dbCreateReservation, dbGetStayById } from "@/lib/db";
 
 export async function POST(request: Request) {
   const { isAuthenticated, userId } = await auth();
@@ -24,19 +24,57 @@ export async function POST(request: Request) {
     );
   }
 
+  let userName = "";
+  let userEmail = "";
+
+  try {
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    userName = [
+      clerkUser.firstName,
+      clerkUser.lastName,
+    ].filter(Boolean).join(" ") || clerkUser.username || "";
+    const emailObj = clerkUser.emailAddresses.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId,
+    );
+    userEmail = emailObj?.emailAddress ?? "";
+  } catch {
+    userName = "";
+    userEmail = "";
+  }
+
+  let stayTitle = "";
+  let bookingLink = "";
+
+  try {
+    const stay = await dbGetStayById(body.stayId);
+    if (stay) {
+      stayTitle = stay.title;
+      bookingLink = stay.bookingLink ?? "";
+    }
+  } catch {
+    stayTitle = "";
+    bookingLink = "";
+  }
+
   try {
     const reservation = await dbCreateReservation({
       stayId: body.stayId,
       roomId: body.roomId ?? null,
       clerkUserId: userId,
-      userName: "",
-      userEmail: "",
+      userName,
+      userEmail,
+      propertyName: stayTitle,
       checkIn: body.checkIn,
       checkOut: body.checkOut,
       guests: body.guests ?? 1,
       status: "pending",
     });
-    return NextResponse.json({ reservation }, { status: 201 });
+
+    return NextResponse.json(
+      { reservation, bookingLink: bookingLink || undefined },
+      { status: 201 },
+    );
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unable to create reservation." },

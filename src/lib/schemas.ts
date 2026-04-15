@@ -92,6 +92,7 @@ export const staySchema = z.object({
   mealOptions: z.array(mealOptionSchema).default([]),
   cancellationPolicies: z.array(cancellationPolicySchema).default([]),
   isFeatured: z.coerce.boolean().default(false),
+  bookingLink: z.string().trim().optional(),
 });
 
 export const experienceSchema = z.object({
@@ -126,6 +127,9 @@ export const reservationSchema = z.object({
   checkOut: z.string().trim().min(1),
   guests: z.coerce.number().int().min(1),
   clerkUserId: z.string().trim().min(1),
+  userName: z.string().trim().optional(),
+  userEmail: z.string().trim().optional(),
+  propertyName: z.string().trim().optional(),
   status: z.enum(["requested", "confirmed", "cancelled"]).default("requested"),
   createdAt: z.string().trim().min(1),
 });

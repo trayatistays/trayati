@@ -366,6 +366,8 @@ function BookingContent() {
 
                     <ReserveNowButton
                       stayId={selectedStay.id}
+                      stayTitle={selectedStay.title}
+                      bookingLink={selectedStay.bookingLink}
                       roomId={selectedRoomId}
                       className="w-full rounded-full bg-[var(--button-primary)] py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)]"
                       style={{

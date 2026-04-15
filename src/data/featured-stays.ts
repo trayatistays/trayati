@@ -78,6 +78,7 @@ export type FeaturedStay = {
   mealOptions: MealOption[];
   cancellationPolicies: CancellationPolicy[];
   isFeatured?: boolean;
+  bookingLink?: string;
 };
 
 export const featuredStays: FeaturedStay[] = [
