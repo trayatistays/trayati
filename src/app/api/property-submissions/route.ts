@@ -1,29 +1,56 @@
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { dbCreateSubmission, dbGetAllSubmissions } from "@/lib/db";
+import { propertySubmissionSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as {
-    clerkUserId?: string;
-    userName?: string;
-    userEmail?: string;
-    property?: unknown;
-  };
+  const { isAuthenticated, userId } = await auth();
 
-  if (!body.clerkUserId || !body.userName || !body.userEmail || !body.property) {
+  if (!isAuthenticated || !userId) {
     return NextResponse.json(
-      { error: "Missing required fields: clerkUserId, userName, userEmail, property" },
+      { error: "Sign in to submit a property." },
+      { status: 401 },
+    );
+  }
+
+  const parsed = propertySubmissionSchema.safeParse(await request.json());
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: z.prettifyError(parsed.error) },
       { status: 400 },
     );
+  }
+
+  let userName = "";
+  let userEmail = "";
+
+  try {
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    userName = [
+      clerkUser.firstName,
+      clerkUser.lastName,
+    ].filter(Boolean).join(" ") || clerkUser.username || "";
+    const emailObj = clerkUser.emailAddresses.find(
+      (e: { id: string | null }) => e.id === clerkUser.primaryEmailAddressId,
+    );
+    userEmail = emailObj?.emailAddress ?? "";
+  } catch {
+    userName = "";
+    userEmail = "";
   }
 
   try {
     const id = `submission-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const submission = await dbCreateSubmission({
       id,
-      clerkUserId: body.clerkUserId,
-      userName: body.userName,
-      userEmail: body.userEmail,
-      propertyPayload: body.property as Record<string, unknown>,
+      clerkUserId: userId,
+      userName,
+      userEmail,
+      propertyPayload: parsed.data.property as Record<string, unknown>,
       status: "pending",
     });
     return NextResponse.json({ success: true, id: submission.id }, { status: 201 });
@@ -36,6 +63,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const submissions = await dbGetAllSubmissions();
     return NextResponse.json({ submissions });

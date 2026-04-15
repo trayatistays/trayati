@@ -3,6 +3,7 @@ import "server-only";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import type { FeaturedStay } from "@/data/featured-stays";
 import type { Experience, Testimonial } from "@/data/testimonials-and-blogs";
+import { redis } from "@/lib/redis";
 
 function toCamelCase<T>(row: Record<string, unknown>): T {
   const result: Record<string, unknown> = {};
@@ -83,12 +84,29 @@ function ensureObject<T>(value: unknown): T {
 }
 
 export async function dbGetAllStays(activeOnly = false): Promise<FeaturedStay[]> {
+  const cacheKey = `stays:${activeOnly ? "active" : "all"}`;
+  try {
+    const cached = await redis.get<FeaturedStay[]>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetAllStays:", e);
+  }
+
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("stays").select("*").order("sort_order", { ascending: true });
   if (activeOnly) query = query.eq("is_active", true);
   const { data, error } = await query;
   if (error) throw new Error(`Failed to fetch stays: ${error.message}`);
-  return (data as StayRow[]).map((row) => dbRowToStay(row));
+  
+  const stays = (data as StayRow[]).map((row) => dbRowToStay(row));
+  
+  try {
+    await redis.set(cacheKey, stays, { ex: 3600 }); // Cache for 1 hour
+  } catch (e) {
+    console.error("Redis set error in dbGetAllStays:", e);
+  }
+  
+  return stays;
 }
 
 export async function dbGetStayById(id: string): Promise<FeaturedStay | null> {
@@ -112,6 +130,17 @@ export async function dbUpsertStay(stay: FeaturedStay & { isActive?: boolean; so
   const row = stayToDbRow(stay);
   const { error } = await supabase.from("stays").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert stay: ${error.message}`);
+  
+  // Invalidate cache
+  try {
+    await Promise.all([
+      redis.del("stays:active"),
+      redis.del("stays:all")
+    ]);
+  } catch (e) {
+    console.error("Redis invalidation error in dbUpsertStay:", e);
+  }
+  
   return stay;
 }
 
@@ -119,6 +148,17 @@ export async function dbDeleteStay(id: string): Promise<boolean> {
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase.from("stays").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete stay: ${error.message}`);
+  
+  // Invalidate cache
+  try {
+    await Promise.all([
+      redis.del("stays:active"),
+      redis.del("stays:all")
+    ]);
+  } catch (e) {
+    console.error("Redis invalidation error in dbDeleteStay:", e);
+  }
+  
   return true;
 }
 
@@ -235,12 +275,29 @@ type TestimonialRow = {
 };
 
 export async function dbGetAllTestimonials(activeOnly = false): Promise<Testimonial[]> {
+  const cacheKey = `testimonials:${activeOnly ? "active" : "all"}`;
+  try {
+    const cached = await redis.get<Testimonial[]>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetAllTestimonials:", e);
+  }
+
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("testimonials").select("*").order("sort_order", { ascending: true });
   if (activeOnly) query = query.eq("is_active", true);
   const { data, error } = await query;
   if (error) throw new Error(`Failed to fetch testimonials: ${error.message}`);
-  return (data as TestimonialRow[]).map((row) => dbRowToTestimonial(row));
+  
+  const testimonials = (data as TestimonialRow[]).map((row) => dbRowToTestimonial(row));
+  
+  try {
+    await redis.set(cacheKey, testimonials, { ex: 3600 });
+  } catch (e) {
+    console.error("Redis set error in dbGetAllTestimonials:", e);
+  }
+  
+  return testimonials;
 }
 
 export async function dbUpsertTestimonial(t: Testimonial & { isActive?: boolean; sortOrder?: number }): Promise<Testimonial> {
@@ -306,12 +363,29 @@ type ExperienceRow = {
 };
 
 export async function dbGetAllExperiences(activeOnly = false): Promise<Experience[]> {
+  const cacheKey = `experiences:${activeOnly ? "active" : "all"}`;
+  try {
+    const cached = await redis.get<Experience[]>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetAllExperiences:", e);
+  }
+
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("experiences").select("*").order("sort_order", { ascending: true });
   if (activeOnly) query = query.eq("is_active", true);
   const { data, error } = await query;
   if (error) throw new Error(`Failed to fetch experiences: ${error.message}`);
-  return (data as ExperienceRow[]).map((row) => dbRowToExperience(row));
+  
+  const experiences = (data as ExperienceRow[]).map((row) => dbRowToExperience(row));
+  
+  try {
+    await redis.set(cacheKey, experiences, { ex: 3600 });
+  } catch (e) {
+    console.error("Redis set error in dbGetAllExperiences:", e);
+  }
+  
+  return experiences;
 }
 
 export async function dbUpsertExperience(e: Experience & { isActive?: boolean; sortOrder?: number }): Promise<Experience> {

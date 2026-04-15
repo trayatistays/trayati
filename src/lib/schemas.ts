@@ -134,6 +134,27 @@ export const reservationSchema = z.object({
   createdAt: z.string().trim().min(1),
 });
 
+export const propertySubmissionSchema = z.object({
+  property: z.object({
+    title: z.string().trim().min(1),
+    city: z.string().trim().min(1),
+    state: z.string().trim().min(1),
+    country: z.string().trim().min(1),
+    description: z.string().trim().min(1),
+    pricePerNight: z.coerce.number().min(0),
+    image: z.string().trim().min(1),
+  }).passthrough(),
+});
+
+export function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 export function slugifyId(input: string) {
   return input
     .toLowerCase()

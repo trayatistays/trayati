@@ -14,7 +14,7 @@ export function LiveIndiaSoulButton({ onClick }: LiveIndiaSoulButtonProps) {
       onClick={onClick}
       whileHover={{ scale: 1.03, y: -1 }}
       whileTap={{ scale: 0.98 }}
-      className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full border px-3.5 py-2.5 transition-all duration-300 sm:w-auto sm:px-5 sm:py-3"
+      className="cta-min-target group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full border px-3.5 py-2.5 transition-all duration-300 sm:w-auto sm:px-5 sm:py-3"
       style={{
         backgroundColor: "rgba(245, 241, 233, 0.82)",
         borderColor: "rgba(164, 108, 43, 0.24)",

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { Resend } from "resend";
+import { ratelimit } from "@/lib/redis";
 
 export async function GET() {
   try {
@@ -18,6 +19,16 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting
+  const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(`contact_${ip}`);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many messages. Please try again after some time." },
+      { status: 429 }
+    );
+  }
+
   const body = (await request.json()) as {
     name?: string;
     email?: string;

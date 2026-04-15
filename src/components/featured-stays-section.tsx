@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   motion,
   useScroll,
@@ -24,7 +24,7 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
-// ─── Progress Dot ─────────────────────────────────────────────────
+// ─── Progress Dot (Desktop) ─────────────────────────────────────────
 function ProgressDot({
   index,
   scrollProgress,
@@ -196,19 +196,19 @@ function StayCard({
             <p className="text-[0.5rem] sm:text-[0.55rem] font-semibold uppercase tracking-[0.45em] text-white/45 mb-3 sm:mb-4">
               {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
             </p>
-            <h3 className="font-display text-3xl sm:text-5xl lg:text-[4rem] font-bold text-white tracking-[-0.035em] leading-[1.02]">
+            <h3 className="mobile-heading font-display text-3xl sm:text-5xl lg:text-[4rem] font-bold text-white tracking-[-0.035em] leading-[1.02]">
               {stay.title}
             </h3>
             <p className="text-[0.7rem] sm:text-xs text-white/35 font-semibold mt-2 sm:mt-2.5 tracking-[0.12em] uppercase">
               {stay.subtitle}
             </p>
-            <p className="mt-4 sm:mt-6 text-white/65 text-sm sm:text-base leading-7 sm:leading-[1.85] max-w-[48ch]">
+            <p className="mobile-body-text mt-4 sm:mt-6 text-white/65 text-sm sm:text-base leading-7 sm:leading-[1.85] max-w-[48ch]">
               {stay.description}
             </p>
 
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <div className="cta-group-gap mt-6 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
               <span
-                className="rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
+                className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
                 style={{
                   background: "linear-gradient(135deg, rgba(199,91,26,0.92) 0%, rgba(180,70,15,0.95) 100%)",
                   boxShadow: "0 4px 20px rgba(199,91,26,0.35)",
@@ -217,7 +217,7 @@ function StayCard({
                 {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
               </span>
               <span
-                className="rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white/90 backdrop-blur-md sm:px-5 sm:py-3"
+                className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white/90 backdrop-blur-md sm:px-5 sm:py-3"
                 style={{
                   backgroundColor: "rgba(32,60,76,0.4)",
                   border: "1px solid rgba(245,241,232,0.1)",
@@ -230,7 +230,7 @@ function StayCard({
                   href={stay.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white/80 backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/15 sm:px-5 sm:py-3"
+                  className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white/80 backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/15 sm:px-5 sm:py-3"
                   style={{
                     backgroundColor: "rgba(255,255,255,0.08)",
                     border: "1px solid rgba(245,241,232,0.12)",
@@ -241,7 +241,7 @@ function StayCard({
               )}
               <Link
                 href={`/booking?stayId=${stay.id}`}
-                className="inline-flex rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-300 hover:shadow-[0_18px_44px_rgba(199,91,26,0.55)] hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
+                className="cta-min-target inline-flex items-center rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-300 hover:shadow-[0_18px_44px_rgba(199,91,26,0.55)] hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
                 style={{
                   background: "linear-gradient(135deg, var(--cta) 0%, #b0460f 100%)",
                   boxShadow: "0 8px 32px rgba(199,91,26,0.4)",
@@ -251,7 +251,7 @@ function StayCard({
               </Link>
               <Link
                 href={`/property/${stay.id}`}
-                className="inline-flex rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white/85 backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/18 sm:px-7 sm:py-3"
+                className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white/85 backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/18 sm:px-7 sm:py-3"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.1)",
                   border: "1px solid rgba(245,241,232,0.15)",
@@ -264,6 +264,149 @@ function StayCard({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+// ─── Mobile Stay Card (Simplified) ────────────────────────────────
+function MobileStayCard({
+  stay,
+  index,
+  total,
+}: {
+  stay: FeaturedStay;
+  index: number;
+  total: number;
+}) {
+  return (
+    <div className="relative h-[75vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]">
+      <Image
+        src={stay.image}
+        alt={stay.alt}
+        fill
+        className="object-cover"
+        priority={index === 0}
+        sizes="100vw"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 20% 80%, rgba(199,91,26,0.08) 0%, transparent 60%)",
+        }}
+      />
+
+      <div className="absolute top-4 left-5">
+        <span className="font-display text-[0.5rem] font-bold uppercase tracking-[0.5em] text-white/40">
+          {String(index + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(total).padStart(2, "0")}
+        </span>
+      </div>
+
+      <div className="absolute top-4 right-5">
+        <span
+          className="rounded-full px-3 py-1.5 text-[0.5rem] font-bold uppercase tracking-[0.3em] text-white/90 backdrop-blur-md"
+          style={{
+            backgroundColor: "rgba(32,60,76,0.45)",
+            border: "1px solid rgba(245,241,232,0.12)",
+          }}
+        >
+          {stay.tag}
+        </span>
+      </div>
+
+      <div className="absolute bottom-0 inset-x-0 p-5">
+        <p className="text-[0.45rem] font-semibold uppercase tracking-[0.45em] text-white/45 mb-2">
+          {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
+        </p>
+        <h3 className="mobile-heading font-display text-2xl font-bold text-white tracking-[-0.03em] leading-[1.05]">
+          {stay.title}
+        </h3>
+
+        <div className="cta-group-gap mt-4 flex flex-wrap items-center gap-2">
+          <span
+            className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
+            style={{
+              background: "linear-gradient(135deg, rgba(199,91,26,0.92) 0%, rgba(180,70,15,0.95) 100%)",
+              boxShadow: "0 4px 20px rgba(199,91,26,0.35)",
+            }}
+          >
+            {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+          </span>
+          <span
+            className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white/90 backdrop-blur-md"
+            style={{
+              backgroundColor: "rgba(32,60,76,0.4)",
+              border: "1px solid rgba(245,241,232,0.1)",
+            }}
+          >
+            ★&nbsp;{stay.rating.toFixed(1)}
+          </span>
+          <Link
+            href={`/booking?stayId=${stay.id}`}
+            className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-all duration-300 active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, var(--cta) 0%, #b0460f 100%)",
+              boxShadow: "0 8px 32px rgba(199,91,26,0.4)",
+            }}
+          >
+            Book Now
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mobile Featured Carousel ──────────────────────────────────────
+function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const total = stays.length;
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollLeft = el.scrollLeft;
+    const cardWidth = el.scrollWidth / total;
+    const nearest = Math.round(scrollLeft / cardWidth);
+    setActiveIndex(Math.min(nearest, total - 1));
+  }, [total]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  const scrollTo = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.scrollWidth / total;
+    el.scrollTo({ left: cardWidth * index, behavior: "smooth" });
+  };
+
+  return (
+    <div className="md:hidden">
+      <div ref={scrollRef} className="stays-carousel">
+        {stays.map((stay, i) => (
+          <MobileStayCard key={stay.id} stay={stay} index={i} total={total} />
+        ))}
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-2">
+        {stays.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => scrollTo(i)}
+            className={`stays-dot ${i === activeIndex ? "stays-dot--active" : ""}`}
+            aria-label={`Go to stay ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -314,7 +457,7 @@ export function FeaturedStaysSection() {
   const activeStays = stays.length ? stays : featuredStays;
   const topFeatured = activeStays
     .filter((s) => s.isFeatured)
-    .slice(0, 2);
+    .slice(0, 4);
   const total = topFeatured.length;
 
   const { scrollYProgress } = useScroll({
@@ -362,13 +505,13 @@ export function FeaturedStaysSection() {
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <h2
-              className="font-display text-3xl sm:text-5xl lg:text-[3.6rem] font-bold tracking-[-0.04em] leading-[1.05] max-w-2xl"
+              className="mobile-heading font-display text-3xl sm:text-5xl lg:text-[3.6rem] font-bold tracking-[-0.04em] leading-[1.05] max-w-2xl"
               style={{ color: "var(--primary)" }}
             >
               Curated for the curious traveller.
             </h2>
             <p
-              className="max-w-[40ch] text-sm sm:text-base leading-7 lg:text-right"
+              className="mobile-body-text max-w-[40ch] text-sm sm:text-base leading-7 lg:text-right"
               style={{ color: "var(--foreground-soft)" }}
             >
               Each property is handpicked for its character, setting, and the quality of experience it delivers.
@@ -377,13 +520,16 @@ export function FeaturedStaysSection() {
         </motion.div>
       </section>
 
-      {/* ── Scroll-Linked Layout (Desktop & Mobile) ── */}
+      {/* ── Mobile: Horizontal Scroll-Snap Carousel ── */}
+      <MobileFeaturedCarousel stays={topFeatured} />
+
+      {/* ── Desktop: Scroll-Linked Layout ── */}
       <div
         ref={containerRef}
         style={{ height: `${total * VH_PER_CARD}vh` }}
-        className="relative mt-2"
+        className="relative mt-2 hidden md:block"
       >
-        <div className="sticky top-[12vh] md:top-0 h-[76vh] md:h-screen overflow-hidden">
+        <div className="sticky top-0 h-screen overflow-hidden">
           <div className="relative w-full h-full">
             {topFeatured.map((stay, i) => (
               <StayCard

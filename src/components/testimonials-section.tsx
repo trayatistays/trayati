@@ -200,22 +200,75 @@ export function TestimonialsSection() {
               >
                 Guest Stories
               </span>
-              <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
+              <h2 className="mobile-heading mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
                 Voices of Our Travelers
               </h2>
             </div>
-            <p className="max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
+            <p className="mobile-body-text max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
               Real stories from real guests who have experienced the magic of Trayati Stays.
             </p>
           </motion.div>
         </div>
 
         <div className="relative border-y py-6 sm:py-8" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
-          {/* edge fades matching brand parchment */}
           <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-24" />
           <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-24" />
 
-          <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          {/* Mobile: horizontal-scrolling carousel with peek-ahead */}
+          <div className="testimonials-peek testimonials-carousel relative md:hidden">
+            {items.map((testimonial, index) => (
+              <button
+                key={`${testimonial.id}-${index}`}
+                type="button"
+                onClick={() => setActiveItem(testimonial)}
+                className="group shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left"
+                style={{
+                  borderColor: "rgba(74,101,68,0.12)",
+                  background:
+                    "linear-gradient(155deg, rgba(255,255,255,0.78), rgba(245,241,233,0.88))",
+                  boxShadow: "0 18px 48px rgba(74,101,68,0.08)",
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="relative h-14 w-14 overflow-hidden rounded-full border" style={{ borderColor: "rgba(74,101,68,0.12)" }}>
+                    <Image
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      fill
+                      className="object-cover"
+                      loader={supabaseImageLoader}
+                    />
+                  </div>
+                  <span className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(164,108,43,0.12)", color: "var(--cta)" }}>
+                    <HiOutlineStar className="text-sm" />
+                    {testimonial.rating.toFixed(1)}
+                  </span>
+                </div>
+
+                <h3 className="mt-5 font-display text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--primary)" }}>
+                  {testimonial.name}
+                </h3>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--muted)" }}>
+                  {testimonial.title}
+                </p>
+                <p className="mt-4 line-clamp-4 text-sm leading-7" style={{ color: "var(--foreground-soft)" }}>
+                  &ldquo;{testimonial.text}&rdquo;
+                </p>
+
+                <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "rgba(74,101,68,0.08)" }}>
+                  <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--gold)" }}>
+                    {testimonial.source ?? "Guest review"}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+                    Open details
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Desktop: marquee carousel */}
+          <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] hidden md:block">
             <div
               className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
               style={

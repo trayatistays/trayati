@@ -124,6 +124,7 @@ export function HeroSection() {
           </video>
         ) : null}
         <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.15)_0%,rgba(0,0,0,0.55)_60%,rgba(0,0,0,0.75)_100%)] md:hidden" />
       </div>
 
       {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}
@@ -148,7 +149,7 @@ export function HeroSection() {
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1
-                className="text-balance mt-6 max-w-4xl 
+                className="mobile-heading text-balance mt-6 max-w-4xl 
              text-[1.65rem] 
              sm:text-[2.25rem] 
              md:text-[2.85rem] 
@@ -165,16 +166,16 @@ export function HeroSection() {
               </div>
 
               <p
-                className="text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
+                className="mobile-body-text text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
                 style={{ color: "#FFFFFF" }}
               >
-                Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir’s 100-year-old Mudhouse to Kasar Devi’s luxury villas, we preserve living history and promote authenticity.
+                Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir's 100-year-old Mudhouse to Kasar Devi's luxury villas, we preserve living history and promote authenticity.
               </p>
 
-              <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+              <div className="cta-group-gap mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <Link
                   href="/booking"
-                  className="w-full rounded-full bg-[var(--button-primary)] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] shadow-[0_18px_40px_rgba(74,101,68,0.40)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-98 sm:w-auto"
+                  className="cta-min-target w-full rounded-full bg-[var(--button-primary)] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] shadow-[0_18px_40px_rgba(74,101,68,0.40)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-98 sm:w-auto"
                   style={{ color: "#FFFFFF" }}
                 >
                   Explore Properties
