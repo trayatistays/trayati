@@ -1,7 +1,39 @@
 "use client";
 
 import { SignInButton, useUser, useAuth } from "@clerk/nextjs";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+
+type PendingReservation = {
+  stayId: string;
+  bookingLink?: string;
+  roomId?: string;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
+};
+
+const STORAGE_KEY = "trayati_pending_reservation";
+
+function savePending(data: PendingReservation) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {}
+}
+
+function loadPending(): PendingReservation | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as PendingReservation) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearPending() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
 
 type ReserveNowButtonProps = {
   stayId: string;
@@ -29,57 +61,72 @@ export function ReserveNowButton({
   const { isLoaded } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pendingReserve, setPendingReserve] = useState(false);
-  const hasRedirected = useRef(false);
 
-  const reserve = useCallback(async () => {
-    setIsSubmitting(true);
-    setMessage(null);
+  const reserve = useCallback(
+    async (overrideData?: PendingReservation) => {
+      setIsSubmitting(true);
+      setMessage(null);
 
-    try {
-      const response = await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          stayId,
-          roomId: roomId ?? undefined,
-          checkIn: checkIn || new Date().toISOString().slice(0, 10),
-          checkOut:
-            checkOut ||
-            new Date(Date.now() + 24 * 60 * 60 * 1000)
-              .toISOString()
-              .slice(0, 10),
-          guests,
-        }),
-      });
+      const sid = overrideData?.stayId ?? stayId;
+      const bl = overrideData?.bookingLink ?? bookingLink;
+      const rid = overrideData?.roomId ?? (roomId ?? undefined);
+      const ci = overrideData?.checkIn ?? checkIn;
+      const co = overrideData?.checkOut ?? checkOut;
+      const g = overrideData?.guests ?? guests;
 
-      const data = (await response.json()) as { error?: string; bookingLink?: string };
-      if (!response.ok) {
-        throw new Error(data.error ?? "Unable to reserve this stay.");
+      try {
+        const response = await fetch("/api/reservations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stayId: sid,
+            roomId: rid,
+            checkIn: ci || new Date().toISOString().slice(0, 10),
+            checkOut:
+              co ||
+              new Date(Date.now() + 24 * 60 * 60 * 1000)
+                .toISOString()
+                .slice(0, 10),
+            guests: g,
+          }),
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          bookingLink?: string;
+        };
+        if (!response.ok) {
+          throw new Error(data.error ?? "Unable to reserve this stay.");
+        }
+
+        clearPending();
+        setMessage("Reservation created! Redirecting to booking...");
+
+        const redirectUrl = data.bookingLink || bl;
+        if (redirectUrl) {
+          setTimeout(() => {
+            window.open(redirectUrl, "_blank", "noopener,noreferrer");
+          }, 800);
+        }
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to reserve this stay."
+        );
+      } finally {
+        setIsSubmitting(false);
       }
-
-      setMessage("Reservation created! Redirecting to booking...");
-
-      const redirectUrl = data.bookingLink || bookingLink;
-      if (redirectUrl) {
-        setTimeout(() => {
-          window.open(redirectUrl, "_blank", "noopener,noreferrer");
-        }, 800);
-      }
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to reserve this stay.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [stayId, roomId, checkIn, checkOut, guests, bookingLink]);
+    },
+    [stayId, bookingLink, roomId, checkIn, checkOut, guests]
+  );
 
   useEffect(() => {
-    if (isSignedIn && pendingReserve && !hasRedirected.current) {
-      hasRedirected.current = true;
-      setPendingReserve(false);
-      reserve();
-    }
-  }, [isSignedIn, pendingReserve, reserve]);
+    if (!isSignedIn) return;
+    const pending = loadPending();
+    if (!pending) return;
+    reserve(pending);
+  }, [isSignedIn, reserve]);
 
   if (!isLoaded) {
     return (
@@ -96,7 +143,9 @@ export function ReserveNowButton({
           className={className}
           style={style}
           type="button"
-          onClick={() => setPendingReserve(true)}
+          onClick={() => {
+            savePending({ stayId, bookingLink, roomId: roomId ?? undefined, checkIn, checkOut, guests });
+          }}
         >
           Reserve Now
         </button>
@@ -109,14 +158,17 @@ export function ReserveNowButton({
       <button
         className={className}
         disabled={isSubmitting}
-        onClick={reserve}
+        onClick={() => reserve()}
         style={style}
         type="button"
       >
         {isSubmitting ? "Reserving..." : "Reserve Now"}
       </button>
       {message && (
-        <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
+        <p
+          className="mt-3 text-center text-xs"
+          style={{ color: "var(--muted)" }}
+        >
           {message}
         </p>
       )}

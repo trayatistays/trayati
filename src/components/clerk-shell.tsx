@@ -1,6 +1,31 @@
 "use client";
 
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+
+const STORAGE_KEY = "trayati_pending_reservation";
+
+function ReservationRecovery({ children }: { children: React.ReactNode }) {
+  const { isSignedIn, isLoaded } = useAuth();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const pending = JSON.parse(raw) as { stayId: string };
+      const returnTo = `/property/${pending.stayId}`;
+      if (pathname !== returnTo) {
+        window.location.replace(returnTo);
+      }
+    } catch {}
+  }, [isSignedIn, isLoaded, pathname]);
+
+  return <>{children}</>;
+}
 
 export function ClerkShell({ children }: { children: React.ReactNode }) {
   return (
@@ -9,7 +34,7 @@ export function ClerkShell({ children }: { children: React.ReactNode }) {
       signInFallbackRedirectUrl="/"
       signUpFallbackRedirectUrl="/"
     >
-      {children}
+      <ReservationRecovery>{children}</ReservationRecovery>
     </ClerkProvider>
   );
 }
