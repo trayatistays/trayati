@@ -110,7 +110,8 @@ function PhotoTile({
         alt={alt}
         fill
         className="object-cover"
-        priority={priority}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
         loader={supabaseImageLoader}
       />
     </div>

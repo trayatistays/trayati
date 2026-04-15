@@ -32,7 +32,7 @@ export function SiteFooter() {
         <div className="pointer-events-none absolute -left-24 -top-16 size-56 rounded-full bg-[rgba(245,241,233,0.06)] blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 right-0 size-60 rounded-full bg-[rgba(164,108,43,0.08)] blur-3xl" />
 
-        <div className="relative z-10 mx-auto flex flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-10 lg:px-14">
+        <div className="relative z-10 mx-auto flex min-w-0 flex-col gap-4 px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-10 lg:px-14">
           <Link
             href="/"
             className="footer-link shrink-0 font-display text-base font-bold uppercase tracking-[0.22em]"
@@ -42,7 +42,7 @@ export function SiteFooter() {
 
           <nav
             aria-label="Footer navigation"
-            className="flex flex-wrap gap-x-5 gap-y-2"
+            className="flex min-w-0 flex-wrap gap-x-5 gap-y-2"
           >
             {quickLinks.map((link) => (
               <Link
@@ -67,7 +67,7 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={label}
-                className="flex size-9 items-center justify-center rounded-full border border-[rgba(245,241,233,0.24)] bg-[rgba(245,241,233,0.08)] text-[var(--footer-foreground)] transition hover:border-[rgba(245,241,233,0.48)] hover:text-[var(--footer-foreground)]"
+                className="flex size-10 items-center justify-center rounded-full border border-[rgba(245,241,233,0.82)] bg-[var(--footer-foreground)] text-[var(--footer-background)] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:border-[var(--gold-soft)] hover:bg-[var(--gold-soft)] hover:text-[var(--footer-background)] sm:size-9"
               >
                 <Icon className="text-sm" />
               </a>

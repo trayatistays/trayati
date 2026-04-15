@@ -273,11 +273,29 @@ button {
   animation-play-state: paused;
 }
 
+.carousel-nav-button {
+  opacity: 1;
+  color: #fff;
+  background-color: rgba(74, 101, 68, 0.76);
+  border-color: rgba(245, 241, 233, 0.34);
+  box-shadow: 0 14px 34px rgba(26, 26, 26, 0.18);
+}
+
+.carousel-nav-button:hover {
+  background-color: rgba(74, 101, 68, 0.88);
+  border-color: rgba(245, 241, 233, 0.5);
+}
+
+.carousel-nav-button svg {
+  color: #fff;
+}
+
 .interactive-carousel {
   scrollbar-width: none;
   -ms-overflow-style: none;
   cursor: grab;
   scroll-snap-type: x proximity;
+  touch-action: pan-y pinch-zoom;
 }
 
 .interactive-carousel::-webkit-scrollbar {
@@ -309,6 +327,16 @@ button {
 }
 
 @media (max-width: 640px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    overflow-wrap: break-word;
+  }
+
   .editorial-prose {
     gap: 1.1rem;
   }
@@ -705,6 +733,42 @@ button {
 
 
 @media (max-width: 640px) {
+  .navbar__inner {
+    gap: 0.45rem;
+    padding-inline: 0.75rem;
+  }
+
+  .navbar__logo {
+    min-width: 0;
+    gap: 0.25rem;
+  }
+
+  .navbar__logo-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .navbar__logo-text {
+    max-width: min(36vw, 9rem);
+  }
+
+  .navbar__actions {
+    flex-shrink: 0;
+    gap: 0.4rem;
+  }
+
+  .navbar__quicklinks-btn {
+    height: 40px;
+    padding-inline: 0.72rem;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+  }
+
+  .navbar__menu-btn {
+    width: 40px;
+    height: 40px;
+  }
+
   body::before {
     background-size: 220px 220px, 180px 180px;
     opacity: 0.03;
@@ -735,6 +799,23 @@ button {
 }
 
 @media (max-width: 767px) {
+  .interactive-carousel,
+  .peek-carousel,
+  .stays-carousel {
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain !important;
+    scroll-snap-type: none !important;
+    touch-action: pan-x pan-y pinch-zoom !important;
+  }
+
+  .mobile-carousel-touch-safe {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+
+  .mobile-carousel-nav {
+    display: none !important;
+  }
+
   .mobile-body-text {
     font-size: var(--font-body);
   }
@@ -808,6 +889,7 @@ button {
     overflow-x: auto;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
     scrollbar-width: none;
     gap: 1.25rem;
     padding-inline: 1.25rem;
@@ -830,6 +912,7 @@ button {
     overflow-x: auto;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
     scrollbar-width: none;
     gap: 0.75rem;
     padding-inline: 1rem;

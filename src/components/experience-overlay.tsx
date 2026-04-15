@@ -143,7 +143,7 @@ export function ExperienceOverlay({
               onClose();
             }
           }}
-          className="fixed inset-0 z-50 overflow-y-auto bg-[rgba(245,241,233,0.72)] backdrop-blur-md"
+          className="fixed inset-0 z-[10020] overflow-y-auto bg-[rgba(245,241,233,0.72)] backdrop-blur-md"
         >
           <motion.div
             ref={dialogRef}
@@ -189,7 +189,7 @@ export function ExperienceOverlay({
                   color: "var(--primary)",
                   backgroundColor: "rgba(255,255,255,0.5)",
                 }}
-                aria-label="Close Live India Soul overlay"
+                aria-label="Close Live India Soul menu"
               >
                 <HiOutlineXMark className="text-2xl" />
               </button>
@@ -237,7 +237,8 @@ export function ExperienceOverlay({
                         fill
                         sizes="420px"
                         className="object-cover"
-                        priority={isOpen}
+                        loading={isOpen ? "eager" : "lazy"}
+                        fetchPriority={isOpen ? "high" : "auto"}
                       />
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(74,101,68,0.04),rgba(74,101,68,0.42))]" />
                       <div className="absolute inset-x-5 bottom-5 rounded-[1.2rem] border p-4 backdrop-blur-md">

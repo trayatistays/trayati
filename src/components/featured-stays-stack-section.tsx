@@ -64,7 +64,8 @@ function StayCard({
           alt={stay.alt}
           fill
           className="object-cover"
-          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
+          fetchPriority={index === 0 ? "high" : "auto"}
           sizes="(max-width: 768px) 100vw, 60vw"
           loader={supabaseImageLoader}
         />

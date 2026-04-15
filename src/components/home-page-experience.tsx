@@ -21,8 +21,8 @@ function DepthSection({
     offset: ["start 92%", "end 8%"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], [72, 0, -24]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [8, 0, -2]);
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [32, 0, -10]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [4, 0, -1]);
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.5, 1], [0.35, 0.85, 1, 0.92]);
 
   return (

@@ -104,7 +104,7 @@ export function HeroSection() {
           alt=""
           aria-hidden="true"
           fill
-          priority
+          preload
           placeholder="blur"
           sizes="100vw"
           className={`absolute inset-0 object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-0" : "opacity-100"}`}
@@ -169,7 +169,7 @@ export function HeroSection() {
                 className="mobile-body-text text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
                 style={{ color: "#FFFFFF" }}
               >
-                Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir's 100-year-old Mudhouse to Kasar Devi's luxury villas, we preserve living history and promote authenticity.
+                Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir&apos;s 100-year-old Mudhouse to Kasar Devi&apos;s luxury villas, we preserve living history and promote authenticity.
               </p>
 
               <div className="cta-group-gap mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">

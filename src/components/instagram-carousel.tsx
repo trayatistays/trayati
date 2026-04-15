@@ -14,9 +14,10 @@ import { HiMiniArrowUpRight, HiOutlineChevronLeft, HiOutlineChevronRight } from 
 import type { InstagramMediaItem } from "@/lib/instagram";
 import { socialLinks } from "@/data/social-links";
 
-const AUTO_SCROLL_SPEED_DESKTOP = 20;
-const AUTO_SCROLL_SPEED_MOBILE = 6;
+const AUTO_SCROLL_SPEED_DESKTOP = 10;
+const AUTO_SCROLL_SPEED_MOBILE = 8;
 const INTERACTION_COOLDOWN_MS = 1800;
+const TOUCH_INTERACTION_COOLDOWN_MS = 4200;
 
 export function InstagramCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -25,7 +26,6 @@ export function InstagramCarousel() {
   const animationFrameRef = useRef<number | null>(null);
   const previousFrameRef = useRef<number | null>(null);
   const isPointerDownRef = useRef(false);
-  const isHoveringRef = useRef(false);
   const isFocusedWithinRef = useRef(false);
   const [items, setItems] = useState<InstagramMediaItem[]>(() => {
     if (typeof window === "undefined") return [];
@@ -42,7 +42,6 @@ export function InstagramCarousel() {
   });
   const [usingFallback, setUsingFallback] = useState(true);
   const [isPointerDown, setIsPointerDown] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
   const [isFocusedWithin, setIsFocusedWithin] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -81,10 +80,6 @@ export function InstagramCarousel() {
   }, [isPointerDown]);
 
   useEffect(() => {
-    isHoveringRef.current = isHovering;
-  }, [isHovering]);
-
-  useEffect(() => {
     isFocusedWithinRef.current = isFocusedWithin;
   }, [isFocusedWithin]);
 
@@ -118,17 +113,14 @@ export function InstagramCarousel() {
       if (
         halfWidth > 0 &&
         !isPointerDownRef.current &&
-        !isHoveringRef.current &&
         !isFocusedWithinRef.current &&
         Date.now() >= interactionLockUntilRef.current
       ) {
         track.scrollLeft += speed * deltaSeconds;
 
         if (track.scrollLeft >= halfWidth) {
-          track.scrollLeft -= halfWidth;
+          track.scrollLeft %= halfWidth;
         }
-      } else if (halfWidth > 0 && track.scrollLeft < 0) {
-        track.scrollLeft += halfWidth;
       }
 
       animationFrameRef.current = window.requestAnimationFrame(loopTrackScroll);
@@ -159,11 +151,11 @@ export function InstagramCarousel() {
     }
 
     if (track.scrollLeft >= halfWidth) {
-      track.scrollLeft -= halfWidth;
+      track.scrollLeft %= halfWidth;
     }
 
     if (track.scrollLeft < 0) {
-      track.scrollLeft += halfWidth;
+      track.scrollLeft = halfWidth + (track.scrollLeft % halfWidth);
     }
   };
 
@@ -179,6 +171,16 @@ export function InstagramCarousel() {
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") {
+      setIsPointerDown(true);
+      lockInteraction(TOUCH_INTERACTION_COOLDOWN_MS);
+      return;
+    }
+
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+
     const track = trackRef.current;
 
     if (!track) {
@@ -219,7 +221,7 @@ export function InstagramCarousel() {
 
     pointerStartRef.current = null;
     setIsPointerDown(false);
-    lockInteraction();
+    lockInteraction(event.pointerType === "touch" ? TOUCH_INTERACTION_COOLDOWN_MS : INTERACTION_COOLDOWN_MS);
   };
 
   const handleWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
@@ -229,15 +231,12 @@ export function InstagramCarousel() {
       return;
     }
 
-    const dominantDelta =
-      Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-
-    if (dominantDelta === 0) {
+    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) || event.deltaX === 0) {
       return;
     }
 
     event.preventDefault();
-    track.scrollLeft += dominantDelta;
+    track.scrollLeft += event.deltaX;
     normalizeInfiniteScroll();
     lockInteraction();
   };
@@ -290,29 +289,27 @@ export function InstagramCarousel() {
           <button
             type="button"
             onClick={() => nudgeTrack(-320)}
-            className="absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
-            style={{ borderColor: "rgba(255,255,255,0.2)" }}
+            className="carousel-nav-button mobile-carousel-nav absolute left-2 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all sm:left-4"
+            aria-label="Scroll Instagram posts left"
           >
-            <HiOutlineChevronLeft className="text-2xl text-white" />
+            <HiOutlineChevronLeft className="text-2xl" />
           </button>
           <button
             type="button"
             onClick={() => nudgeTrack(320)}
-            className="absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
-            style={{ borderColor: "rgba(255,255,255,0.2)" }}
+            className="carousel-nav-button mobile-carousel-nav absolute right-2 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all sm:right-4"
+            aria-label="Scroll Instagram posts right"
           >
-            <HiOutlineChevronRight className="text-2xl text-white" />
+            <HiOutlineChevronRight className="text-2xl" />
           </button>
 
           <div
             ref={trackRef}
-            className="interactive-carousel relative overflow-x-auto pb-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+            className="interactive-carousel mobile-carousel-touch-safe relative overflow-x-auto pb-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
             onFocusCapture={() => setIsFocusedWithin(true)}
             onBlurCapture={(event) => {
               if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {

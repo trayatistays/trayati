@@ -53,7 +53,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
               fill
               sizes="(max-width: 640px) 56px, (max-width: 1024px) 72px, 80px"
               className="object-contain"
-              priority
+              loading="eager"
             />
           </div>
           <div className="navbar__logo-text">

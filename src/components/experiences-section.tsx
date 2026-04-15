@@ -139,9 +139,10 @@ function ExperienceDialog({
   );
 }
 
-const EXP_SCROLL_SPEED_DESKTOP = 0.5;
-const EXP_SCROLL_SPEED_MOBILE = 0.25;
-const EXP_RESUME_DELAY_MS = 3000;
+const EXP_SCROLL_SPEED_DESKTOP = 30;
+const EXP_SCROLL_SPEED_MOBILE = 20;
+const MOBILE_BUTTON_SCROLL_AMOUNT = 260;
+const MOBILE_INTERACTION_RESUME_MS = 4200;
 
 function MobileExperienceCarousel({
   items,
@@ -151,53 +152,133 @@ function MobileExperienceCarousel({
   onSelect: (item: Experience) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isPausedRef = useRef(false);
   const rafRef = useRef<number>(0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const previousFrameRef = useRef<number | null>(null);
+  const scrollPositionRef = useRef(0);
+  const isInteractingRef = useRef(false);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const loopItems = [...items, ...items];
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    const tick = () => {
-      if (!isPausedRef.current) {
-        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-        const speed = isMobile ? EXP_SCROLL_SPEED_MOBILE : EXP_SCROLL_SPEED_DESKTOP;
-        el.scrollLeft += speed;
-        const halfWidth = el.scrollWidth / 2;
-        if (el.scrollLeft >= halfWidth) {
-          el.scrollLeft = 0;
-        }
+    scrollPositionRef.current = el.scrollLeft;
+
+    const tick = (timestamp: number) => {
+      if (previousFrameRef.current === null) {
+        previousFrameRef.current = timestamp;
       }
+
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const speed = isMobile ? EXP_SCROLL_SPEED_MOBILE : EXP_SCROLL_SPEED_DESKTOP;
+      const deltaSeconds = (timestamp - previousFrameRef.current) / 1000;
+      previousFrameRef.current = timestamp;
+
+      if (isInteractingRef.current) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      scrollPositionRef.current += speed * deltaSeconds;
+
+      const halfWidth = el.scrollWidth / 2;
+      if (halfWidth > 0 && scrollPositionRef.current >= halfWidth) {
+        scrollPositionRef.current -= halfWidth;
+      }
+
+      el.scrollLeft = scrollPositionRef.current;
       rafRef.current = requestAnimationFrame(tick);
     };
 
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(resumeTimeoutRef.current);
+      previousFrameRef.current = null;
+    };
   }, []);
 
-  const pause = useCallback(() => {
-    isPausedRef.current = true;
-    clearTimeout(timeoutRef.current);
+  const pauseForTouch = useCallback(() => {
+    const el = scrollRef.current;
+    if (el) {
+      scrollPositionRef.current = el.scrollLeft;
+    }
+    isInteractingRef.current = true;
+    clearTimeout(resumeTimeoutRef.current);
   }, []);
 
-  const resume = useCallback(() => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      isPausedRef.current = false;
-    }, EXP_RESUME_DELAY_MS);
+  const resumeAfterTouch = useCallback(() => {
+    const syncPosition = () => {
+      const el = scrollRef.current;
+      if (el) {
+        scrollPositionRef.current = el.scrollLeft;
+      }
+    };
+
+    syncPosition();
+    clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      syncPosition();
+      previousFrameRef.current = null;
+      isInteractingRef.current = false;
+    }, MOBILE_INTERACTION_RESUME_MS);
+  }, []);
+
+  const scroll = useCallback((direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const halfWidth = el.scrollWidth / 2;
+    const offset = direction === "left" ? -MOBILE_BUTTON_SCROLL_AMOUNT : MOBILE_BUTTON_SCROLL_AMOUNT;
+    let nextPosition = scrollPositionRef.current + offset;
+
+    if (halfWidth > 0) {
+      if (nextPosition < 0) nextPosition += halfWidth;
+      if (nextPosition >= halfWidth) nextPosition -= halfWidth;
+    }
+
+    scrollPositionRef.current = nextPosition;
+    el.scrollTo({ left: nextPosition, behavior: "smooth" });
   }, []);
 
   return (
-    <div
-      className="peek-fade relative md:hidden"
-      onTouchStart={pause}
-      onTouchEnd={resume}
-      onMouseDown={pause}
-      onMouseUp={resume}
-    >
-      <div ref={scrollRef} className="peek-carousel">
+    <div className="peek-fade mobile-carousel-touch-safe relative md:hidden">
+      <button
+        type="button"
+        onClick={() => scroll("left")}
+        className="carousel-nav-button mobile-carousel-nav absolute left-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+        aria-label="Scroll stories left"
+      >
+        <HiOutlineChevronLeft className="text-2xl" />
+      </button>
+      <button
+        type="button"
+        onClick={() => scroll("right")}
+        className="carousel-nav-button mobile-carousel-nav absolute right-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+        aria-label="Scroll stories right"
+      >
+        <HiOutlineChevronRight className="text-2xl" />
+      </button>
+
+      <div
+        ref={scrollRef}
+        className="peek-carousel mobile-carousel-touch-safe"
+        onPointerDown={(event) => {
+          if (event.pointerType === "touch") {
+            pauseForTouch();
+          }
+        }}
+        onPointerUp={(event) => {
+          if (event.pointerType === "touch") {
+            resumeAfterTouch();
+          }
+        }}
+        onPointerCancel={(event) => {
+          if (event.pointerType === "touch") {
+            resumeAfterTouch();
+          }
+        }}
+      >
         {loopItems.map((experience, index) => (
           <button
             key={`${experience.id}-${index}`}
@@ -328,7 +409,7 @@ export function ExperiencesSection() {
 
   return (
     <>
-      <section className="relative w-full overflow-hidden px-0 py-16 sm:py-24 lg:py-32">
+      <section className="relative w-full overflow-hidden px-0 py-12 sm:py-16 lg:py-20">
         <div className="px-4 sm:px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -372,18 +453,18 @@ export function ExperiencesSection() {
             <button
               type="button"
               onClick={() => scroll("left")}
-              className="absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
-              style={{ borderColor: "rgba(255,255,255,0.2)" }}
+              className="carousel-nav-button absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+              aria-label="Scroll stories left"
             >
-              <HiOutlineChevronLeft className="text-2xl text-white" />
+              <HiOutlineChevronLeft className="text-2xl" />
             </button>
             <button
               type="button"
               onClick={() => scroll("right")}
-              className="absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
-              style={{ borderColor: "rgba(255,255,255,0.2)" }}
+              className="carousel-nav-button absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+              aria-label="Scroll stories right"
             >
-              <HiOutlineChevronRight className="text-2xl text-white" />
+              <HiOutlineChevronRight className="text-2xl" />
             </button>
 
             <div 

@@ -178,7 +178,7 @@ export default async function BlogPostPage({
               fill
               className="object-cover"
               loader={supabaseImageLoader}
-              priority
+              preload
             />
           </div>
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,58,82,0.02),rgba(13,58,82,0.34))]" />

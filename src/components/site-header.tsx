@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
@@ -57,6 +57,28 @@ export function SiteHeader() {
     setTimeout(() => router.push(routes[item]), 300);
   };
 
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
   return (
     <>
       <Navbar
@@ -81,21 +103,24 @@ export function SiteHeader() {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="fixed inset-0 z-[9998] overflow-y-auto"
         aria-hidden={!menuOpen}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Trayati Stays menu"
       >
         <div className="absolute inset-0" style={{ backgroundColor: "rgba(245, 241, 233, 0.97)" }} />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(13,58,82,0.10),transparent_24%),radial-gradient(circle_at_80%_18%,rgba(164,108,43,0.08),transparent_20%)] pointer-events-none" />
         <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(74,101,68,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(74,101,68,0.06)_1px,transparent_1px)] [background-size:72px_72px] pointer-events-none" />
 
-        <div className="relative flex min-h-full flex-col px-4 pt-28 pb-4 sm:px-8 sm:pt-32 sm:pb-6 lg:px-12 lg:pt-36">
+        <div className="relative flex min-h-full min-w-0 flex-col px-4 pt-28 pb-4 sm:px-8 sm:pt-32 sm:pb-6 lg:px-12 lg:pt-36">
           <div className="flex items-center justify-center pt-2">
             <h2 className="font-display text-2xl font-semibold tracking-[-0.05em] sm:text-4xl" style={{ color: "var(--primary)" }}>
               Trayati Stays
             </h2>
           </div>
 
-          <div className="grid flex-1 items-start gap-8 py-6 md:grid-cols-[0.9fr_auto_1fr] md:items-center md:gap-20 lg:gap-24">
+          <div className="grid min-w-0 flex-1 items-start gap-8 py-6 md:grid-cols-[0.9fr_auto_1fr] md:items-center md:gap-20 lg:gap-24">
             {/* Preview card */}
-            <div className="flex flex-col items-center justify-center gap-6 md:items-end md:gap-8">
+            <div className="flex min-w-0 flex-col items-center justify-center gap-6 md:items-end md:gap-8">
               <div
                 className="hidden md:block w-full max-w-[320px] overflow-hidden rounded-[1.75rem] border p-3 shadow-[0_24px_60px_rgba(74,101,68,0.14)] backdrop-blur-xl"
                 style={{
@@ -166,7 +191,7 @@ export function SiteHeader() {
             <div className="hidden h-full min-h-52 w-px md:block" style={{ backgroundColor: "var(--border-soft)" }} />
 
             {/* Nav links */}
-            <div className="flex flex-col justify-center md:pl-2">
+            <div className="flex min-w-0 flex-col justify-center md:pl-2">
               <p className="text-xs uppercase tracking-[0.34em]" style={{ color: "var(--muted)" }}>
                 Explore section
               </p>

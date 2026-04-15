@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, type PointerEvent as ReactPointerEvent } from "react";
 import {
   motion,
   AnimatePresence,
@@ -11,13 +11,14 @@ import {
   useSpring,
   type MotionValue,
 } from "framer-motion";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
 import { useStays } from "@/hooks/use-stays";
 
-const VH_PER_CARD = 110;
+const VH_PER_CARD = 88;
 const SPRING_CONFIG = { stiffness: 350, damping: 35, mass: 0.2 };
 const AUTO_ADVANCE_MS = 5000;
-const PAUSE_AFTER_INTERACT_MS = 8000;
+const MOBILE_INTERACTION_RESUME_MS = 4200;
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -162,7 +163,8 @@ function StayCard({
               alt={stay.alt}
               fill
               className="object-cover"
-              priority={isFirst}
+              loading={isFirst ? "eager" : "lazy"}
+              fetchPriority={isFirst ? "high" : "auto"}
               sizes="(max-width: 768px) 100vw, 90vw"
             />
           </motion.div>
@@ -293,7 +295,8 @@ function MobileStayCard({
         alt={stay.alt}
         fill
         className="object-cover"
-        priority={index === 0}
+        loading={index === 0 ? "eager" : "lazy"}
+        fetchPriority={index === 0 ? "high" : "auto"}
         sizes="100vw"
       />
 
@@ -385,8 +388,9 @@ function MobileStayCard({
 // ─── Mobile Featured Carousel (3D + Auto-Advance) ──────────────────
 function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const isPausedRef = useRef(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const total = stays.length;
 
   useEffect(() => {
@@ -394,44 +398,97 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
       if (isPausedRef.current) return;
       setActiveIndex((prev) => (prev + 1) % total);
     }, AUTO_ADVANCE_MS);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      clearTimeout(resumeTimeoutRef.current);
+    };
   }, [total]);
-
-  const pause = useCallback(() => {
-    isPausedRef.current = true;
-    clearTimeout(timeoutRef.current);
-  }, []);
-
-  const resume = useCallback(() => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      isPausedRef.current = false;
-    }, PAUSE_AFTER_INTERACT_MS);
-  }, []);
 
   const goTo = (index: number) => {
     setActiveIndex(index);
-    pause();
-    resume();
+  };
+
+  const goBy = (offset: number) => {
+    setActiveIndex((prev) => (prev + offset + total) % total);
+  };
+
+  const pauseForTouch = () => {
+    isPausedRef.current = true;
+    clearTimeout(resumeTimeoutRef.current);
+  };
+
+  const resumeAfterTouch = () => {
+    clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      isPausedRef.current = false;
+    }, MOBILE_INTERACTION_RESUME_MS);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") return;
+    pauseForTouch();
+    touchStartRef.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") return;
+
+    if (!touchStartRef.current) {
+      resumeAfterTouch();
+      return;
+    }
+
+    const deltaX = event.clientX - touchStartRef.current.x;
+    const deltaY = event.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    if (Math.abs(deltaX) < 44 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+      resumeAfterTouch();
+      return;
+    }
+
+    goBy(deltaX < 0 ? 1 : -1);
+    resumeAfterTouch();
   };
 
   return (
     <div
-      className="md:hidden"
-      onTouchStart={pause}
-      onTouchEnd={resume}
-      onMouseDown={pause}
-      onMouseUp={resume}
+      className="mobile-carousel-touch-safe md:hidden"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => {
+        touchStartRef.current = null;
+        resumeAfterTouch();
+      }}
     >
       <div style={{ perspective: 1200, overflow: "hidden" }}>
-        <AnimatePresence mode="wait">
-          <MobileStayCard
-            key={stays[activeIndex].id}
-            stay={stays[activeIndex]}
-            index={activeIndex}
-            total={total}
-          />
-        </AnimatePresence>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => goBy(-1)}
+            className="carousel-nav-button mobile-carousel-nav absolute left-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+            aria-label="Show previous stay"
+          >
+            <HiOutlineChevronLeft className="text-2xl" />
+          </button>
+          <button
+            type="button"
+            onClick={() => goBy(1)}
+            className="carousel-nav-button mobile-carousel-nav absolute right-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+            aria-label="Show next stay"
+          >
+            <HiOutlineChevronRight className="text-2xl" />
+          </button>
+
+          <AnimatePresence mode="wait">
+            <MobileStayCard
+              key={stays[activeIndex].id}
+              stay={stays[activeIndex]}
+              index={activeIndex}
+              total={total}
+            />
+          </AnimatePresence>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-2">
