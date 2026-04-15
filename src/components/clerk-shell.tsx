@@ -1,12 +1,12 @@
 "use client";
 
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const STORAGE_KEY = "trayati_pending_reservation";
 
-function ReservationRecovery({ children }: { children: React.ReactNode }) {
+function ReservationRecoveryInner({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,6 +25,14 @@ function ReservationRecovery({ children }: { children: React.ReactNode }) {
   }, [isSignedIn, isLoaded, pathname]);
 
   return <>{children}</>;
+}
+
+function ReservationRecovery({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense>
+      <ReservationRecoveryInner>{children}</ReservationRecoveryInner>
+    </Suspense>
+  );
 }
 
 export function ClerkShell({ children }: { children: React.ReactNode }) {

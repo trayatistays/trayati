@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
 import { socialLinks } from "@/data/social-links";
@@ -41,6 +40,8 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
 };
 export function HeroSection() {
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { stiffness: 110, damping: 18, mass: 0.8 });
@@ -49,6 +50,17 @@ export function HeroSection() {
   const orbY = useSpring(mouseY, { stiffness: 90, damping: 20, mass: 1 });
   const heroTransform = useMotionTemplate`translate3d(${smoothX}px, ${smoothY}px, 0px)`;
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState >= 2) {
+      setVideoLoaded(true);
+    }
+    const handleCanPlay = () => setVideoLoaded(true);
+    video.addEventListener("canplay", handleCanPlay);
+    return () => video.removeEventListener("canplay", handleCanPlay);
+  }, []);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     const { currentTarget, clientX, clientY } = event;
@@ -71,15 +83,19 @@ export function HeroSection() {
       onMouseLeave={resetMouse}
       className="relative isolate min-h-[85vh] overflow-hidden"
     >
-      {/* Background Image */}
+      {/* Background Video */}
       <div className="absolute inset-0 -z-20">
-        <Image
-          src="/background-hero-section.jpg"
-          alt="Trayati Stays Hero Background"
-          fill
-          priority
-          className="object-cover object-center"
-        />
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
+        >
+          <source src="/background-video.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}
