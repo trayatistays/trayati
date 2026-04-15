@@ -1,13 +1,31 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
 import Image from "next/image";
+import { useReducedMotion } from "framer-motion";
 import { FaInstagram } from "react-icons/fa6";
-import { HiMiniArrowUpRight } from "react-icons/hi2";
+import { HiMiniArrowLeft, HiMiniArrowRight, HiMiniArrowUpRight } from "react-icons/hi2";
 import type { InstagramMediaItem } from "@/lib/instagram";
 import { socialLinks } from "@/data/social-links";
 
+const AUTO_SCROLL_SPEED = 24;
+const INTERACTION_COOLDOWN_MS = 1800;
+
 export function InstagramCarousel() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pointerStartRef = useRef<{ x: number; scrollLeft: number } | null>(null);
+  const interactionLockUntilRef = useRef(0);
+  const animationFrameRef = useRef<number | null>(null);
+  const previousFrameRef = useRef<number | null>(null);
+  const isPointerDownRef = useRef(false);
+  const isHoveringRef = useRef(false);
+  const isFocusedWithinRef = useRef(false);
   const [items, setItems] = useState<InstagramMediaItem[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -22,6 +40,10 @@ export function InstagramCarousel() {
     return [];
   });
   const [usingFallback, setUsingFallback] = useState(true);
+  const [isPointerDown, setIsPointerDown] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isFocusedWithin, setIsFocusedWithin] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (items.length > 0) return;
@@ -53,12 +75,176 @@ export function InstagramCarousel() {
     };
   }, [items.length]);
 
+  useEffect(() => {
+    isPointerDownRef.current = isPointerDown;
+  }, [isPointerDown]);
+
+  useEffect(() => {
+    isHoveringRef.current = isHovering;
+  }, [isHovering]);
+
+  useEffect(() => {
+    isFocusedWithinRef.current = isFocusedWithin;
+  }, [isFocusedWithin]);
+
+  const lockInteraction = (duration = INTERACTION_COOLDOWN_MS) => {
+    interactionLockUntilRef.current = Date.now() + duration;
+  };
+
+  useEffect(() => {
+    if (!items.length || prefersReducedMotion) {
+      return;
+    }
+
+    const loopTrackScroll = (timestamp: number) => {
+      const track = trackRef.current;
+
+      if (!track) {
+        animationFrameRef.current = window.requestAnimationFrame(loopTrackScroll);
+        return;
+      }
+
+      if (previousFrameRef.current === null) {
+        previousFrameRef.current = timestamp;
+      }
+
+      const halfWidth = track.scrollWidth / 2;
+      const deltaSeconds = (timestamp - previousFrameRef.current) / 1000;
+      previousFrameRef.current = timestamp;
+
+      if (
+        halfWidth > 0 &&
+        !isPointerDownRef.current &&
+        !isHoveringRef.current &&
+        !isFocusedWithinRef.current &&
+        Date.now() >= interactionLockUntilRef.current
+      ) {
+        track.scrollLeft += AUTO_SCROLL_SPEED * deltaSeconds;
+
+        if (track.scrollLeft >= halfWidth) {
+          track.scrollLeft -= halfWidth;
+        }
+      } else if (halfWidth > 0 && track.scrollLeft < 0) {
+        track.scrollLeft += halfWidth;
+      }
+
+      animationFrameRef.current = window.requestAnimationFrame(loopTrackScroll);
+    };
+
+    animationFrameRef.current = window.requestAnimationFrame(loopTrackScroll);
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+      animationFrameRef.current = null;
+      previousFrameRef.current = null;
+    };
+  }, [items.length, prefersReducedMotion]);
+
+  const normalizeInfiniteScroll = () => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    const halfWidth = track.scrollWidth / 2;
+
+    if (halfWidth === 0) {
+      return;
+    }
+
+    if (track.scrollLeft >= halfWidth) {
+      track.scrollLeft -= halfWidth;
+    }
+
+    if (track.scrollLeft < 0) {
+      track.scrollLeft += halfWidth;
+    }
+  };
+
+  const nudgeTrack = (offset: number) => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    lockInteraction();
+    track.scrollBy({ left: offset, behavior: "smooth" });
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    pointerStartRef.current = {
+      x: event.clientX,
+      scrollLeft: track.scrollLeft,
+    };
+    setIsPointerDown(true);
+    lockInteraction(2600);
+    track.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isPointerDown || !pointerStartRef.current) {
+      return;
+    }
+
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    const deltaX = event.clientX - pointerStartRef.current.x;
+    track.scrollLeft = pointerStartRef.current.scrollLeft - deltaX;
+    normalizeInfiniteScroll();
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current;
+
+    if (track?.hasPointerCapture(event.pointerId)) {
+      track.releasePointerCapture(event.pointerId);
+    }
+
+    pointerStartRef.current = null;
+    setIsPointerDown(false);
+    lockInteraction();
+  };
+
+  const handleWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    const dominantDelta =
+      Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+
+    if (dominantDelta === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    track.scrollLeft += dominantDelta;
+    normalizeInfiniteScroll();
+    lockInteraction();
+  };
+
   if (!items.length) {
     return null;
   }
 
   return (
-      <section className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
+    <section className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
       <div className="relative w-full overflow-hidden border-y px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
         <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
         <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
@@ -72,71 +258,125 @@ export function InstagramCarousel() {
               The visual diary of Trayati
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 sm:text-base" style={{ color: "var(--foreground-soft)" }}>
-              {usingFallback
-                ? ""
-                : ""}
+              Scroll, drag, or tap through our latest frames while the reel keeps drifting on its own.
             </p>
           </div>
 
-          <a
-            href={socialLinks.instagram.url}
-            target="_blank"
-            rel="noreferrer"
-            className="ultra-3d-hover inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
-            style={{
-              color: "var(--primary)",
-              borderColor: "rgba(74,101,68,0.18)",
-              backgroundColor: "rgba(245,241,233,0.88)",
-            }}
-          >
-            Open Instagram
-            <HiMiniArrowUpRight className="text-lg" />
-          </a>
-        </div>
-
-        <div className="relative z-10 mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div
-            className="marquee-track marquee-track--hover-slow flex w-max gap-4"
-            style={
-              {
-                "--marquee-duration": "32s",
-                "--marquee-duration-hover": "54s",
-              } as CSSProperties
-            }
-          >
-            {items.map((item, index) => (
-              <a
-                key={`${item.id}-${index}`}
-                href={item.permalink}
-                target="_blank"
-                rel="noreferrer"
-                className="ultra-3d-hover group relative block w-[14rem] shrink-0 overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
+          <div className="flex flex-wrap items-center gap-3">
+            <div
+              className="hidden items-center gap-2 rounded-full border px-2 py-2 sm:inline-flex"
+              style={{
+                borderColor: "rgba(74,101,68,0.12)",
+                backgroundColor: "rgba(255,255,255,0.46)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => nudgeTrack(-320)}
+                className="inline-flex size-10 items-center justify-center rounded-full border transition hover:-translate-x-0.5"
                 style={{
                   borderColor: "rgba(74,101,68,0.12)",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,233,0.78))",
-                  boxShadow: "0 18px 40px rgba(74,101,68,0.08)",
+                  backgroundColor: "rgba(245,241,233,0.92)",
+                  color: "var(--primary)",
                 }}
+                aria-label="Scroll Instagram posts left"
               >
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <Image
-                    src={item.mediaUrl}
-                    alt={item.alt}
-                    fill
-                    sizes="(max-width: 640px) 224px, 288px"
-                    className="object-cover transition duration-700 group-hover:scale-110"
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(74,101,68,0.76)_100%)]" />
-                  <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(164,108,43,0.88)" }}>
-                    <FaInstagram />
+                <HiMiniArrowLeft className="text-lg" />
+              </button>
+              <button
+                type="button"
+                onClick={() => nudgeTrack(320)}
+                className="inline-flex size-10 items-center justify-center rounded-full border transition hover:translate-x-0.5"
+                style={{
+                  borderColor: "rgba(74,101,68,0.12)",
+                  backgroundColor: "rgba(245,241,233,0.92)",
+                  color: "var(--primary)",
+                }}
+                aria-label="Scroll Instagram posts right"
+              >
+                <HiMiniArrowRight className="text-lg" />
+              </button>
+            </div>
+
+            <a
+              href={socialLinks.instagram.url}
+              target="_blank"
+              rel="noreferrer"
+              className="ultra-3d-hover inline-flex items-center gap-3 rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em]"
+              style={{
+                color: "var(--primary)",
+                borderColor: "rgba(74,101,68,0.18)",
+                backgroundColor: "rgba(245,241,233,0.88)",
+              }}
+            >
+              Open Instagram
+              <HiMiniArrowUpRight className="text-lg" />
+            </a>
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-8">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--muted)" }}>
+              {usingFallback ? "Curated highlights" : "Live visual stream"}
+            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--gold)" }}>
+              Swipe, wheel, or drag
+            </p>
+          </div>
+
+          <div
+            ref={trackRef}
+            className="interactive-carousel relative overflow-x-auto pb-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            onFocusCapture={() => setIsFocusedWithin(true)}
+            onBlurCapture={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                setIsFocusedWithin(false);
+              }
+            }}
+            onWheel={handleWheel}
+          >
+            <div className="flex w-max gap-4 pr-4 sm:gap-5">
+              {items.map((item, index) => (
+                <a
+                  key={`${item.id}-${index}`}
+                  href={item.permalink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ultra-3d-hover group relative block w-[14rem] shrink-0 snap-start overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
+                  style={{
+                    borderColor: "rgba(74,101,68,0.12)",
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,233,0.78))",
+                    boxShadow: "0 18px 40px rgba(74,101,68,0.08)",
+                  }}
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <Image
+                      src={item.mediaUrl}
+                      alt={item.alt}
+                      fill
+                      sizes="(max-width: 640px) 224px, 288px"
+                      className="object-cover transition duration-700 group-hover:scale-110"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(74,101,68,0.76)_100%)]" />
+                    <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(164,108,43,0.88)" }}>
+                      <FaInstagram />
+                    </div>
+                    <div className="absolute inset-x-4 bottom-4">
+                      <p className="max-h-16 overflow-hidden text-sm leading-5 text-white/90">{item.caption}</p>
+                    </div>
                   </div>
-                  <div className="absolute inset-x-4 bottom-4">
-                    <p className="max-h-10 overflow-hidden text-sm leading-5 text-white/90">{item.caption}</p>
-                  </div>
-                </div>
-              </a>
-            ))}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>

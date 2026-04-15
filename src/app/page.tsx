@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import { HeroSection } from "@/components/hero-section";
-import { FeaturedStaysSection } from "@/components/featured-stays-section";
-import { InstagramCarousel } from "@/components/instagram-carousel";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { ExperiencesSection } from "@/components/experiences-section";
+import { HomePageExperience } from "@/components/home-page-experience";
 
 export const metadata: Metadata = {
   title: "Luxury Stays in Kasar Devi, Dharamshala, Jaisalmer and Varkala",
@@ -13,13 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return (
-    <main className="min-h-screen">
-      <HeroSection />
-      <FeaturedStaysSection />
-      <ExperiencesSection />
-      <TestimonialsSection />
-      <InstagramCarousel />
-    </main>
-  );
+  return <HomePageExperience />;
 }

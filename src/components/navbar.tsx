@@ -27,10 +27,10 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile links when main menu opens
-  useEffect(() => {
-    if (menuOpen) setMobileLinksOpen(false);
-  }, [menuOpen]);
+  const handleMenuToggle = () => {
+    setMobileLinksOpen(false);
+    onToggleMenu();
+  };
 
   return (
     <motion.header
@@ -130,7 +130,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           {/* Hamburger — always visible */}
           <motion.button
             type="button"
-            onClick={onToggleMenu}
+            onClick={handleMenuToggle}
             whileHover={{ scale: 1.06, rotate: menuOpen ? 0 : 6 }}
             whileTap={{ scale: 0.96 }}
             className="navbar__menu-btn"

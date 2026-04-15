@@ -200,6 +200,54 @@ button {
   transform: perspective(1000px) translateY(-2px) scale(0.98) rotateX(0deg) rotateY(0deg);
 }
 
+.home-depth-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-depth-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.7;
+  will-change: transform;
+}
+
+.home-depth-orb--sage {
+  top: 8rem;
+  left: -6rem;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(circle, rgba(74, 101, 68, 0.2) 0%, rgba(74, 101, 68, 0) 72%);
+}
+
+.home-depth-orb--gold {
+  top: 34rem;
+  right: -5rem;
+  width: 22rem;
+  height: 22rem;
+  background: radial-gradient(circle, rgba(164, 108, 43, 0.22) 0%, rgba(164, 108, 43, 0) 70%);
+}
+
+.home-depth-orb--ink {
+  bottom: 8rem;
+  left: 38%;
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(circle, rgba(13, 58, 82, 0.16) 0%, rgba(13, 58, 82, 0) 72%);
+}
+
+.home-depth-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 130px 130px;
+  mask-image: linear-gradient(180deg, transparent, black 16%, black 82%, transparent);
+  opacity: 0.16;
+}
+
 /* Footer link hover — bright CTA orange glow */
 .footer-link {
   color: var(--footer-foreground);
@@ -224,6 +272,57 @@ button {
 
 .marquee-track--footer:hover {
   animation-play-state: paused;
+}
+
+.interactive-carousel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  scroll-snap-type: x proximity;
+}
+
+.interactive-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.interactive-carousel:active {
+  cursor: grabbing;
+}
+
+.editorial-prose {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.editorial-prose p {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--foreground-soft);
+  font-family: var(--font-eb-garamond), serif;
+  font-size: clamp(1.1rem, 1.25vw + 0.9rem, 1.38rem);
+  line-height: 1.95;
+  letter-spacing: 0.01em;
+}
+
+.editorial-prose p:first-child {
+  color: var(--foreground);
+  font-size: clamp(1.18rem, 1.35vw + 1rem, 1.52rem);
+}
+
+@media (max-width: 640px) {
+  .editorial-prose {
+    gap: 1.1rem;
+  }
+
+  .editorial-prose p {
+    max-width: none;
+    font-size: 1.03rem;
+    line-height: 1.82;
+  }
+
+  .editorial-prose p:first-child {
+    font-size: 1.12rem;
+  }
 }
 
 @keyframes marquee-scroll {
@@ -610,6 +709,29 @@ button {
   body::before {
     background-size: 220px 220px, 180px 180px;
     opacity: 0.03;
+  }
+
+  .home-depth-orb--sage {
+    left: -10rem;
+    width: 18rem;
+    height: 18rem;
+  }
+
+  .home-depth-orb--gold {
+    right: -9rem;
+    top: 28rem;
+    width: 16rem;
+    height: 16rem;
+  }
+
+  .home-depth-orb--ink {
+    left: 15%;
+    width: 14rem;
+    height: 14rem;
+  }
+
+  .home-depth-grid {
+    background-size: 92px 92px;
   }
 }
 
