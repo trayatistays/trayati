@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
 import {
   motion,
+  AnimatePresence,
   useScroll,
   useTransform,
   useSpring,
@@ -15,6 +16,8 @@ import { useStays } from "@/hooks/use-stays";
 
 const VH_PER_CARD = 110;
 const SPRING_CONFIG = { stiffness: 350, damping: 35, mass: 0.2 };
+const AUTO_ADVANCE_MS = 5000;
+const PAUSE_AFTER_INTERACT_MS = 8000;
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -267,7 +270,7 @@ function StayCard({
   );
 }
 
-// ─── Mobile Stay Card (Simplified) ────────────────────────────────
+// ─── Mobile Stay Card (3D + Simplified) ────────────────────────────
 function MobileStayCard({
   stay,
   index,
@@ -278,7 +281,13 @@ function MobileStayCard({
   total: number;
 }) {
   return (
-    <div className="relative h-[75vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]">
+    <motion.div
+      initial={{ opacity: 0, rotateY: -20, x: 60 }}
+      animate={{ opacity: 1, rotateY: 0, x: 0 }}
+      exit={{ opacity: 0, rotateY: 20, x: -60, scale: 0.95 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      className="mobile-3d-card--stay relative h-[72vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]"
+    >
       <Image
         src={stay.image}
         alt={stay.alt}
@@ -315,7 +324,12 @@ function MobileStayCard({
         </span>
       </div>
 
-      <div className="absolute bottom-0 inset-x-0 p-5">
+      <motion.div
+        className="absolute bottom-0 inset-x-0 p-5"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
         <p className="text-[0.45rem] font-semibold uppercase tracking-[0.45em] text-white/45 mb-2">
           {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
         </p>
@@ -352,47 +366,72 @@ function MobileStayCard({
           >
             Book Now
           </Link>
+          <Link
+            href={`/property/${stay.id}`}
+            className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white/85 backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/18"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 1)",
+              border: "1px solid rgba(245,241,232,0.15)",
+            }}
+          >
+            View Details&nbsp;-&gt;
+          </Link>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-// ─── Mobile Featured Carousel ──────────────────────────────────────
+// ─── Mobile Featured Carousel (3D + Auto-Advance) ──────────────────
 function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const isPausedRef = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const total = stays.length;
 
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const scrollLeft = el.scrollLeft;
-    const cardWidth = el.scrollWidth / total;
-    const nearest = Math.round(scrollLeft / cardWidth);
-    setActiveIndex(Math.min(nearest, total - 1));
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (isPausedRef.current) return;
+      setActiveIndex((prev) => (prev + 1) % total);
+    }, AUTO_ADVANCE_MS);
+    return () => clearInterval(id);
   }, [total]);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleScroll, { passive: true });
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  const pause = useCallback(() => {
+    isPausedRef.current = true;
+    clearTimeout(timeoutRef.current);
+  }, []);
 
-  const scrollTo = (index: number) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = el.scrollWidth / total;
-    el.scrollTo({ left: cardWidth * index, behavior: "smooth" });
+  const resume = useCallback(() => {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      isPausedRef.current = false;
+    }, PAUSE_AFTER_INTERACT_MS);
+  }, []);
+
+  const goTo = (index: number) => {
+    setActiveIndex(index);
+    pause();
+    resume();
   };
 
   return (
-    <div className="md:hidden">
-      <div ref={scrollRef} className="stays-carousel">
-        {stays.map((stay, i) => (
-          <MobileStayCard key={stay.id} stay={stay} index={i} total={total} />
-        ))}
+    <div
+      className="md:hidden"
+      onTouchStart={pause}
+      onTouchEnd={resume}
+      onMouseDown={pause}
+      onMouseUp={resume}
+    >
+      <div style={{ perspective: 1200, overflow: "hidden" }}>
+        <AnimatePresence mode="wait">
+          <MobileStayCard
+            key={stays[activeIndex].id}
+            stay={stays[activeIndex]}
+            index={activeIndex}
+            total={total}
+          />
+        </AnimatePresence>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-2">
@@ -400,8 +439,8 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
           <button
             key={i}
             type="button"
-            onClick={() => scrollTo(i)}
-            className={`stays-dot ${i === activeIndex ? "stays-dot--active" : ""}`}
+            onClick={() => goTo(i)}
+            className={`carousel-dot ${i === activeIndex ? "carousel-dot--active" : ""}`}
             aria-label={`Go to stay ${i + 1}`}
           />
         ))}
@@ -520,7 +559,7 @@ export function FeaturedStaysSection() {
         </motion.div>
       </section>
 
-      {/* ── Mobile: Horizontal Scroll-Snap Carousel ── */}
+      {/* ── Mobile: 3D Auto-Advance Carousel ── */}
       <MobileFeaturedCarousel stays={topFeatured} />
 
       {/* ── Desktop: Scroll-Linked Layout ── */}

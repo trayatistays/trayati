@@ -9,7 +9,7 @@ import { AnimatedText } from "@/components/animated-text";
 import heroPoster from "@/assets/hero-poster.webp";
 import { socialLinks } from "@/data/social-links";
 
-const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments and Condominiums"];
+const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments"];
 const destinations = ["Kasar Devi", "Dharamsala", "Jaisalmer", "Varkala"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [

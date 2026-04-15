@@ -20,7 +20,7 @@ const experiences: Array<
     description:
       "Local hosts, raw culture. Think family-run village homes where you eat farm-fresh meals, hear folk tales by the fire, and learn chai-making from someone who's done it 50 years.",
     routeValue: "Folklore Homestays",
-    image: "/property-lounge.jpg",
+    image: "/property-lounge.webp",
     imageAlt: "Warm heritage-style homestay lounge with handcrafted character.",
     iconColor: "rgba(196, 212, 120, 0.95)",
     icon: "homestay",
@@ -37,7 +37,7 @@ const experiences: Array<
     description:
       "Independent, automated, hassle-free. Smart locks, self check-in, modern comforts in heritage locations. Perfect for digital nomads or families wanting privacy without host interaction but still breathing destination vibes.",
     routeValue: "Apartments & Condos",
-    image: "/property-bedroom.jpg",
+    image: "/property-bedroom.webp",
     imageAlt: "Refined apartment-style stay with clean contemporary interiors.",
     iconColor: "rgba(255, 120, 86, 0.95)",
     icon: "apartment",
@@ -54,7 +54,7 @@ const experiences: Array<
     description:
       "Private luxury escapes. Gated compounds, pools, sprawling lawns-your own palace with staff on call. Heritage havelis turned boutique estates, colonial bungalows with history, modern villas in cultural hotspots.",
     routeValue: "Villas",
-    image: "/samar-villa.png",
+    image: "/samar-villa.webp",
     imageAlt: "Private villa escape with open grounds and a premium retreat atmosphere.",
     iconColor: "rgba(179, 221, 244, 0.95)",
     icon: "villa",

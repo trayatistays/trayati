@@ -116,7 +116,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           <button
             type="button"
             onClick={() => setMobileLinksOpen((v) => !v)}
-            className="navbar__quicklinks-btn md:hidden"
+            className="navbar__quicklinks-btn sm:hidden"
             aria-label={mobileLinksOpen ? "Close quick links" : "Open quick links"}
             aria-expanded={mobileLinksOpen}
           >
@@ -159,7 +159,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="navbar__mobile-links md:hidden"
+            className="navbar__mobile-links sm:hidden"
           >
             <div className="navbar__mobile-links-inner">
               {onOpenExperience && (

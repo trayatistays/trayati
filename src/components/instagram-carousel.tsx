@@ -10,11 +10,12 @@ import {
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 import { FaInstagram } from "react-icons/fa6";
-import { HiMiniArrowLeft, HiMiniArrowRight, HiMiniArrowUpRight } from "react-icons/hi2";
+import { HiMiniArrowUpRight, HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import type { InstagramMediaItem } from "@/lib/instagram";
 import { socialLinks } from "@/data/social-links";
 
-const AUTO_SCROLL_SPEED = 24;
+const AUTO_SCROLL_SPEED_DESKTOP = 20;
+const AUTO_SCROLL_SPEED_MOBILE = 6;
 const INTERACTION_COOLDOWN_MS = 1800;
 
 export function InstagramCarousel() {
@@ -36,7 +37,7 @@ export function InstagramCarousel() {
       if (Date.now() - ts < STALE_MS && data.items.length > 0) {
         return [...data.items, ...data.items];
       }
-    } catch {}
+    } catch { }
     return [];
   });
   const [usingFallback, setUsingFallback] = useState(true);
@@ -66,7 +67,7 @@ export function InstagramCarousel() {
             data: { items: payload.items, usingFallback: payload.usingFallback },
             ts: Date.now(),
           }));
-        } catch {}
+        } catch { }
       })
       .catch(() => undefined);
 
@@ -111,6 +112,8 @@ export function InstagramCarousel() {
       const halfWidth = track.scrollWidth / 2;
       const deltaSeconds = (timestamp - previousFrameRef.current) / 1000;
       previousFrameRef.current = timestamp;
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const speed = isMobile ? AUTO_SCROLL_SPEED_MOBILE : AUTO_SCROLL_SPEED_DESKTOP;
 
       if (
         halfWidth > 0 &&
@@ -119,7 +122,7 @@ export function InstagramCarousel() {
         !isFocusedWithinRef.current &&
         Date.now() >= interactionLockUntilRef.current
       ) {
-        track.scrollLeft += AUTO_SCROLL_SPEED * deltaSeconds;
+        track.scrollLeft += speed * deltaSeconds;
 
         if (track.scrollLeft >= halfWidth) {
           track.scrollLeft -= halfWidth;
@@ -257,47 +260,9 @@ export function InstagramCarousel() {
             <h2 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl" style={{ color: "var(--primary)" }}>
               The visual diary of Trayati
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 sm:text-base" style={{ color: "var(--foreground-soft)" }}>
-              Scroll, drag, or tap through our latest frames while the reel keeps drifting on its own.
-            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div
-              className="hidden items-center gap-2 rounded-full border px-2 py-2 sm:inline-flex"
-              style={{
-                borderColor: "rgba(74,101,68,0.12)",
-                backgroundColor: "rgba(255,255,255,0.46)",
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => nudgeTrack(-320)}
-                className="inline-flex size-10 items-center justify-center rounded-full border transition hover:-translate-x-0.5"
-                style={{
-                  borderColor: "rgba(74,101,68,0.12)",
-                  backgroundColor: "rgba(245,241,233,0.92)",
-                  color: "var(--primary)",
-                }}
-                aria-label="Scroll Instagram posts left"
-              >
-                <HiMiniArrowLeft className="text-lg" />
-              </button>
-              <button
-                type="button"
-                onClick={() => nudgeTrack(320)}
-                className="inline-flex size-10 items-center justify-center rounded-full border transition hover:translate-x-0.5"
-                style={{
-                  borderColor: "rgba(74,101,68,0.12)",
-                  backgroundColor: "rgba(245,241,233,0.92)",
-                  color: "var(--primary)",
-                }}
-                aria-label="Scroll Instagram posts right"
-              >
-                <HiMiniArrowRight className="text-lg" />
-              </button>
-            </div>
-
+          <div className="flex items-center gap-3">
             <a
               href={socialLinks.instagram.url}
               target="_blank"
@@ -315,15 +280,29 @@ export function InstagramCarousel() {
           </div>
         </div>
 
-        <div className="relative z-10 mt-8">
-          <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="group/carousel relative z-10 mt-8">
+          <div className="mb-4 flex items-center justify-between gap-3 px-4 md:px-0">
             <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--muted)" }}>
               {usingFallback ? "Curated highlights" : "Live visual stream"}
             </p>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--gold)" }}>
-              Swipe, wheel, or drag
-            </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => nudgeTrack(-320)}
+            className="absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
+            style={{ borderColor: "rgba(255,255,255,0.2)" }}
+          >
+            <HiOutlineChevronLeft className="text-2xl text-white" />
+          </button>
+          <button
+            type="button"
+            onClick={() => nudgeTrack(320)}
+            className="absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border bg-white/10 opacity-0 backdrop-blur-md transition-all hover:bg-white/20 group-hover/carousel:opacity-100"
+            style={{ borderColor: "rgba(255,255,255,0.2)" }}
+          >
+            <HiOutlineChevronRight className="text-2xl text-white" />
+          </button>
 
           <div
             ref={trackRef}
