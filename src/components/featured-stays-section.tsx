@@ -212,62 +212,62 @@ function StayCard({
             </p>
 
             <div className="cta-group-gap mt-6 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
-              <span
-className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(199,91,26,0.92) 0%, rgba(180,70,15,0.95) 100%)",
-                    boxShadow: "0 4px 20px rgba(199,91,26,0.35)",
-                  }}
-               >
-                 {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
-               </span>
                <span
-className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white/90 backdrop-blur-md sm:px-5 sm:py-3"
-                  style={{
-                    backgroundColor: "rgba(32,60,76,0.4)",
-                    border: "1px solid rgba(245,241,232,0.1)",
-                  }}
-               >
-                 ★&nbsp;{stay.rating.toFixed(1)}
-               </span>
-              {stay.googleMapsUrl && (
-                <a
-                  href={stay.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/15 sm:px-5 sm:py-3"
+ className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
                    style={{
-                     backgroundColor: "#CD2327",
-                     border: "1px solid rgba(205,35,39,0.2)",
+                     backgroundColor: "#6B1F1F",
+                     boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
+                   }}
+                >
+                  {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+                </span>
+                <span
+ className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md sm:px-5 sm:py-3"
+                   style={{
+                     backgroundColor: "#6B1F1F",
+                     border: "1px solid rgba(255,255,255,0.1)",
+                   }}
+                >
+                  ★&nbsp;{stay.rating.toFixed(1)}
+                </span>
+               {stay.googleMapsUrl && (
+                 <a
+                   href={stay.googleMapsUrl}
+                   target="_blank"
+                   rel="noopener noreferrer"
+ className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-[#8B2F2F] sm:px-5 sm:py-3"
+                    style={{
+                      backgroundColor: "#6B1F1F",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "#ffffff"
+                    }}
+                  >
+                    View on Map&nbsp;↗
+                  </a>
+               )}
+               <Link
+                 href={`/booking?stayId=${stay.id}`}
+ className="cta-min-target inline-flex items-center rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-300 hover:bg-[#8B2F2F] hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
+                   style={{
+                     backgroundColor: "#6B1F1F",
+                     boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
                      color: "#ffffff"
                    }}
-                 >
-                   View on Map&nbsp;↗
-                 </a>
-              )}
-              <Link
-                href={`/booking?stayId=${stay.id}`}
-className="cta-min-target inline-flex items-center rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-300 hover:shadow-[0_18px_44px_rgba(199,91,26,0.55)] hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
+                >
+                  Book This Stay
+                </Link>
+               <Link
+                 href={`/property/${stay.id}`}
+ className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-[#8B2F2F] sm:px-7 sm:py-3"
                   style={{
-                    background: "linear-gradient(135deg, var(--cta) 0%, #b0460f 100%)",
-                    boxShadow: "0 8px 32px rgba(199,91,26,0.4)",
+                    backgroundColor: "#6B1F1F",
+                    border: "1px solid rgba(255,255,255,0.1)",
                     color: "#ffffff"
                   }}
-               >
-                 Book This Stay
-               </Link>
-              <Link
-                href={`/property/${stay.id}`}
-className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/18 sm:px-7 sm:py-3"
-                 style={{
-                   backgroundColor: "#CD2327",
-                   border: "1px solid rgba(205,35,39,0.2)",
-                   color: "#ffffff"
-                 }}
-               >
-                 View Details&nbsp;→
-               </Link>
-            </div>
+                >
+                  View Details&nbsp;→
+                </Link>
+             </div>
           </div>
         </div>
       </div>
@@ -347,38 +347,38 @@ function MobileStayCard({
 <span
 className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
               style={{
-                background: "linear-gradient(135deg, rgba(199,91,26,0.92) 0%, rgba(180,70,15,0.95) 100%)",
-                boxShadow: "0 4px 20px rgba(199,91,26,0.35)",
+                backgroundColor: "#6B1F1F",
+                boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
               }}
             >
               {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
             </span>
 <span
-className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white/90 backdrop-blur-md"
+className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white backdrop-blur-md"
                 style={{
-                  backgroundColor: "rgba(32,60,76,0.4)",
-                  border: "1px solid rgba(245,241,232,0.1)",
+                  backgroundColor: "#6B1F1F",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }}
               >
                 ★&nbsp;{stay.rating.toFixed(1)}
               </span>
-          <Link
-            href={`/booking?stayId=${stay.id}`}
-            className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-all duration-300 active:scale-[0.98]"
-            style={{
-              background: "linear-gradient(135deg, var(--cta) 0%, #b0460f 100%)",
-              boxShadow: "0 8px 32px rgba(199,91,26,0.4)",
-            }}
+           <Link
+             href={`/booking?stayId=${stay.id}`}
+             className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-all duration-300 active:scale-[0.98] hover:bg-[#8B2F2F]"
+             style={{
+               backgroundColor: "#6B1F1F",
+               boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
+             }}
           >
             Book Now
           </Link>
-          <Link
-            href={`/property/${stay.id}`}
-            className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-white/18"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              border: "1px solid rgba(245,241,232,0.15)",
-            }}
+           <Link
+             href={`/property/${stay.id}`}
+             className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-[#8B2F2F]"
+             style={{
+               backgroundColor: "#6B1F1F",
+               border: "1px solid rgba(255,255,255,0.1)",
+             }}
           >
             View Details&nbsp;-&gt;
           </Link>

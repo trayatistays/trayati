@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 type AnimatedTextProps = {
   items: string[];
@@ -9,33 +9,25 @@ type AnimatedTextProps = {
   interval?: number;
 };
 
-function subscribe(callback: () => void) {
-  const mediaQuery = window.matchMedia("(max-width: 767px)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
-}
-
-function getSnapshot() {
-  return window.matchMedia("(max-width: 767px)").matches;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export function AnimatedText({
   items,
   className,
   interval = 2200,
 }: AnimatedTextProps) {
   const [index, setIndex] = useState(0);
-  const isMobile = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const id = window.setInterval(() => {
       setIndex((current) => (current + 1) % items.length);
     }, interval);
-
     return () => window.clearInterval(id);
   }, [interval, items.length]);
 

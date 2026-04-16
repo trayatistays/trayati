@@ -108,28 +108,29 @@ function StayCard({
           <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3">
             <span
               className="rounded-full px-4 py-2 text-xs sm:text-sm font-bold text-white"
-              style={{ backgroundColor: "rgba(164, 108, 43, 0.88)" }}
+              style={{ backgroundColor: "#6B1F1F" }}
             >
               {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
             </span>
             <span
               className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white"
-              style={{ boxShadow: "0 0 20px rgba(164,108,43,0.6)" }}
+              style={{ backgroundColor: "#6B1F1F", boxShadow: "0 0 20px rgba(107,31,31,0.6)" }}
             >
               ★&nbsp;{stay.rating.toFixed(1)}
             </span>
             <Link
               href={`/booking?stayId=${stay.id}`}
-              className="inline-flex rounded-full bg-[var(--button-primary)] px-5 py-2 text-xs font-bold text-white shadow-[0_14px_36px_rgba(74,101,68,0.45)] transition hover:scale-105 hover:bg-[var(--button-primary-hover)] sm:px-6 sm:py-2.5 sm:text-sm"
+              className="inline-flex rounded-full px-5 py-2 text-xs font-bold text-white shadow-[0_14px_36px_rgba(107,31,31,0.45)] transition hover:scale-105 hover:bg-[#8B2F2F] sm:px-6 sm:py-2.5 sm:text-sm"
+              style={{ backgroundColor: "#6B1F1F" }}
             >
               Book This Stay
             </Link>
             <Link
               href={`/property/${stay.id}`}
-              className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:opacity-90 sm:px-6 sm:py-2.5"
+              className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:bg-[#8B2F2F] sm:px-6 sm:py-2.5"
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                border: "1.5px solid rgba(255,255,255,0.65)",
+                backgroundColor: "#6B1F1F",
+                border: "1px solid rgba(255,255,255,0.1)",
               }}
             >
               View Details&nbsp;→

@@ -3,61 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
-import { useRef, useEffect, useState, useSyncExternalStore } from "react";
-import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
+import { useRef, useEffect, useState } from "react";
 import { AnimatedText } from "@/components/animated-text";
-import { socialLinks } from "@/data/social-links";
 
 const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments"];
-const destinations = ["Kasar Devi", "Dharamsala", "Jaisalmer", "Varkala"];
-const menuItems = ["About", "Blogs", "Connect", "Solutions"];
-const socials = [
-  { label: "WhatsApp", href: socialLinks.whatsapp.url, icon: FaWhatsapp },
-  { label: "Instagram", href: socialLinks.instagram.url, icon: FaInstagram },
-  { label: "Facebook", href: socialLinks.facebook.url, icon: FaFacebookF },
-];
-const overlayImages: Record<string, { src: string; title: string; subtitle: string }> = {
-  About: {
-    src: "/menu-about.webp",
-    title: "About Trayati Stays",
-    subtitle: "Mountain panoramas and an intentional stay experience.",
-  },
-  Blogs: {
-    src: "/menu-blogs.webp",
-    title: "Blogs and Stories",
-    subtitle: "Property stories, destination ideas, and travel inspiration.",
-  },
-  Connect: {
-    src: "/menu-connect.webp",
-    title: "Connect With Us",
-    subtitle: "Conversations shaped around views, warmth, and hospitality.",
-  },
-  Solutions: {
-    src: "/menu-solutions.webp",
-    title: "Tailored Solutions",
-    subtitle: "A smarter way to present and discover memorable stays.",
-  },
-};
-
-function subscribe(callback: () => void) {
-  const mediaQuery = window.matchMedia("(min-width: 768px)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
-}
-
-function getSnapshot() {
-  return window.matchMedia("(min-width: 768px)").matches;
-}
-
-function getServerSnapshot() {
-  return false;
-}
 
 export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const isDesktop = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isDesktop, setIsDesktop] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { stiffness: 110, damping: 18, mass: 0.8 });
@@ -68,27 +23,32 @@ export function HeroSection() {
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
   useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!isDesktop) return;
     const timer = window.setTimeout(() => {
       setShouldLoadVideo(true);
     }, 250);
-
     return () => window.clearTimeout(timer);
   }, [isDesktop]);
 
   useEffect(() => {
     if (!shouldLoadVideo) return;
-
     const video = videoRef.current;
     if (!video) return;
-
-    if (video.readyState >= 2) {
-      setVideoLoaded(true);
-    }
-
     const handleCanPlay = () => setVideoLoaded(true);
-    video.addEventListener("canplay", handleCanPlay);
-
+    if (video.readyState >= 2) {
+      handleCanPlay();
+    } else {
+      video.addEventListener("canplay", handleCanPlay);
+    }
     return () => video.removeEventListener("canplay", handleCanPlay);
   }, [shouldLoadVideo]);
 
@@ -96,14 +56,12 @@ export function HeroSection() {
     ? (event: React.MouseEvent<HTMLElement>) => {
         const { currentTarget, clientX, clientY } = event;
         const rect = currentTarget.getBoundingClientRect();
-        const x = (clientX - rect.left - rect.width / 2) / 36;
-        const y = (clientY - rect.top - rect.height / 2) / 40;
-        mouseX.set(x);
-        mouseY.set(y);
+        mouseX.set((clientX - rect.left - rect.width / 2) / 36);
+        mouseY.set((clientY - rect.top - rect.height / 2) / 40);
       }
     : undefined;
 
-  const resetMouse = isDesktop
+  const handleMouseLeave = isDesktop
     ? () => {
         mouseX.set(0);
         mouseY.set(0);
@@ -114,10 +72,9 @@ export function HeroSection() {
     <section
       id="top"
       onMouseMove={handleMouseMove}
-      onMouseLeave={resetMouse}
+      onMouseLeave={handleMouseLeave}
       className="relative isolate min-h-[85vh] overflow-hidden"
     >
-      {/* Background */}
       <div className="absolute inset-0 -z-20">
         <Image
           src="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
@@ -139,14 +96,13 @@ export function HeroSection() {
             poster="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
           >
-            <source src="/background-video.mp4" type="video/mp4" />
+            <source src="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/output-720p-nosound.mp4" type="video/mp4" />
           </video>
         ) : null}
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
 
-      {/* Subtle colour-tinted halos - desktop only */}
       {isDesktop && (
         <>
           <motion.div
@@ -161,7 +117,6 @@ export function HeroSection() {
       )}
 
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
-
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
             <motion.div
@@ -172,13 +127,7 @@ export function HeroSection() {
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1
-                className="mobile-heading text-balance mt-6 max-w-4xl 
-             text-[1.65rem] 
-             sm:text-[2.25rem] 
-             md:text-[2.85rem] 
-             lg:text-[3.65rem] 
-             xl:text-[4.35rem] 
-             font-semibold leading-[1.1] tracking-[-0.02em]"
+                className="mobile-heading text-balance mt-6 max-w-4xl text-[1.65rem] sm:text-[2.25rem] md:text-[2.85rem] lg:text-[3.65rem] xl:text-[4.35rem] font-semibold leading-[1.1] tracking-[-0.02em]"
                 style={{ color: "#FFFFFF", fontFamily: "var(--font-playfair)" }}
               >
                 we curate
@@ -203,7 +152,6 @@ export function HeroSection() {
                 >
                   Explore Properties
                 </Link>
-
               </div>
             </motion.div>
           </div>

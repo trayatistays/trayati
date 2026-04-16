@@ -1,26 +1,12 @@
 "use client";
 
-import { useRef, useSyncExternalStore } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroSection } from "@/components/hero-section";
 import { FeaturedStaysSection } from "@/components/featured-stays-section";
 import { InstagramCarousel } from "@/components/instagram-carousel";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { ExperiencesSection } from "@/components/experiences-section";
-
-function subscribe(callback: () => void) {
-  const mediaQuery = window.matchMedia("(min-width: 768px)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
-}
-
-function getSnapshot() {
-  return window.matchMedia("(min-width: 768px)").matches;
-}
-
-function getServerSnapshot() {
-  return false;
-}
 
 function DepthSection({
   children,
@@ -61,7 +47,14 @@ function DepthSection({
 }
 
 export function HomePageExperience() {
-  const isDesktop = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
 
   const { scrollYProgress } = useScroll();
   const orbOneY = useTransform(scrollYProgress, [0, 1], ["-6%", "16%"]);
