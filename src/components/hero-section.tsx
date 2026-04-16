@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useSyncExternalStore } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
 import { socialLinks } from "@/data/social-links";
@@ -38,10 +38,26 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
     subtitle: "A smarter way to present and discover memorable stays.",
   },
 };
+
+function subscribe(callback: () => void) {
+  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+function getSnapshot() {
+  return window.matchMedia("(min-width: 768px)").matches;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const isDesktop = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { stiffness: 110, damping: 18, mass: 0.8 });
@@ -52,12 +68,13 @@ export function HeroSection() {
   const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
   useEffect(() => {
+    if (!isDesktop) return;
     const timer = window.setTimeout(() => {
       setShouldLoadVideo(true);
     }, 250);
 
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [isDesktop]);
 
   useEffect(() => {
     if (!shouldLoadVideo) return;
@@ -75,19 +92,23 @@ export function HeroSection() {
     return () => video.removeEventListener("canplay", handleCanPlay);
   }, [shouldLoadVideo]);
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
-    const { currentTarget, clientX, clientY } = event;
-    const rect = currentTarget.getBoundingClientRect();
-    const x = (clientX - rect.left - rect.width / 2) / 36;
-    const y = (clientY - rect.top - rect.height / 2) / 40;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
+  const handleMouseMove = isDesktop
+    ? (event: React.MouseEvent<HTMLElement>) => {
+        const { currentTarget, clientX, clientY } = event;
+        const rect = currentTarget.getBoundingClientRect();
+        const x = (clientX - rect.left - rect.width / 2) / 36;
+        const y = (clientY - rect.top - rect.height / 2) / 40;
+        mouseX.set(x);
+        mouseY.set(y);
+      }
+    : undefined;
 
-  const resetMouse = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+  const resetMouse = isDesktop
+    ? () => {
+        mouseX.set(0);
+        mouseY.set(0);
+      }
+    : undefined;
 
   return (
     <section
@@ -96,18 +117,18 @@ export function HeroSection() {
       onMouseLeave={resetMouse}
       className="relative isolate min-h-[85vh] overflow-hidden"
     >
-      {/* Background Video */}
+      {/* Background */}
       <div className="absolute inset-0 -z-20">
         <Image
-          src="/background.webp"
+          src="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
           alt=""
           aria-hidden="true"
           fill
-          preload
+          unoptimized
           sizes="100vw"
-          className={`absolute inset-0 object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-0" : "opacity-100"}`}
+          className="absolute inset-0 object-cover object-center"
         />
-        {shouldLoadVideo ? (
+        {isDesktop && shouldLoadVideo ? (
           <video
             ref={videoRef}
             autoPlay
@@ -115,7 +136,7 @@ export function HeroSection() {
             loop
             playsInline
             preload="metadata"
-            poster="/background.webp"
+            poster="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
           >
             <source src="/background-video.mp4" type="video/mp4" />
@@ -125,15 +146,19 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
 
-      {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}
-      <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(164, 108, 43, 0.14)" }}
-        className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56 pointer-events-none"
-      />
-      <motion.div
-        style={{ transform: orbTransform, backgroundColor: "rgba(13, 58, 82, 0.14)" }}
-        className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
-      />
+      {/* Subtle colour-tinted halos - desktop only */}
+      {isDesktop && (
+        <>
+          <motion.div
+            style={{ transform: orbTransform, backgroundColor: "rgba(164, 108, 43, 0.14)" }}
+            className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56 pointer-events-none"
+          />
+          <motion.div
+            style={{ transform: orbTransform, backgroundColor: "rgba(13, 58, 82, 0.14)" }}
+            className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
+          />
+        </>
+      )}
 
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
 
@@ -143,7 +168,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 44 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-              style={{ transform: heroTransform }}
+              style={isDesktop ? { transform: heroTransform } : undefined}
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1
