@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { locations, guestCategories } from "@/data/social-links";
+import { guestCategories } from "@/data/social-links";
 import { experienceTypes, type ExperienceType } from "@/data/experience-types";
 
 type FilterState = {
@@ -13,6 +14,11 @@ type FilterState = {
   experienceType: ExperienceType | "";
 };
 
+type Location = {
+  city: string;
+  state: string;
+};
+
 export function BookingFilterForm({
   onFilter,
   filters,
@@ -20,6 +26,31 @@ export function BookingFilterForm({
   onFilter: (filters: FilterState) => void;
   filters: FilterState;
 }) {
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/stays")
+      .then((r) => r.json())
+      .then((d) => {
+        const stays = d.stays ?? [];
+        const uniqueCities = new Map<string, Location>();
+        
+        stays.forEach((stay: { city: string; state: string }) => {
+          if (!uniqueCities.has(stay.city)) {
+            uniqueCities.set(stay.city, {
+              city: stay.city,
+              state: stay.state,
+            });
+          }
+        });
+        
+        setLocations(Array.from(uniqueCities.values()).sort((a, b) => a.city.localeCompare(b.city)));
+        setLocationsLoading(false);
+      })
+      .catch(() => setLocationsLoading(false));
+  }, []);
+
   const handleChange = (key: keyof FilterState, value: string | number) => {
     const updated = { ...filters, [key]: value };
     onFilter(updated);
@@ -58,11 +89,12 @@ export function BookingFilterForm({
               backgroundColor: "rgba(255,255,255,0.8)",
               color: "var(--foreground)",
             }}
+            disabled={locationsLoading}
           >
-            <option value="">Select a destination...</option>
+            <option value="">{locationsLoading ? "Loading..." : "Select a destination..."}</option>
             {locations.map((loc) => (
-              <option key={loc} value={loc}>
-                {loc}
+              <option key={loc.city} value={loc.city}>
+                {loc.city}, {loc.state}
               </option>
             ))}
           </select>

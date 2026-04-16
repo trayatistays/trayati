@@ -6,7 +6,6 @@ import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-mot
 import { useRef, useEffect, useState } from "react";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AnimatedText } from "@/components/animated-text";
-import heroPoster from "@/assets/hero-poster.webp";
 import { socialLinks } from "@/data/social-links";
 
 const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments"];
@@ -100,12 +99,11 @@ export function HeroSection() {
       {/* Background Video */}
       <div className="absolute inset-0 -z-20">
         <Image
-          src={heroPoster}
+          src="/background.webp"
           alt=""
           aria-hidden="true"
           fill
           preload
-          placeholder="blur"
           sizes="100vw"
           className={`absolute inset-0 object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-0" : "opacity-100"}`}
         />
@@ -117,14 +115,14 @@ export function HeroSection() {
             loop
             playsInline
             preload="metadata"
-            poster={heroPoster.src}
+            poster="/background.webp"
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
           >
             <source src="/background-video.mp4" type="video/mp4" />
           </video>
         ) : null}
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.15)_0%,rgba(0,0,0,0.55)_60%,rgba(0,0,0,0.75)_100%)] md:hidden" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
 
       {/* Subtle colour-tinted halos that sit on top of the tribal pattern */}

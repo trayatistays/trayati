@@ -37,7 +37,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
+      className={`navbar ${scrolled || menuOpen ? "navbar--scrolled" : ""}`}
     >
       <div className="navbar__inner">
         {/* ── Logo ────────────────────────────────────────────── */}
@@ -46,7 +46,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           className="navbar__logo"
           aria-label="Trayati Stays homepage"
         >
-          <div className={`navbar__logo-icon ${scrolled ? "navbar__logo-icon--scrolled" : ""}`}>
+          <div className={`navbar__logo-icon ${scrolled || menuOpen ? "navbar__logo-icon--scrolled" : ""}`}>
             <Image
               src="/Logo_transparent.png"
               alt="Trayati Stays logo"

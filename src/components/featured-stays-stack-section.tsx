@@ -128,7 +128,7 @@ function StayCard({
               href={`/property/${stay.id}`}
               className="inline-flex rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white transition hover:opacity-90 sm:px-6 sm:py-2.5"
               style={{
-                backgroundColor: "rgba(255, 255, 255, 1)",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
                 border: "1.5px solid rgba(255,255,255,0.65)",
               }}
             >

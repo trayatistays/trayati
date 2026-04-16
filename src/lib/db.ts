@@ -316,6 +316,14 @@ export async function dbUpsertTestimonial(t: Testimonial & { isActive?: boolean;
   };
   const { error } = await supabase.from("testimonials").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert testimonial: ${error.message}`);
+  
+  try {
+    await redis.del("testimonials:active");
+    await redis.del("testimonials:all");
+  } catch (e) {
+    console.error("Redis cache clear error:", e);
+  }
+  
   return t;
 }
 
@@ -323,6 +331,14 @@ export async function dbDeleteTestimonial(id: string): Promise<boolean> {
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase.from("testimonials").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete testimonial: ${error.message}`);
+  
+  try {
+    await redis.del("testimonials:active");
+    await redis.del("testimonials:all");
+  } catch (e) {
+    console.error("Redis cache clear error:", e);
+  }
+  
   return true;
 }
 
@@ -406,6 +422,14 @@ export async function dbUpsertExperience(e: Experience & { isActive?: boolean; s
   };
   const { error } = await supabase.from("experiences").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert experience: ${error.message}`);
+  
+  try {
+    await redis.del("experiences:active");
+    await redis.del("experiences:all");
+  } catch (e) {
+    console.error("Redis cache clear error:", e);
+  }
+  
   return e;
 }
 
@@ -413,6 +437,14 @@ export async function dbDeleteExperience(id: string): Promise<boolean> {
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase.from("experiences").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete experience: ${error.message}`);
+  
+  try {
+    await redis.del("experiences:active");
+    await redis.del("experiences:all");
+  } catch (e) {
+    console.error("Redis cache clear error:", e);
+  }
+  
   return true;
 }
 
@@ -584,4 +616,75 @@ export async function dbUpdateReservationStatus(id: string, status: string): Pro
   const supabase = requireSupabaseAdmin();
   const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
   if (error) throw new Error(`Failed to update reservation: ${error.message}`);
+}
+
+// ─── DESTINATIONS ───────────────────────────────────────────────────
+
+export type Destination = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+};
+
+export async function dbGetAllDestinations(activeOnly = false): Promise<Destination[]> {
+  const cacheKey = `destinations:${activeOnly ? "active" : "all"}`;
+  try {
+    const cached = await redis.get<Destination[]>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetAllDestinations:", e);
+  }
+
+  const supabase = requireSupabaseAdmin();
+  let query = supabase.from("destinations").select("*").order("sort_order", { ascending: true });
+  if (activeOnly) query = query.eq("is_active", true);
+  const { data, error } = await query;
+  if (error) throw new Error(`Failed to fetch destinations: ${error.message}`);
+  
+  const destinations = (data as Record<string, unknown>[]).map((row) => toCamelCase<Destination>(row));
+  
+  try {
+    await redis.set(cacheKey, destinations, { ex: 3600 });
+  } catch (e) {
+    console.error("Redis set error in dbGetAllDestinations:", e);
+  }
+  
+  return destinations;
+}
+
+export async function dbUpsertDestination(d: Destination): Promise<Destination> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(d as Record<string, unknown>);
+  const { error } = await supabase.from("destinations").upsert(row, { onConflict: "id" });
+  if (error) throw new Error(`Failed to upsert destination: ${error.message}`);
+  
+  try {
+    await Promise.all([
+      redis.del("destinations:active"),
+      redis.del("destinations:all")
+    ]);
+  } catch (e) {
+    console.error("Redis invalidation error in dbUpsertDestination:", e);
+  }
+  
+  return d;
+}
+
+export async function dbDeleteDestination(id: string): Promise<boolean> {
+  const supabase = requireSupabaseAdmin();
+  const { error } = await supabase.from("destinations").delete().eq("id", id);
+  if (error) throw new Error(`Failed to delete destination: ${error.message}`);
+  
+  try {
+    await Promise.all([
+      redis.del("destinations:active"),
+      redis.del("destinations:all")
+    ]);
+  } catch (e) {
+    console.error("Redis invalidation error in dbDeleteDestination:", e);
+  }
+  
+  return true;
 }

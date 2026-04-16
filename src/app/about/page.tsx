@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiHomeModern, HiBuildingOffice2, HiBuildingLibrary, HiArrowRight } from "react-icons/hi2";
 import { RiDoubleQuotesL } from "react-icons/ri";
+import { FaBehance, FaLinkedinIn } from "react-icons/fa";
 
 export default function AboutPage() {
   const containerVariants = {
@@ -144,10 +146,10 @@ export default function AboutPage() {
             <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
               Trayati Stays bridges that gap by listing only handpicked properties. Every destination has a story, and we make sure you live inside it.
             </p>
-            
+
             <div className="pt-4 flex flex-wrap gap-4">
               {['Verified Stays', 'Handpicked', 'Cultural Immersion', 'Local Guidance'].map((tag) => (
-                <span 
+                <span
                   key={tag}
                   className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest border"
                   style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(255,255,255,0.5)" }}
@@ -160,51 +162,107 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Stay Categories */}
-      <section className="py-24 sm:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-4">Stay Categories</h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground-soft)" }}>
-              Carefully defined to match every type of traveler while preserving the essence of the destination.
-            </p>
-          </div>
+      {/* Founder Section */}
+      <section className="py-24 sm:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl opacity-10" style={{ backgroundColor: "var(--primary)" }} />
+          <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full blur-3xl opacity-10" style={{ backgroundColor: "var(--cta)" }} />
+        </div>
 
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="text-center mb-16"
           >
-            {categories.map((cat) => (
-              <motion.div
-                key={cat.id}
-                variants={itemVariants}
-                whileHover={{ y: -10 }}
-                className="group p-8 sm:p-10 rounded-[2rem] border transition-all duration-500 hover:shadow-2xl relative overflow-hidden"
-                style={{ 
-                  backgroundColor: "rgba(245,241,232,0.4)",
-                  borderColor: "var(--border-soft)"
-                }}
-              >
-                {/* Subtle background icon */}
-                <cat.icon className="absolute -right-8 -bottom-8 text-9xl opacity-5 transition-transform group-hover:scale-110 group-hover:-rotate-12" style={{ color: cat.color }} />
-                
-                <div 
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 text-3xl"
-                  style={{ backgroundColor: cat.bg, color: cat.color }}
-                >
-                  <cat.icon />
-                </div>
-                
-                <h3 className="text-2xl font-bold mb-4 tracking-tight">{cat.title}</h3>
-                <p className="text-base leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
-                  {cat.description}
-                </p>
-              </motion.div>
-            ))}
+            <span className="text-[0.65rem] font-bold uppercase tracking-[0.4em]" style={{ color: "var(--cta)" }}>
+              Meet The Visionary
+            </span>
           </motion.div>
+
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Founder Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="lg:col-span-5 relative"
+            >
+              <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden shadow-2xl group">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-10" />
+                <Image
+                  src="/owner.jpg"
+                  alt="Ishan Saraf - Founder, Trayati Stays"
+                  fill
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                />
+              </div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl -z-10" style={{ backgroundColor: "var(--primary)", opacity: 0.15 }} />
+              <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full -z-10" style={{ backgroundColor: "var(--cta)", opacity: 0.1 }} />
+            </motion.div>
+
+            {/* Founder Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="lg:col-span-7 space-y-8"
+            >
+              <div>
+                <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-3" style={{ color: "var(--foreground)" }}>
+                  Ishan Saraf
+                </h2>
+                <p className="text-lg font-medium" style={{ color: "var(--primary)" }}>
+                  Founder, Trayati Stays
+                </p>
+              </div>
+
+              <div className="space-y-5">
+                <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
+                  Trayati Stays is the vision of Ishan Saraf—a modern creator, entrepreneur, and experiential thinker who believes that spaces should do more than just host people; they should <span className="font-semibold" style={{ color: "var(--foreground)" }}>inspire them</span>.
+                </p>
+                <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
+                  With a background spanning creative design, business, and hands-on building, Ishan brings a unique perspective to hospitality—where aesthetics, energy, and intention come together seamlessly.
+                </p>
+                <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
+                  His journey reflects a blend of entrepreneurship and artistic expression, shaped by a deep appreciation for mindful living and meaningful experiences. Ishan is also known for building ventures and exploring ideas across domains, bringing a <span className="font-semibold" style={{ color: "var(--foreground)" }}>thoughtful, detail-oriented approach</span> to everything he creates.
+                </p>
+                <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
+                  At Trayati Stays, this philosophy translates into a space that is not just luxurious, but deeply rooted in its surroundings—where every texture, view, and moment is curated to offer guests a sense of <span className="font-semibold" style={{ color: "var(--cta)" }}>calm, connection, and quiet luxury</span> in the Himalayas.
+                </p>
+              </div>
+
+              {/* Social Links */}
+              <div className="flex items-center gap-4 pt-4">
+                <span className="text-sm font-medium" style={{ color: "var(--muted)" }}>Connect:</span>
+                <a
+                  href="https://www.behance.net/ishansaraf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                  style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(255,255,255,0.8)", color: "var(--foreground)" }}
+                  aria-label="Behance Profile"
+                >
+                  <FaBehance className="text-xl" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/ishan-saraf-4a8aa4153/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                  style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(255,255,255,0.8)", color: "var(--foreground)" }}
+                  aria-label="LinkedIn Profile"
+                >
+                  <FaLinkedinIn className="text-xl" />
+                </a>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -221,7 +279,7 @@ export default function AboutPage() {
           >
             {/* Pattern background */}
             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,1) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
-            
+
             <div className="relative z-10 max-w-3xl mx-auto">
               <h2 className="text-white text-[0.7rem] font-bold uppercase tracking-[0.5em] mb-8 opacity-60">Our Vision</h2>
               <p className="text-3xl sm:text-5xl font-display font-bold text-white leading-[1.1] mb-10 tracking-tight">
@@ -230,7 +288,7 @@ export default function AboutPage() {
               <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-12 font-medium">
                 From Bir’s 100-year-old Mudhouse to Kasar Devi’s premium cottages—we aim to reach experimental travellers across all classes, craving authenticity and experience.
               </p>
-              
+
               <Link
                 href="/booking"
                 className="inline-flex items-center gap-4 rounded-full bg-[var(--button-primary)] px-10 py-5 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-95"

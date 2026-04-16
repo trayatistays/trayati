@@ -629,6 +629,12 @@ button {
   white-space: nowrap;
 }
 
+@media (min-width: 640px) {
+  .navbar__quicklinks-btn {
+    display: none;
+  }
+}
+
 .navbar__quicklinks-btn:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.35);
