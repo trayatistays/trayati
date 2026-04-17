@@ -65,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} ${imFellEnglish.variable} ${playfairDisplay.variable} h-full`}>
       <head>
+        <meta name="naver-site-verification" content="" />
         <link rel="preconnect" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
         <link rel="dns-prefetch" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
       </head>
