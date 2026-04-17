@@ -287,11 +287,11 @@ function MobileStayCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, rotateY: -20, x: 60 }}
-      animate={{ opacity: 1, rotateY: 0, x: 0 }}
-      exit={{ opacity: 0, rotateY: 20, x: -60, scale: 0.95 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className="mobile-3d-card--stay relative h-[72vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]"
+      initial={{ opacity: 0, x: 40 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -40 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="relative h-[72vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]"
     >
       <Image
         src={stay.image}
@@ -305,12 +305,6 @@ function MobileStayCard({
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "radial-gradient(ellipse at 20% 80%, rgba(199,91,26,0.08) 0%, transparent 60%)",
-        }}
-      />
 
       <div className="absolute top-4 left-5">
         <span className="font-display text-[0.5rem] font-bold uppercase tracking-[0.5em] text-white/40">
@@ -320,10 +314,9 @@ function MobileStayCard({
 
       <div className="absolute top-4 right-5">
         <span
-          className="rounded-full px-3 py-1.5 text-[0.5rem] font-bold uppercase tracking-[0.3em] text-white/90 backdrop-blur-md"
+          className="rounded-full px-3 py-1.5 text-[0.5rem] font-bold uppercase tracking-[0.3em] text-white/90"
           style={{
-            backgroundColor: "rgba(32,60,76,0.45)",
-            border: "1px solid rgba(245,241,232,0.12)",
+            backgroundColor: "rgba(32,60,76,0.75)",
           }}
         >
           {stay.tag}
@@ -334,7 +327,7 @@ function MobileStayCard({
         className="absolute bottom-0 inset-x-0 p-5"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ delay: 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <p className="text-[0.45rem] font-semibold uppercase tracking-[0.45em] text-white/45 mb-2">
           {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
@@ -354,7 +347,7 @@ className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-x
               {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
             </span>
 <span
-className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white backdrop-blur-md"
+className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
                 style={{
                   backgroundColor: "#6B1F1F",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -464,34 +457,34 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
         resumeAfterTouch();
       }}
     >
-      <div style={{ perspective: 1200, overflow: "hidden" }}>
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => goBy(-1)}
-            className="carousel-nav-button mobile-carousel-nav absolute left-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-            aria-label="Show previous stay"
-          >
-            <HiOutlineChevronLeft className="text-2xl" />
-          </button>
-          <button
-            type="button"
-            onClick={() => goBy(1)}
-            className="carousel-nav-button mobile-carousel-nav absolute right-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-            aria-label="Show next stay"
-          >
-            <HiOutlineChevronRight className="text-2xl" />
-          </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => goBy(-1)}
+          className="carousel-nav-button mobile-carousel-nav absolute left-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border transition-all"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+          aria-label="Show previous stay"
+        >
+          <HiOutlineChevronLeft className="text-2xl" />
+        </button>
+        <button
+          type="button"
+          onClick={() => goBy(1)}
+          className="carousel-nav-button mobile-carousel-nav absolute right-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full border transition-all"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+          aria-label="Show next stay"
+        >
+          <HiOutlineChevronRight className="text-2xl" />
+        </button>
 
-          <AnimatePresence mode="wait">
-            <MobileStayCard
-              key={stays[activeIndex].id}
-              stay={stays[activeIndex]}
-              index={activeIndex}
-              total={total}
-            />
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="wait">
+          <MobileStayCard
+            key={stays[activeIndex].id}
+            stay={stays[activeIndex]}
+            index={activeIndex}
+            total={total}
+          />
+        </AnimatePresence>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-2">

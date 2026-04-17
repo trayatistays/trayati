@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { AnimatedText } from "@/components/animated-text";
 
@@ -13,18 +13,11 @@ export function HeroSection() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const smoothX = useSpring(mouseX, { stiffness: 110, damping: 18, mass: 0.8 });
-  const smoothY = useSpring(mouseY, { stiffness: 110, damping: 18, mass: 0.8 });
-  const orbX = useSpring(mouseX, { stiffness: 90, damping: 20, mass: 1 });
-  const orbY = useSpring(mouseY, { stiffness: 90, damping: 20, mass: 1 });
-  const heroTransform = useMotionTemplate`translate3d(${smoothX}px, ${smoothY}px, 0px)`;
-  const orbTransform = useMotionTemplate`translate3d(${orbX}px, ${orbY}px, 0px)`;
 
   useEffect(() => {
     const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768);
+      const desktop = window.innerWidth >= 768;
+      setIsDesktop(desktop);
     };
     checkDesktop();
     window.addEventListener("resize", checkDesktop);
@@ -52,28 +45,10 @@ export function HeroSection() {
     return () => video.removeEventListener("canplay", handleCanPlay);
   }, [shouldLoadVideo]);
 
-  const handleMouseMove = isDesktop
-    ? (event: React.MouseEvent<HTMLElement>) => {
-        const { currentTarget, clientX, clientY } = event;
-        const rect = currentTarget.getBoundingClientRect();
-        mouseX.set((clientX - rect.left - rect.width / 2) / 36);
-        mouseY.set((clientY - rect.top - rect.height / 2) / 40);
-      }
-    : undefined;
-
-  const handleMouseLeave = isDesktop
-    ? () => {
-        mouseX.set(0);
-        mouseY.set(0);
-      }
-    : undefined;
-
   return (
     <section
       id="top"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="relative isolate min-h-[85vh] overflow-hidden"
+      className="relative isolate min-h-[85vh]"
     >
       <div className="absolute inset-0 -z-20">
         <Image
@@ -81,7 +56,8 @@ export function HeroSection() {
           alt=""
           aria-hidden="true"
           fill
-          unoptimized
+          priority
+          fetchPriority="high"
           sizes="100vw"
           className="absolute inset-0 object-cover object-center"
         />
@@ -92,7 +68,7 @@ export function HeroSection() {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             poster="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
             className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
           >
@@ -103,19 +79,6 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
 
-      {isDesktop && (
-        <>
-          <motion.div
-            style={{ transform: orbTransform, backgroundColor: "rgba(164, 108, 43, 0.14)" }}
-            className="absolute left-[8%] top-16 -z-10 size-40 rounded-full blur-3xl sm:top-24 sm:size-56 pointer-events-none"
-          />
-          <motion.div
-            style={{ transform: orbTransform, backgroundColor: "rgba(13, 58, 82, 0.14)" }}
-            className="absolute bottom-12 right-[8%] -z-10 size-52 rounded-full blur-3xl sm:bottom-20 sm:size-72 pointer-events-none"
-          />
-        </>
-      )}
-
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
@@ -123,7 +86,6 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 44 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-              style={isDesktop ? { transform: heroTransform } : undefined}
               className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1

@@ -13,17 +13,20 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const ebGaramond = EB_Garamond({
   variable: "--font-eb-garamond",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const imFellEnglish = IM_Fell_English({
@@ -31,12 +34,14 @@ const imFellEnglish = IM_Fell_English({
   subsets: ["latin"],
   weight: ["400"],
   style: ["normal", "italic"],
+  display: "swap",
 });
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = siteMetadata;
@@ -59,6 +64,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} ${imFellEnglish.variable} ${playfairDisplay.variable} h-full`}>
+      <head>
+        <link rel="preconnect" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
+        <link rel="dns-prefetch" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
+      </head>
       <body className="min-h-full antialiased">
         <script
           type="application/ld+json"
