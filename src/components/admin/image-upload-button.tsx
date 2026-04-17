@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { HiOutlineCloudArrowUp, HiOutlineTrash } from "react-icons/hi2";
+import { compressImage, formatFileSize } from "@/lib/client-image-compress";
 
 type ImageUploadProps = {
   value: string;
@@ -18,10 +19,12 @@ export function ImageUploadButton({ value, onChange, label = "Image" }: ImageUpl
     setUploading(true);
     setError("");
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
+      const { blob, name } = await compressImage(file);
+
+      const formData = new FormData();
+      formData.append("file", blob, name);
+
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
@@ -30,13 +33,15 @@ export function ImageUploadButton({ value, onChange, label = "Image" }: ImageUpl
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("Upload failed:", data);
         setError(data.error ?? "Upload failed");
         return;
       }
 
       onChange(data.url);
-    } catch {
-      setError("Upload failed");
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -123,10 +128,12 @@ export function MultiImageUploadButton({ values, onChange, label = "Photos" }: M
     setUploading(true);
     setError("");
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
+      const { blob, name } = await compressImage(file);
+
+      const formData = new FormData();
+      formData.append("file", blob, name);
+
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
@@ -135,13 +142,15 @@ export function MultiImageUploadButton({ values, onChange, label = "Photos" }: M
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("Upload failed:", data);
         setError(data.error ?? "Upload failed");
         return;
       }
 
       onChange([...values, data.url]);
-    } catch {
-      setError("Upload failed");
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }
