@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { dbGetAllSubmissions, dbUpdateSubmissionStatus } from "@/lib/db";
+import { dbGetAllSubmissions, dbUpdateSubmissionStatus, dbGetSubmissionById, dbDeleteSubmission } from "@/lib/db";
+import { deleteManagedAssetByUrl } from "@/lib/stay-media";
 
 export async function GET() {
   if (!(await isAdminAuthenticated())) {
@@ -60,10 +61,19 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const { requireSupabaseAdmin } = await import("@/lib/supabase-admin");
-    const supabase = requireSupabaseAdmin();
-    const { error } = await supabase.from("property_submissions").delete().eq("id", body.id);
-    if (error) throw error;
+    const submission = await dbGetSubmissionById(body.id);
+    
+    if (submission) {
+      const propertyPayload = submission.propertyPayload as Record<string, unknown> | undefined;
+      const imageUrl = propertyPayload?.image as string | undefined;
+      
+      await dbDeleteSubmission(body.id);
+      
+      if (imageUrl) {
+        await deleteManagedAssetByUrl(imageUrl).catch(() => {});
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

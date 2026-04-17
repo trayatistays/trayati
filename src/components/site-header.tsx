@@ -40,7 +40,7 @@ const overlayImages: Record<string, { src: string; title: string; subtitle: stri
   },
 };
 
-export function SiteHeader() {
+export function SiteHeader({ forceScrolled = false }: { forceScrolled?: boolean }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [experienceOpen, setExperienceOpen] = useState(false);
@@ -85,6 +85,7 @@ export function SiteHeader() {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onOpenExperience={() => setExperienceOpen(true)}
+        forceScrolled={forceScrolled}
       />
 
       <ExperienceOverlay

@@ -189,20 +189,19 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 relative"
+              className="lg:col-span-5 relative flex justify-center"
             >
-              <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden shadow-2xl group">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-10" />
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl group border-4" style={{ borderColor: "var(--border-soft)" }}>
                 <Image
                   src="/owner.jpg"
                   alt="Ishan Saraf - Founder, Trayati Stays"
                   fill
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 40vw"
+                  sizes="(max-width: 640px) 256px, (max-width: 1024px) 320px, 384px"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl -z-10" style={{ backgroundColor: "var(--primary)", opacity: 0.15 }} />
-              <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full -z-10" style={{ backgroundColor: "var(--cta)", opacity: 0.1 }} />
+              <div className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full -z-10" style={{ backgroundColor: "var(--primary)", opacity: 0.15 }} />
+              <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full -z-10" style={{ backgroundColor: "var(--cta)", opacity: 0.1 }} />
             </motion.div>
 
             {/* Founder Content */}
@@ -224,16 +223,16 @@ export default function AboutPage() {
 
               <div className="space-y-5">
                 <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
-                  Trayati Stays is the vision of Ishan Saraf—a modern creator, entrepreneur, and experiential thinker who believes that spaces should do more than just host people; they should <span className="font-semibold" style={{ color: "var(--foreground)" }}>inspire them</span>.
+                  Trayati Stays is the vision of Ishan Saraf, a modern creator, entrepreneur, and experiential thinker who believes that spaces should do more than just host people; they should <span className="font-semibold" style={{ color: "var(--foreground)" }}>inspire them</span>.
                 </p>
                 <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
-                  With a background spanning creative design, business, and hands-on building, Ishan brings a unique perspective to hospitality—where aesthetics, energy, and intention come together seamlessly.
+                  Ishan combines a background in photography, backpacker lodging and experiences, and hands-on building to bring a unique perspective to hospitality, where <span className="font-semibold" style={{ color: "var(--foreground)" }}>aesthetics, energy, and intention merge seamlessly</span>. His journey embodies a blend of entrepreneurship and artistic expression, rooted in a deep appreciation for mindful living and meaningful experiences.
                 </p>
                 <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
-                  His journey reflects a blend of entrepreneurship and artistic expression, shaped by a deep appreciation for mindful living and meaningful experiences. Ishan is also known for building ventures and exploring ideas across domains, bringing a <span className="font-semibold" style={{ color: "var(--foreground)" }}>thoughtful, detail-oriented approach</span> to everything he creates.
+                  Ishan is also recognized for building ventures and exploring ideas across various domains, bringing a <span className="font-semibold" style={{ color: "var(--foreground)" }}>thoughtful and detail-oriented approach</span> to everything he creates.
                 </p>
                 <p className="text-lg leading-relaxed" style={{ color: "var(--foreground-soft)" }}>
-                  At Trayati Stays, this philosophy translates into a space that is not just luxurious, but deeply rooted in its surroundings—where every texture, view, and moment is curated to offer guests a sense of <span className="font-semibold" style={{ color: "var(--cta)" }}>calm, connection, and quiet luxury</span> in the Himalayas.
+                  At Trayati Stays, this philosophy is realized through a space that is not only luxurious but deeply integrated with its surroundings. Every texture, view, and moment is carefully curated to provide guests with a sense of <span className="font-semibold" style={{ color: "var(--cta)" }}>calm, connection, and quiet luxury</span> across India.
                 </p>
               </div>
 

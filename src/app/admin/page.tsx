@@ -297,7 +297,16 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
         ].map((field) => (
           <label key={field.key} className="block">
             <span className="mb-1 block text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{field.label}</span>
-            <input value={(form[field.key] ?? "") as string | number} onChange={(e) => update(field.key, ["pricePerNight", "basePrice", "rating"].includes(field.key) ? Number(e.target.value) : e.target.value)} className="w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
+            <input
+              type={["pricePerNight", "basePrice", "rating"].includes(field.key) ? "number" : "text"}
+              step={field.key === "rating" ? "0.1" : "any"}
+              min={field.key === "rating" ? "0" : undefined}
+              max={field.key === "rating" ? "5" : undefined}
+              value={(form[field.key] ?? "") as string | number}
+              onChange={(e) => update(field.key, ["pricePerNight", "basePrice", "rating"].includes(field.key) ? Number(e.target.value) : e.target.value)}
+              className="w-full rounded-lg border px-4 py-3 text-sm"
+              style={{ borderColor: "var(--border-soft)" }}
+            />
           </label>
         ))}
         <ImageUploadButton label="Main Image *" value={(form.image ?? "") as string} onChange={(url) => update("image", url)} />
@@ -501,7 +510,7 @@ function TestimonialsTab() {
   }
 
   if (creating || editing) {
-    return <SimpleForm title={editing ? "Edit Testimonial" : "New Testimonial"} initial={editing} fields={[{ key: "name", label: "Name *" }, { key: "title", label: "Title" }, { key: "image", label: "Photo", image: true }, { key: "source", label: "Source" }, { key: "date", label: "Date" }, { key: "rating", label: "Rating", type: "number" }, { key: "text", label: "Testimonial Text *", textarea: true }]} onSave={handleSave} onCancel={() => { setCreating(false); setEditing(null); }} />;
+    return <SimpleForm title={editing ? "Edit Testimonial" : "New Testimonial"} initial={editing} fields={[{ key: "name", label: "Name *" }, { key: "title", label: "Title" }, { key: "image", label: "Photo", image: true }, { key: "source", label: "Source" }, { key: "date", label: "Date" }, { key: "rating", label: "Rating", type: "number", step: "0.1" }, { key: "text", label: "Testimonial Text *", textarea: true }]} onSave={handleSave} onCancel={() => { setCreating(false); setEditing(null); }} />;
   }
 
   return (
@@ -599,7 +608,7 @@ function ExperiencesTab() {
   );
 }
 
-function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: string; initial: Record<string, unknown> | null; fields: { key: string; label: string; type?: string; textarea?: boolean; image?: boolean; checkbox?: boolean }[]; onSave: (data: Record<string, unknown>) => void; onCancel: () => void }) {
+function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: string; initial: Record<string, unknown> | null; fields: { key: string; label: string; type?: string; step?: string; textarea?: boolean; image?: boolean; checkbox?: boolean }[]; onSave: (data: Record<string, unknown>) => void; onCancel: () => void }) {
   const defaultForm: Record<string, unknown> = { id: `item-${Date.now()}` };
   for (const f of fields) defaultForm[f.key] = f.checkbox ? false : f.type === "number" ? 0 : "";
   if (!initial) { defaultForm.date = new Date().toISOString().slice(0, 10); defaultForm.rating = 5; defaultForm.readTime = 5; defaultForm.featured = false; }
@@ -640,7 +649,7 @@ function SimpleForm({ title, initial, fields, onSave, onCancel }: { title: strin
                   {f.textarea ? (
                     <textarea value={(form[f.key] ?? "") as string} onChange={(e) => update(f.key, e.target.value)} className={f.key === "content" ? "min-h-64 w-full rounded-lg border px-4 py-3 text-sm" : "min-h-24 w-full rounded-lg border px-4 py-3 text-sm"} style={{ borderColor: "var(--border-soft)" }} />
                   ) : (
-                    <input type={f.type ?? "text"} step={f.type === "number" ? "any" : undefined} value={(form[f.key] ?? "") as string | number} onChange={(e) => update(f.key, f.type === "number" ? Number(e.target.value) : e.target.value)} className="w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
+                    <input type={f.type ?? "text"} step={f.step ?? (f.type === "number" ? "any" : undefined)} value={(form[f.key] ?? "") as string | number} onChange={(e) => update(f.key, f.type === "number" ? Number(e.target.value) : e.target.value)} className="w-full rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--border-soft)" }} />
                   )}
                 </>
               )}

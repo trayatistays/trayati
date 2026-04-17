@@ -13,7 +13,7 @@ export function PublicSiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={`public-site-shell min-h-screen${isHome ? " public-site-shell--home" : ""}`}>
-      {!hideChrome && <SiteHeader />}
+      {!hideChrome && <SiteHeader forceScrolled={!isHome} />}
       
       <div className="public-site-shell__bg" aria-hidden="true" />
       <div className="public-site-shell__veil" aria-hidden="true" />

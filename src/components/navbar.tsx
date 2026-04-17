@@ -11,21 +11,25 @@ type NavbarProps = {
   menuOpen: boolean;
   onToggleMenu: () => void;
   onOpenExperience?: () => void;
+  forceScrolled?: boolean;
 };
 
-export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps) {
+export function Navbar({ menuOpen, onToggleMenu, onOpenExperience, forceScrolled = false }: NavbarProps) {
   const { isSignedIn } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [mobileLinksOpen, setMobileLinksOpen] = useState(false);
 
   useEffect(() => {
+    if (forceScrolled) return;
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [forceScrolled]);
+
+  const showScrolledStyle = scrolled || menuOpen || forceScrolled;
 
   const handleMenuToggle = () => {
     setMobileLinksOpen(false);
@@ -37,7 +41,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`navbar ${scrolled || menuOpen ? "navbar--scrolled" : ""}`}
+      className={`navbar ${showScrolledStyle ? "navbar--scrolled" : ""}`}
     >
       <div className="navbar__inner">
         {/* ── Logo ────────────────────────────────────────────── */}
@@ -46,7 +50,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience }: NavbarProps
           className="navbar__logo"
           aria-label="Trayati Stays homepage"
         >
-          <div className={`navbar__logo-icon ${scrolled || menuOpen ? "navbar__logo-icon--scrolled" : ""}`}>
+          <div className={`navbar__logo-icon ${showScrolledStyle ? "navbar__logo-icon--scrolled" : ""}`}>
             <Image
               src="/Logo_transparent.png"
               alt="Trayati Stays logo"

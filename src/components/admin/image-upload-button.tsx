@@ -2,7 +2,28 @@
 
 import { useState, useRef } from "react";
 import { HiOutlineCloudArrowUp, HiOutlineTrash } from "react-icons/hi2";
-import { compressImage, formatFileSize } from "@/lib/client-image-compress";
+import { compressImage } from "@/lib/client-image-compress";
+
+function isManagedUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith("/uploads/")) return true;
+  if (url.includes("/storage/v1/object/public/")) return true;
+  return false;
+}
+
+async function deleteFromStorage(url: string): Promise<void> {
+  if (!isManagedUrl(url)) return;
+
+  try {
+    await fetch("/api/admin/upload", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+  } catch (error) {
+    console.error("Failed to delete from storage:", error);
+  }
+}
 
 type ImageUploadProps = {
   value: string;
@@ -59,6 +80,13 @@ export function ImageUploadButton({ value, onChange, label = "Image" }: ImageUpl
     if (file && file.type.startsWith("image/")) handleUpload(file);
   }
 
+  async function handleRemove() {
+    if (value) {
+      await deleteFromStorage(value);
+    }
+    onChange("");
+  }
+
   return (
     <div className="block">
       <span className="mb-1 block text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{label}</span>
@@ -102,7 +130,7 @@ export function ImageUploadButton({ value, onChange, label = "Image" }: ImageUpl
           />
           <button
             type="button"
-            onClick={() => onChange("")}
+            onClick={handleRemove}
             className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
           >
             <HiOutlineTrash className="h-3 w-3" />
@@ -162,7 +190,11 @@ export function MultiImageUploadButton({ values, onChange, label = "Photos" }: M
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  function removeAt(index: number) {
+  async function removeAt(index: number) {
+    const url = values[index];
+    if (url) {
+      await deleteFromStorage(url);
+    }
     onChange(values.filter((_, i) => i !== index));
   }
 

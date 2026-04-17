@@ -300,6 +300,14 @@ export async function dbGetAllTestimonials(activeOnly = false): Promise<Testimon
   return testimonials;
 }
 
+export async function dbGetTestimonialById(id: string): Promise<Testimonial | null> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase.from("testimonials").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Failed to fetch testimonial ${id}: ${error.message}`);
+  if (!data) return null;
+  return dbRowToTestimonial(data as TestimonialRow);
+}
+
 export async function dbUpsertTestimonial(t: Testimonial & { isActive?: boolean; sortOrder?: number }): Promise<Testimonial> {
   const supabase = requireSupabaseAdmin();
   const row = {
@@ -402,6 +410,14 @@ export async function dbGetAllExperiences(activeOnly = false): Promise<Experienc
   }
   
   return experiences;
+}
+
+export async function dbGetExperienceById(id: string): Promise<Experience | null> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase.from("experiences").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Failed to fetch experience ${id}: ${error.message}`);
+  if (!data) return null;
+  return dbRowToExperience(data as ExperienceRow);
 }
 
 export async function dbUpsertExperience(e: Experience & { isActive?: boolean; sortOrder?: number }): Promise<Experience> {
@@ -537,6 +553,13 @@ export async function dbUpdateSubmissionStatus(id: string, status: "approved" | 
     reviewed_by: "admin",
   }).eq("id", id);
   if (error) throw new Error(`Failed to update submission: ${error.message}`);
+}
+
+export async function dbDeleteSubmission(id: string): Promise<boolean> {
+  const supabase = requireSupabaseAdmin();
+  const { error } = await supabase.from("property_submissions").delete().eq("id", id);
+  if (error) throw new Error(`Failed to delete submission: ${error.message}`);
+  return true;
 }
 
 function dbRowToSubmission(row: SubmissionRow): PropertySubmission {

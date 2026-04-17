@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { dbUpsertStay, dbDeleteStay, dbUpsertTestimonial, dbDeleteTestimonial, dbUpsertExperience, dbDeleteExperience } from "@/lib/db";
+import {
+  dbGetStayById,
+  dbDeleteStay,
+  dbUpsertStay,
+  dbGetTestimonialById,
+  dbDeleteTestimonial,
+  dbUpsertTestimonial,
+  dbGetExperienceById,
+  dbDeleteExperience,
+  dbUpsertExperience,
+} from "@/lib/db";
 import { staySchema, testimonialSchema, experienceSchema } from "@/lib/schemas";
+import { deleteManagedAssetByUrl } from "@/lib/stay-media";
 
 type Collection = "stays" | "testimonials" | "experiences" | "reservations";
 
@@ -59,6 +70,46 @@ export async function PUT(
   }
 }
 
+async function deleteStayWithImages(id: string): Promise<boolean> {
+  const stay = await dbGetStayById(id);
+  if (!stay) return false;
+
+  await dbDeleteStay(id);
+
+  const imagesToDelete = [stay.image, ...(stay.photos || [])].filter(Boolean);
+  await Promise.allSettled(
+    imagesToDelete.map((url) => deleteManagedAssetByUrl(url))
+  );
+
+  return true;
+}
+
+async function deleteTestimonialWithImage(id: string): Promise<boolean> {
+  const testimonial = await dbGetTestimonialById(id);
+  if (!testimonial) return false;
+
+  await dbDeleteTestimonial(id);
+
+  if (testimonial.image) {
+    await deleteManagedAssetByUrl(testimonial.image).catch(() => {});
+  }
+
+  return true;
+}
+
+async function deleteExperienceWithImage(id: string): Promise<boolean> {
+  const experience = await dbGetExperienceById(id);
+  if (!experience) return false;
+
+  await dbDeleteExperience(id);
+
+  if (experience.image) {
+    await deleteManagedAssetByUrl(experience.image).catch(() => {});
+  }
+
+  return true;
+}
+
 export async function DELETE(
   _request: Request,
   context: RouteContext<"/api/admin/content/[collection]/[id]">,
@@ -77,13 +128,13 @@ export async function DELETE(
     let removed;
     switch (collection) {
       case "stays":
-        removed = await dbDeleteStay(id);
+        removed = await deleteStayWithImages(id);
         break;
       case "testimonials":
-        removed = await dbDeleteTestimonial(id);
+        removed = await deleteTestimonialWithImage(id);
         break;
       case "experiences":
-        removed = await dbDeleteExperience(id);
+        removed = await deleteExperienceWithImage(id);
         break;
       default:
         return NextResponse.json({ error: "Cannot delete from this collection." }, { status: 400 });
