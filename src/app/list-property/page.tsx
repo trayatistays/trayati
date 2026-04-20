@@ -579,7 +579,7 @@ export default function ListPropertyPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <label className="cursor-pointer rounded-lg border px-4 py-2 text-sm font-semibold text-white" style={{ backgroundColor: "var(--cta)" }}>
+                <label className="rounded-lg border px-4 py-2 text-sm font-semibold text-white" style={{ backgroundColor: "var(--cta)" }}>
                   {uploadingPhoto ? "Uploading..." : "Upload Photos"}
                   <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => void handlePhotoUpload(e.target.files)} disabled={uploadingPhoto} />
                 </label>

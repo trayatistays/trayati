@@ -11,6 +11,9 @@ export type RoomType = {
   extraBedOption?: string | null;
   pricePerNight: number;
   maxOccupancy: number;
+  capacity?: number; // Alias for maxOccupancy
+  area?: string; // Size in sqm or sqft
+  description?: string;
 };
 
 // ─── Amenities Definition ─────────────────────────────────────────
@@ -35,9 +38,12 @@ export type AmenitiesDetail = {
 
 // ─── Meal Options Definition ──────────────────────────────────────
 export type MealOption = {
+  id?: string;
+  name?: string;
   type: "breakfast" | "lunch" | "dinner" | "packed";
   available: boolean;
   price?: number;
+  pricePerPerson?: number;
   description?: string;
 };
 
@@ -47,6 +53,17 @@ export type CancellationPolicy = {
   description: string;
   refundPercentage: number;
   daysBeforeCheckin: number;
+};
+
+// ─── Pricing Configuration Definition ─────────────────────────────
+export type PricingConfig = {
+  cleaningFeeType: "percentage" | "fixed";
+  cleaningFeeValue: number;
+  serviceFeeType: "percentage" | "fixed";
+  serviceFeeValue: number;
+  gstPercentage: number;
+  extraGuestFee: number;
+  extraGuestThreshold: number;
 };
 
 // ─── Featured Stay Definition (Expanded) ──────────────────────────
@@ -77,6 +94,7 @@ export type FeaturedStay = {
   amenitiesDetail: AmenitiesDetail;
   mealOptions: MealOption[];
   cancellationPolicies: CancellationPolicy[];
+  pricingConfig?: PricingConfig;
   isFeatured?: boolean;
   bookingLink?: string;
 };

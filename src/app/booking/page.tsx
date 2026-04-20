@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { BookingFilterForm } from "@/components/booking-filter-form";
 import { BookingResults } from "@/components/booking-results";
+import { BookingCheckoutCard } from "@/components/booking-checkout-card";
 import { ReserveNowButton } from "@/components/reserve-now-button";
 import { useStays } from "@/hooks/use-stays";
 import type { ExperienceType } from "@/data/experience-types";
@@ -35,7 +36,7 @@ function BookingContent() {
   });
 
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(
-    selectedStay && selectedStay.roomTypes.length === 1 
+    selectedStay?.roomTypes?.length === 1 
       ? selectedStay.roomTypes[0].id 
       : null
   );
@@ -195,7 +196,7 @@ function BookingContent() {
                   </div>
 
                   {/* Available Rooms Section */}
-                  {selectedStay.roomTypes.length > 0 && (
+                  {selectedStay?.roomTypes?.length > 0 && (
                     <div>
                       <h3 className="font-display text-lg font-bold mb-4">Available Rooms</h3>
                       <div className="space-y-3">
@@ -204,7 +205,7 @@ function BookingContent() {
                             key={room.id}
                             whileHover={{ y: -4 }}
                             onClick={() => setSelectedRoomId(room.id)}
-                            className="p-4 rounded-lg border cursor-pointer transition"
+                            className="p-4 rounded-lg border transition"
                             style={{
                               borderColor:
                                 selectedRoomId === room.id
@@ -274,7 +275,9 @@ function BookingContent() {
                   animate={{ opacity: 1, x: 0 }}
                   className="lg:sticky lg:top-24 h-fit"
                 >
-                  <div
+                  <>
+                    <BookingCheckoutCard stay={selectedStay} roomId={selectedRoomId} />
+                    {false && <div
                     className="rounded-2xl p-6 space-y-6"
                     style={{
                       backgroundColor: "rgba(245,241,232,0.9)",
@@ -338,13 +341,19 @@ function BookingContent() {
                          }}
                       >
                         {(() => {
-                          const selectedRoom = selectedStay.roomTypes.find(
-                            (room) => room.id === selectedRoomId
-                          );
+                          const selectedRoom =
+                            selectedStay?.roomTypes.find(
+                              (room) => room.id === selectedRoomId
+                            ) ?? {
+                              name: "",
+                              pricePerNight: 0,
+                              maxOccupancy: 0,
+                              bedConfiguration: "",
+                            };
                           return selectedRoom ? (
                             <div className="space-y-2">
                               <p className="text-xs opacity-70">
-                                <span className="font-semibold">Room Selected:</span> {selectedRoom.name}
+                                <span className="font-semibold">Room Selected:</span> {selectedRoom?.name}
                               </p>
                               <div className="flex items-center justify-between">
                                 <span className="text-xs opacity-70">Price per night:</span>
@@ -365,10 +374,8 @@ function BookingContent() {
                     )}
 
                     <ReserveNowButton
-                      stayId={selectedStay.id}
-                      stayTitle={selectedStay.title}
-                      bookingLink={selectedStay.bookingLink}
-                      roomId={selectedRoomId}
+                      stayId={selectedStay?.id ?? ""}
+                      stayTitle={selectedStay?.title}
                       className="w-full rounded-full bg-[var(--button-primary)] py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)]"
                       style={{
                         boxShadow: "0 8px 24px rgba(74,101,68,0.3)",
@@ -378,7 +385,8 @@ function BookingContent() {
                     <p style={{ color: "var(--muted)" }} className="text-xs text-center">
                       Final price will be confirmed after dates are selected&apos;
                     </p>
-                  </div>
+                  </div>}
+                  </>
                 </motion.div>
               </motion.div>
             </div>

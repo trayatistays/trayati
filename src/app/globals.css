@@ -93,7 +93,6 @@ input[type="submit"],
 input[type="button"],
 label[for],
 select {
-  cursor: var(--cursor-clickable);
 }
 
 button {
@@ -537,7 +536,6 @@ button {
   padding: 0.25rem 0;
   background: none;
   border: none;
-  cursor: pointer;
   transition: color 0.4s ease-in-out;
 }
 
@@ -582,7 +580,6 @@ button {
   border: 1.5px solid rgba(0, 0, 0, 0.2);
   background: rgba(0, 0, 0, 0.04);
   color: #1A1A1A;
-  cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease, color 0.4s ease-in-out;
 }
 
@@ -619,7 +616,6 @@ button {
   border: 1.5px solid rgba(0, 0, 0, 0.18);
   background: rgba(0, 0, 0, 0.04);
   color: #1A1A1A;
-  cursor: pointer;
   font-family: var(--font-montserrat);
   font-size: 0.7rem;
   font-weight: 700;
@@ -663,7 +659,6 @@ button {
   border: 1.5px solid rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.08);
   color: #FFFFFF;
-  cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease, color 0.4s ease-in-out;
 }
 
@@ -718,7 +713,6 @@ button {
   color: #1A1A1A;
   background: transparent;
   border: none;
-  cursor: pointer;
   text-decoration: none;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -933,7 +927,6 @@ button {
     border-radius: 50%;
     border: none;
     outline: none;
-    cursor: pointer;
     background: rgba(74, 101, 68, 0.25);
     transition: background 0.3s ease, transform 0.3s ease;
   }

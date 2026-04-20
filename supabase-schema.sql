@@ -112,6 +112,27 @@ create table if not exists public.reservations (
   created_at timestamptz not null default now()
 );
 
+-- 7. BOOKING SESSIONS (multi-step booking flow)
+create table if not exists public.booking_sessions (
+  id text primary key default gen_random_uuid()::text,
+  clerk_user_id text not null,
+  stay_id text not null,
+  room_id text not null,
+  check_in date not null,
+  check_out date not null,
+  guests integer not null default 1,
+  meal_option_id text,
+  special_requests text default '',
+  room_total integer not null,
+  meal_total integer not null default 0,
+  subtotal integer not null,
+  gst_amount integer not null,
+  total_amount integer not null,
+  status text not null default 'pending' check (status in ('pending', 'completed', 'cancelled')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- ========================================
 -- ROW LEVEL SECURITY
 -- ========================================
@@ -122,6 +143,7 @@ alter table public.experiences enable row level security;
 alter table public.property_submissions enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.reservations enable row level security;
+alter table public.booking_sessions enable row level security;
 
 -- Public can read active stays, testimonials, experiences
 create policy "public can read active stays"
@@ -167,6 +189,11 @@ create policy "service role full access on contact_messages"
 
 create policy "service role full access on reservations"
   on public.reservations for all
+  to service_role
+  using (true) with check (true);
+
+create policy "service role full access on booking_sessions"
+  on public.booking_sessions for all
   to service_role
   using (true) with check (true);
 
@@ -223,6 +250,10 @@ create trigger testimonials_updated_at
 
 create trigger experiences_updated_at
   before update on public.experiences
+  for each row execute function public.handle_updated_at();
+
+create trigger booking_sessions_updated_at
+  before update on public.booking_sessions
   for each row execute function public.handle_updated_at();
 
 -- ========================================

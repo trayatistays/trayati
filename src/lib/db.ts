@@ -3,7 +3,7 @@ import "server-only";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import type { FeaturedStay } from "@/data/featured-stays";
 import type { Experience, Testimonial } from "@/data/testimonials-and-blogs";
-import { redis } from "@/lib/redis";
+import { multiLevelGet, multiLevelSet, invalidateStaysCache, invalidateTestimonialsCache, invalidateExperiencesCache, invalidateDestinationsCache } from "@/lib/cache";
 
 function toCamelCase<T>(row: Record<string, unknown>): T {
   const result: Record<string, unknown> = {};
@@ -85,12 +85,9 @@ function ensureObject<T>(value: unknown): T {
 
 export async function dbGetAllStays(activeOnly = false): Promise<FeaturedStay[]> {
   const cacheKey = `stays:${activeOnly ? "active" : "all"}`;
-  try {
-    const cached = await redis.get<FeaturedStay[]>(cacheKey);
-    if (cached) return cached;
-  } catch (e) {
-    console.error("Redis error in dbGetAllStays:", e);
-  }
+  
+  const cached = await multiLevelGet<FeaturedStay[]>(cacheKey);
+  if (cached) return cached;
 
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("stays").select("*").order("sort_order", { ascending: true });
@@ -100,13 +97,89 @@ export async function dbGetAllStays(activeOnly = false): Promise<FeaturedStay[]>
   
   const stays = (data as StayRow[]).map((row) => dbRowToStay(row));
   
-  try {
-    await redis.set(cacheKey, stays, { ex: 3600 }); // Cache for 1 hour
-  } catch (e) {
-    console.error("Redis set error in dbGetAllStays:", e);
-  }
+  await multiLevelSet(cacheKey, stays, 3600);
   
   return stays;
+}
+
+export type PaginatedStaysOptions = {
+  limit?: number;
+  cursor?: string;
+  featured?: boolean;
+  experienceType?: string;
+  city?: string;
+  state?: string;
+};
+
+export type PaginatedStaysResult = {
+  stays: FeaturedStay[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
+
+export async function dbGetStaysPaginated(options: PaginatedStaysOptions = {}): Promise<PaginatedStaysResult> {
+  const { limit = 10, cursor, featured, experienceType, city, state } = options;
+  
+  const cacheKey = `stays:paginated:${limit}:${cursor ?? "start"}:${featured ?? "all"}:${experienceType ?? "all"}:${city ?? "all"}:${state ?? "all"}`;
+  
+  const cached = await multiLevelGet<PaginatedStaysResult>(cacheKey);
+  if (cached) return cached;
+
+  const supabase = requireSupabaseAdmin();
+  
+  let query = supabase
+    .from("stays")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true })
+    .limit(limit + 1);
+
+  if (cursor) {
+    const decoded = Buffer.from(cursor, "base64").toString("utf-8");
+    const [sortOrderStr, id] = decoded.split(":");
+    const sortOrder = parseInt(sortOrderStr, 10);
+    if (!isNaN(sortOrder) && id) {
+      query = query.or(`sort_order.gt.${sortOrder},and(sort_order.eq.${sortOrder},id.gt.${id})`);
+    }
+  }
+
+  if (featured !== undefined) {
+    query = query.contains("amenities_detail", { featured });
+  }
+
+  if (experienceType) {
+    query = query.eq("experience_type", experienceType);
+  }
+
+  if (city) {
+    query = query.ilike("city", `%${city}%`);
+  }
+
+  if (state) {
+    query = query.ilike("state", `%${state}%`);
+  }
+
+  const { data, error } = await query;
+  
+  if (error) throw new Error(`Failed to fetch paginated stays: ${error.message}`);
+  
+  const rows = (data as StayRow[]) ?? [];
+  const hasMore = rows.length > limit;
+  const staysRows = hasMore ? rows.slice(0, limit) : rows;
+  const stays = staysRows.map((row) => dbRowToStay(row));
+  
+  let nextCursor: string | null = null;
+  if (hasMore && staysRows.length > 0) {
+    const lastItem = staysRows[staysRows.length - 1];
+    nextCursor = Buffer.from(`${lastItem.sort_order}:${lastItem.id}`).toString("base64");
+  }
+
+  const result: PaginatedStaysResult = { stays, nextCursor, hasMore };
+  
+  await multiLevelSet(cacheKey, result, 300);
+  
+  return result;
 }
 
 export async function dbGetStayById(id: string): Promise<FeaturedStay | null> {
@@ -131,15 +204,7 @@ export async function dbUpsertStay(stay: FeaturedStay & { isActive?: boolean; so
   const { error } = await supabase.from("stays").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert stay: ${error.message}`);
   
-  // Invalidate cache
-  try {
-    await Promise.all([
-      redis.del("stays:active"),
-      redis.del("stays:all")
-    ]);
-  } catch (e) {
-    console.error("Redis invalidation error in dbUpsertStay:", e);
-  }
+  await invalidateStaysCache();
   
   return stay;
 }
@@ -149,15 +214,7 @@ export async function dbDeleteStay(id: string): Promise<boolean> {
   const { error } = await supabase.from("stays").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete stay: ${error.message}`);
   
-  // Invalidate cache
-  try {
-    await Promise.all([
-      redis.del("stays:active"),
-      redis.del("stays:all")
-    ]);
-  } catch (e) {
-    console.error("Redis invalidation error in dbDeleteStay:", e);
-  }
+  await invalidateStaysCache();
   
   return true;
 }
@@ -276,12 +333,9 @@ type TestimonialRow = {
 
 export async function dbGetAllTestimonials(activeOnly = false): Promise<Testimonial[]> {
   const cacheKey = `testimonials:${activeOnly ? "active" : "all"}`;
-  try {
-    const cached = await redis.get<Testimonial[]>(cacheKey);
-    if (cached) return cached;
-  } catch (e) {
-    console.error("Redis error in dbGetAllTestimonials:", e);
-  }
+  
+  const cached = await multiLevelGet<Testimonial[]>(cacheKey);
+  if (cached) return cached;
 
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("testimonials").select("*").order("sort_order", { ascending: true });
@@ -291,11 +345,7 @@ export async function dbGetAllTestimonials(activeOnly = false): Promise<Testimon
   
   const testimonials = (data as TestimonialRow[]).map((row) => dbRowToTestimonial(row));
   
-  try {
-    await redis.set(cacheKey, testimonials, { ex: 3600 });
-  } catch (e) {
-    console.error("Redis set error in dbGetAllTestimonials:", e);
-  }
+  await multiLevelSet(cacheKey, testimonials, 3600);
   
   return testimonials;
 }
@@ -325,12 +375,7 @@ export async function dbUpsertTestimonial(t: Testimonial & { isActive?: boolean;
   const { error } = await supabase.from("testimonials").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert testimonial: ${error.message}`);
   
-  try {
-    await redis.del("testimonials:active");
-    await redis.del("testimonials:all");
-  } catch (e) {
-    console.error("Redis cache clear error:", e);
-  }
+  await invalidateTestimonialsCache();
   
   return t;
 }
@@ -340,12 +385,7 @@ export async function dbDeleteTestimonial(id: string): Promise<boolean> {
   const { error } = await supabase.from("testimonials").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete testimonial: ${error.message}`);
   
-  try {
-    await redis.del("testimonials:active");
-    await redis.del("testimonials:all");
-  } catch (e) {
-    console.error("Redis cache clear error:", e);
-  }
+  await invalidateTestimonialsCache();
   
   return true;
 }
@@ -388,12 +428,9 @@ type ExperienceRow = {
 
 export async function dbGetAllExperiences(activeOnly = false): Promise<Experience[]> {
   const cacheKey = `experiences:${activeOnly ? "active" : "all"}`;
-  try {
-    const cached = await redis.get<Experience[]>(cacheKey);
-    if (cached) return cached;
-  } catch (e) {
-    console.error("Redis error in dbGetAllExperiences:", e);
-  }
+  
+  const cached = await multiLevelGet<Experience[]>(cacheKey);
+  if (cached) return cached;
 
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("experiences").select("*").order("sort_order", { ascending: true });
@@ -403,11 +440,7 @@ export async function dbGetAllExperiences(activeOnly = false): Promise<Experienc
   
   const experiences = (data as ExperienceRow[]).map((row) => dbRowToExperience(row));
   
-  try {
-    await redis.set(cacheKey, experiences, { ex: 3600 });
-  } catch (e) {
-    console.error("Redis set error in dbGetAllExperiences:", e);
-  }
+  await multiLevelSet(cacheKey, experiences, 3600);
   
   return experiences;
 }
@@ -439,12 +472,7 @@ export async function dbUpsertExperience(e: Experience & { isActive?: boolean; s
   const { error } = await supabase.from("experiences").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert experience: ${error.message}`);
   
-  try {
-    await redis.del("experiences:active");
-    await redis.del("experiences:all");
-  } catch (e) {
-    console.error("Redis cache clear error:", e);
-  }
+  await invalidateExperiencesCache();
   
   return e;
 }
@@ -454,12 +482,7 @@ export async function dbDeleteExperience(id: string): Promise<boolean> {
   const { error } = await supabase.from("experiences").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete experience: ${error.message}`);
   
-  try {
-    await redis.del("experiences:active");
-    await redis.del("experiences:all");
-  } catch (e) {
-    console.error("Redis cache clear error:", e);
-  }
+  await invalidateExperiencesCache();
   
   return true;
 }
@@ -653,12 +676,9 @@ export type Destination = {
 
 export async function dbGetAllDestinations(activeOnly = false): Promise<Destination[]> {
   const cacheKey = `destinations:${activeOnly ? "active" : "all"}`;
-  try {
-    const cached = await redis.get<Destination[]>(cacheKey);
-    if (cached) return cached;
-  } catch (e) {
-    console.error("Redis error in dbGetAllDestinations:", e);
-  }
+  
+  const cached = await multiLevelGet<Destination[]>(cacheKey);
+  if (cached) return cached;
 
   const supabase = requireSupabaseAdmin();
   let query = supabase.from("destinations").select("*").order("sort_order", { ascending: true });
@@ -668,11 +688,7 @@ export async function dbGetAllDestinations(activeOnly = false): Promise<Destinat
   
   const destinations = (data as Record<string, unknown>[]).map((row) => toCamelCase<Destination>(row));
   
-  try {
-    await redis.set(cacheKey, destinations, { ex: 3600 });
-  } catch (e) {
-    console.error("Redis set error in dbGetAllDestinations:", e);
-  }
+  await multiLevelSet(cacheKey, destinations, 3600);
   
   return destinations;
 }
@@ -683,14 +699,7 @@ export async function dbUpsertDestination(d: Destination): Promise<Destination> 
   const { error } = await supabase.from("destinations").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert destination: ${error.message}`);
   
-  try {
-    await Promise.all([
-      redis.del("destinations:active"),
-      redis.del("destinations:all")
-    ]);
-  } catch (e) {
-    console.error("Redis invalidation error in dbUpsertDestination:", e);
-  }
+  await invalidateDestinationsCache();
   
   return d;
 }
@@ -700,14 +709,169 @@ export async function dbDeleteDestination(id: string): Promise<boolean> {
   const { error } = await supabase.from("destinations").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete destination: ${error.message}`);
   
-  try {
-    await Promise.all([
-      redis.del("destinations:active"),
-      redis.del("destinations:all")
-    ]);
-  } catch (e) {
-    console.error("Redis invalidation error in dbDeleteDestination:", e);
-  }
+  await invalidateDestinationsCache();
   
   return true;
+}
+
+// ─── BOOKINGS ──────────────────────────────────────────────────────
+
+export type Booking = {
+  id: string;
+  clerkUserId: string;
+  stayId: string;
+  roomId: string;
+  startDate: string;
+  endDate: string;
+  guests: number;
+  totalAmount: number;
+  status: "pending" | "confirmed" | "cancelled";
+  paymentId?: string;
+  razorpayOrderId?: string;
+  mealOptionId?: string;
+  specialRequests?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export async function dbCreateBooking(booking: Omit<Booking, "id" | "createdAt" | "updatedAt">): Promise<Booking> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(booking as Record<string, unknown>);
+  const { data, error } = await supabase
+    .from("bookings")
+    .insert(row)
+    .select("*")
+    .single();
+  
+  if (error) throw new Error(`Failed to create booking: ${error.message}`);
+  return toCamelCase<Booking>(data as Record<string, unknown>);
+}
+
+export async function dbGetBooking(id: string): Promise<Booking | null> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  
+  if (error) throw new Error(`Failed to fetch booking ${id}: ${error.message}`);
+  if (!data) return null;
+  return toCamelCase<Booking>(data as Record<string, unknown>);
+}
+
+export async function dbUpdateBooking(id: string, updates: Partial<Booking>): Promise<void> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(updates as Record<string, unknown>);
+  const { error } = await supabase.from("bookings").update(row).eq("id", id);
+  if (error) throw new Error(`Failed to update booking ${id}: ${error.message}`);
+}
+
+export async function dbListBookings(clerkUserId: string): Promise<Booking[]> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("clerk_user_id", clerkUserId)
+    .order("created_at", { ascending: false });
+  
+  if (error) throw new Error(`Failed to fetch bookings: ${error.message}`);
+  return (data as Record<string, unknown>[]).map((row) => toCamelCase<Booking>(row));
+}
+
+// ─── INVOICES ──────────────────────────────────────────────────────
+
+export type Invoice = {
+  id: string;
+  invoiceNumber: string;
+  bookingId: string;
+  totalAmount: number;
+  gstAmount: number;
+  subtotal: number;
+  paymentId?: string;
+  generatedAt: string;
+};
+
+export async function dbCreateInvoice(invoice: Omit<Invoice, "id" | "generatedAt">): Promise<Invoice> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(invoice as Record<string, unknown>);
+  row.generated_at = new Date().toISOString();
+  
+  const { data, error } = await supabase
+    .from("invoices")
+    .insert(row)
+    .select("*")
+    .single();
+  
+  if (error) throw new Error(`Failed to create invoice: ${error.message}`);
+  return toCamelCase<Invoice>(data as Record<string, unknown>);
+}
+
+export async function dbGetInvoice(invoiceNumber: string): Promise<Invoice | null> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("invoices")
+    .select("*")
+    .eq("invoice_number", invoiceNumber)
+    .maybeSingle();
+  
+  if (error) throw new Error(`Failed to fetch invoice: ${error.message}`);
+  if (!data) return null;
+  return toCamelCase<Invoice>(data as Record<string, unknown>);
+}
+
+// ─── BOOKING SESSIONS ───────────────────────────────────────────────
+
+export type BookingSession = {
+  id: string;
+  clerkUserId: string;
+  stayId: string;
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  roomTotal: number;
+  mealTotal: number;
+  subtotal: number;
+  gstAmount: number;
+  totalAmount: number;
+  mealOptionId?: string;
+  specialRequests?: string;
+  status: "pending" | "completed" | "expired";
+  createdAt: string;
+  updatedAt: string;
+};
+
+export async function dbCreateBookingSession(session: Omit<BookingSession, "id" | "createdAt" | "updatedAt">): Promise<BookingSession> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(session as Record<string, unknown>);
+  
+  const { data, error } = await supabase
+    .from("booking_sessions")
+    .insert(row)
+    .select("*")
+    .single();
+  
+  if (error) throw new Error(`Failed to create booking session: ${error.message}`);
+  return toCamelCase<BookingSession>(data as Record<string, unknown>);
+}
+
+export async function dbGetBookingSession(id: string): Promise<BookingSession | null> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("booking_sessions")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  
+  if (error) throw new Error(`Failed to fetch booking session: ${error.message}`);
+  if (!data) return null;
+  return toCamelCase<BookingSession>(data as Record<string, unknown>);
+}
+
+export async function dbUpdateBookingSession(id: string, updates: Partial<BookingSession>): Promise<void> {
+  const supabase = requireSupabaseAdmin();
+  const row = toSnakeCase(updates as Record<string, unknown>);
+  const { error } = await supabase.from("booking_sessions").update(row).eq("id", id);
+  if (error) throw new Error(`Failed to update booking session: ${error.message}`);
 }

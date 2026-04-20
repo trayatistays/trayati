@@ -98,7 +98,7 @@ export default function ContactPage() {
               target={item.href.startsWith("http") ? "_blank" : undefined}
               rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="rounded-[1.5rem] border p-8 text-center cursor-pointer transition backdrop-blur-xl"
+              className="rounded-[1.5rem] border p-8 text-center transition backdrop-blur-xl"
               style={{
                 borderColor: "rgba(74,101,68,0.2)",
                 backgroundColor: "rgba(245,241,233,0.9)",

@@ -103,7 +103,7 @@ export function ImageUploadButton({ value, onChange, label = "Image" }: ImageUpl
           {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
         </div>
         <div
-          className="flex shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg border px-3 py-3 text-center transition hover:opacity-80"
+          className="flex shrink-0 flex-col items-center justify-center rounded-lg border px-3 py-3 text-center transition hover:opacity-80"
           style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(74,101,68,0.04)", minWidth: "90px" }}
           onClick={() => inputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
@@ -212,7 +212,7 @@ export function MultiImageUploadButton({ values, onChange, label = "Photos" }: M
           </div>
         ))}
         <div
-          className="flex h-20 w-28 cursor-pointer flex-col items-center justify-center rounded-lg border transition hover:opacity-80"
+          className="flex h-20 w-28 flex-col items-center justify-center rounded-lg border transition hover:opacity-80"
           style={{ borderColor: "var(--border-soft)", backgroundColor: "rgba(74,101,68,0.04)" }}
           onClick={() => inputRef.current?.click()}
         >

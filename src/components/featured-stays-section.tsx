@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useEffect, type PointerEvent as ReactPointerEvent } from "react";
+import { useRef, useState, useEffect, type PointerEvent as ReactPointerEvent, useMemo, useCallback, memo } from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useTransform,
   useSpring,
+  useReducedMotion,
   type MotionValue,
 } from "framer-motion";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
@@ -17,7 +18,7 @@ import { useStays } from "@/hooks/use-stays";
 
 const VH_PER_CARD = 88;
 const SPRING_CONFIG = { stiffness: 350, damping: 35, mass: 0.2 };
-const AUTO_ADVANCE_MS = 5000;
+const AUTO_ADVANCE_MS = 6000;
 const MOBILE_INTERACTION_RESUME_MS = 4200;
 
 function formatPrice(price: number) {
@@ -28,7 +29,6 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
-// ─── Progress Dot (Desktop) ─────────────────────────────────────────
 function ProgressDot({
   index,
   scrollProgress,
@@ -56,12 +56,6 @@ function ProgressDot({
     [0.6, 1.3, 1.3, 0.6]
   );
 
-  const glow = useTransform(
-    scrollProgress,
-    [Math.max(0, s - buf), s, Math.min(1, e - buf), Math.min(1, e)],
-    ["0px 0px 0px rgba(199,91,26,0)", "0px 0px 8px rgba(199,91,26,0.6)", "0px 0px 8px rgba(199,91,26,0.6)", "0px 0px 0px rgba(199,91,26,0)"]
-  );
-
   return (
     <motion.button
       onClick={onClick}
@@ -73,18 +67,15 @@ function ProgressDot({
         height: 7,
         borderRadius: "50%",
         backgroundColor: "rgba(245,241,232,0.9)",
-        boxShadow: glow,
         cursor: "pointer",
         border: "none",
         outline: "none",
-        transition: "background-color 0.3s ease",
       }}
     />
   );
 }
 
-// ─── Stay Card (Desktop) ──────────────────────────────────────────
-function StayCard({
+const StayCard = memo(function StayCard({
   stay,
   index,
   scrollProgress,
@@ -143,7 +134,6 @@ function StayCard({
         y: isFirst ? 0 : y,
         zIndex,
         filter,
-        willChange: "transform, filter",
       }}
     >
       <div className="relative w-full h-full p-4 sm:p-6 lg:p-8">
@@ -212,71 +202,70 @@ function StayCard({
             </p>
 
             <div className="cta-group-gap mt-6 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3">
-               <span
- className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
-                   style={{
-                     backgroundColor: "#6B1F1F",
-                     boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
-                   }}
-                >
-                  {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
-                </span>
-                <span
- className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md sm:px-5 sm:py-3"
-                   style={{
-                     backgroundColor: "#6B1F1F",
-                     border: "1px solid rgba(255,255,255,0.1)",
-                   }}
-                >
-                  ★&nbsp;{stay.rating.toFixed(1)}
-                </span>
-               {stay.googleMapsUrl && (
-                 <a
-                   href={stay.googleMapsUrl}
-                   target="_blank"
-                   rel="noopener noreferrer"
- className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-[#8B2F2F] sm:px-5 sm:py-3"
-                    style={{
-                      backgroundColor: "#6B1F1F",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "#ffffff"
-                    }}
-                  >
-                    View on Map&nbsp;↗
-                  </a>
-               )}
-               <Link
-                 href={`/booking?stayId=${stay.id}`}
- className="cta-min-target inline-flex items-center rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-300 hover:bg-[#8B2F2F] hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
-                   style={{
-                     backgroundColor: "#6B1F1F",
-                     boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
-                     color: "#ffffff"
-                   }}
-                >
-                  Book This Stay
-                </Link>
-               <Link
-                 href={`/property/${stay.id}`}
- className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:text-white hover:bg-[#8B2F2F] sm:px-7 sm:py-3"
+              <span
+                className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm sm:px-6 sm:py-3"
+                style={{
+                  backgroundColor: "#6B1F1F",
+                  boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
+                }}
+              >
+                {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+              </span>
+              <span
+                className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md sm:px-5 sm:py-3"
+                style={{
+                  backgroundColor: "#6B1F1F",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+              >
+                ★&nbsp;{stay.rating.toFixed(1)}
+              </span>
+              {stay.googleMapsUrl && (
+                <a
+                  href={stay.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-[#8B2F2F] sm:px-5 sm:py-3"
                   style={{
                     backgroundColor: "#6B1F1F",
                     border: "1px solid rgba(255,255,255,0.1)",
                     color: "#ffffff"
                   }}
                 >
-                  View Details&nbsp;→
-                </Link>
-             </div>
+                  View on Map&nbsp;↗
+                </a>
+              )}
+              <Link
+                href={`/booking?stayId=${stay.id}`}
+                className="cta-min-target inline-flex items-center rounded-full px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-transform hover:scale-[1.03] active:scale-[0.98] sm:px-8 sm:py-3"
+                style={{
+                  backgroundColor: "#6B1F1F",
+                  boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
+                  color: "#ffffff"
+                }}
+              >
+                Book This Stay
+              </Link>
+              <Link
+                href={`/property/${stay.id}`}
+                className="cta-min-target inline-flex items-center rounded-full px-5 py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-md transition-colors hover:bg-[#8B2F2F] sm:px-7 sm:py-3"
+                style={{
+                  backgroundColor: "#6B1F1F",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#ffffff"
+                }}
+              >
+                View Details&nbsp;→
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     </motion.div>
   );
-}
+});
 
-// ─── Mobile Stay Card (3D + Simplified) ────────────────────────────
-function MobileStayCard({
+const MobileStayCard = memo(function MobileStayCard({
   stay,
   index,
   total,
@@ -286,11 +275,7 @@ function MobileStayCard({
   total: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -40 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className="relative h-[72vh] w-full overflow-hidden rounded-[1.5rem] bg-[#1a2f3d]"
     >
       <Image
@@ -323,12 +308,7 @@ function MobileStayCard({
         </span>
       </div>
 
-      <motion.div
-        className="absolute bottom-0 inset-x-0 p-5"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
+      <div className="absolute bottom-0 inset-x-0 p-5">
         <p className="text-[0.45rem] font-semibold uppercase tracking-[0.45em] text-white/45 mb-2">
           {stay.type}&nbsp;·&nbsp;{stay.city}, {stay.state}
         </p>
@@ -337,59 +317,61 @@ function MobileStayCard({
         </h3>
 
         <div className="cta-group-gap mt-4 flex flex-wrap items-center gap-2">
-<span
-className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
-              style={{
-                backgroundColor: "#6B1F1F",
-                boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
-              }}
-            >
-              {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
-            </span>
-<span
-className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
-                style={{
-                  backgroundColor: "#6B1F1F",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                ★&nbsp;{stay.rating.toFixed(1)}
-              </span>
-           <Link
-             href={`/booking?stayId=${stay.id}`}
-             className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-all duration-300 active:scale-[0.98] hover:bg-[#8B2F2F]"
-             style={{
-               backgroundColor: "#6B1F1F",
-               boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
-             }}
+          <span
+            className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
+            style={{
+              backgroundColor: "#6B1F1F",
+              boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
+            }}
+          >
+            {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+          </span>
+          <span
+            className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
+            style={{
+              backgroundColor: "#6B1F1F",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            ★&nbsp;{stay.rating.toFixed(1)}
+          </span>
+          <Link
+            href={`/booking?stayId=${stay.id}`}
+            className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-transform active:scale-[0.98] hover:bg-[#8B2F2F]"
+            style={{
+              backgroundColor: "#6B1F1F",
+              boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
+            }}
           >
             Book Now
           </Link>
-           <Link
-             href={`/property/${stay.id}`}
-             className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-[#8B2F2F]"
-             style={{
-               backgroundColor: "#6B1F1F",
-               border: "1px solid rgba(255,255,255,0.1)",
-             }}
+          <Link
+            href={`/property/${stay.id}`}
+            className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition-colors hover:bg-[#8B2F2F]"
+            style={{
+              backgroundColor: "#6B1F1F",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
           >
             View Details&nbsp;-&gt;
           </Link>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
-}
+});
 
-// ─── Mobile Featured Carousel (3D + Auto-Advance) ──────────────────
 function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const isPausedRef = useRef(false);
   const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const total = stays.length;
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+    
     const id = setInterval(() => {
       if (isPausedRef.current) return;
       setActiveIndex((prev) => (prev + 1) % total);
@@ -398,7 +380,7 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
       clearInterval(id);
       clearTimeout(resumeTimeoutRef.current);
     };
-  }, [total]);
+  }, [total, prefersReducedMotion]);
 
   const goTo = (index: number) => {
     setActiveIndex(index);
@@ -478,12 +460,19 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
         </button>
 
         <AnimatePresence mode="wait">
-          <MobileStayCard
+          <motion.div
             key={stays[activeIndex].id}
-            stay={stays[activeIndex]}
-            index={activeIndex}
-            total={total}
-          />
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <MobileStayCard
+              stay={stays[activeIndex]}
+              index={activeIndex}
+              total={total}
+            />
+          </motion.div>
         </AnimatePresence>
       </div>
 
@@ -502,7 +491,6 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
   );
 }
 
-// ─── Rotating Badge ───────────────────────────────────────────────
 function RotatingBadge() {
   const text = "FEATURED STAYS · TRAYATI · EXPLORE · ";
   return (
@@ -511,7 +499,6 @@ function RotatingBadge() {
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 24, ease: "linear" }}
         className="relative size-28"
-        style={{ willChange: "transform" }}
       >
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <defs>
@@ -542,14 +529,14 @@ function RotatingBadge() {
   );
 }
 
-// ─── Main Export ──────────────────────────────────────────────────
 export function FeaturedStaysSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { stays } = useStays();
   const activeStays = stays.length ? stays : featuredStays;
-  const topFeatured = activeStays
-    .filter((s) => s.isFeatured)
-    .slice(0, 4);
+  const topFeatured = useMemo(() => 
+    activeStays.filter((s) => s.isFeatured).slice(0, 4),
+    [activeStays]
+  );
   const total = topFeatured.length;
 
   const { scrollYProgress } = useScroll({
@@ -559,13 +546,13 @@ export function FeaturedStaysSection() {
 
   const smoothProgress = useSpring(scrollYProgress, SPRING_CONFIG);
 
-  const scrollToItem = (index: number) => {
+  const scrollToItem = useCallback((index: number) => {
     if (!containerRef.current) return;
     const startOffset = containerRef.current.offsetTop;
     const viewportHeight = window.innerHeight;
     const targetScroll = startOffset + (index * VH_PER_CARD * viewportHeight) / 100;
     window.scrollTo({ top: targetScroll, behavior: "smooth" });
-  };
+  }, []);
 
   if (total === 0) return null;
 
@@ -612,10 +599,8 @@ export function FeaturedStaysSection() {
         </motion.div>
       </section>
 
-      {/* ── Mobile: 3D Auto-Advance Carousel ── */}
       <MobileFeaturedCarousel stays={topFeatured} />
 
-      {/* ── Desktop: Scroll-Linked Layout ── */}
       <div
         ref={containerRef}
         style={{ height: `${total * VH_PER_CARD}vh` }}

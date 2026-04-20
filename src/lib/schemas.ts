@@ -53,6 +53,24 @@ const cancellationPolicySchema = z.object({
   daysBeforeCheckin: z.coerce.number().int().min(0),
 });
 
+const pricingConfigSchema = z.object({
+  cleaningFeeType: z.enum(["percentage", "fixed"]).default("percentage"),
+  cleaningFeeValue: z.coerce.number().min(0).default(15),
+  serviceFeeType: z.enum(["percentage", "fixed"]).default("percentage"),
+  serviceFeeValue: z.coerce.number().min(0).default(5),
+  gstPercentage: z.coerce.number().min(0).max(100).default(18),
+  extraGuestFee: z.coerce.number().min(0).default(0),
+  extraGuestThreshold: z.coerce.number().int().min(1).default(2),
+}).default({
+  cleaningFeeType: "percentage" as const,
+  cleaningFeeValue: 15,
+  serviceFeeType: "percentage" as const,
+  serviceFeeValue: 5,
+  gstPercentage: 18,
+  extraGuestFee: 0,
+  extraGuestThreshold: 2,
+});
+
 export const roomTypeSchema = z.object({
   id: z.string().trim().min(1),
   name: z.string().trim().min(1),
@@ -91,6 +109,7 @@ export const staySchema = z.object({
   amenitiesDetail: amenitiesDetailSchema,
   mealOptions: z.array(mealOptionSchema).default([]),
   cancellationPolicies: z.array(cancellationPolicySchema).default([]),
+  pricingConfig: pricingConfigSchema,
   isFeatured: z.coerce.boolean().default(false),
   bookingLink: z.string().trim().optional(),
 });

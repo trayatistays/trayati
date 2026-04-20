@@ -93,7 +93,7 @@ export default function SolutionsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.08, duration: 0.5 }}
               whileHover={{ y: -8 }}
-              className="rounded-[1.5rem] border p-8 backdrop-blur-xl transition cursor-pointer"
+              className="rounded-[1.5rem] border p-8 backdrop-blur-xl transition"
               style={{
                 borderColor: "rgba(74,101,68,0.2)",
                 backgroundColor: "rgba(245,241,233,0.9)",

@@ -97,7 +97,6 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
         <ReserveNowButton
           stayId={stay.id}
           stayTitle={stay.title}
-          bookingLink={stay.bookingLink}
           className="block w-full rounded-lg bg-[var(--button-primary)] px-4 py-3 text-center font-bold text-white transition-all hover:bg-[var(--button-primary-hover)] hover:shadow-xl"
         />
 

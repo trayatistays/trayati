@@ -85,7 +85,6 @@ export default function GlobalError({
                   color: "white",
                   backgroundColor: "#4A6544",
                   border: "none",
-                  cursor: "pointer",
                   boxShadow: "0 12px 30px rgba(74,101,68,0.35)",
                 }}
               >

@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
+  memo,
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react";
@@ -19,7 +20,51 @@ const AUTO_SCROLL_SPEED_MOBILE = 8;
 const INTERACTION_COOLDOWN_MS = 1800;
 const TOUCH_INTERACTION_COOLDOWN_MS = 4200;
 
+const InstagramCard = memo(function InstagramCard({
+  item,
+  index,
+}: {
+  item: InstagramMediaItem;
+  index: number;
+}) {
+  return (
+    <a
+      key={`${item.id}-${index}`}
+      href={item.permalink}
+      target="_blank"
+      rel="noreferrer"
+      className="ultra-3d-hover group relative block w-[14rem] shrink-0 snap-start overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
+      style={{
+        borderColor: "rgba(74,101,68,0.12)",
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,232,0.78))",
+        boxShadow: "0 18px 40px rgba(74,101,68,0.08)",
+      }}
+    >
+      <div className="relative aspect-[4/5] overflow-hidden">
+        <Image
+          src={item.mediaUrl}
+          alt={item.alt}
+          fill
+          sizes="(max-width: 640px) 224px, 288px"
+          className="object-cover transition duration-700 group-hover:scale-110"
+          loading="lazy"
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(74,101,68,0.76)_100%)]" />
+        <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(164,108,43,0.88)" }}>
+          <FaInstagram />
+        </div>
+        <div className="absolute inset-x-4 bottom-4">
+          <p className="max-h-16 overflow-hidden text-sm leading-5 text-white/90">{item.caption}</p>
+        </div>
+      </div>
+    </a>
+  );
+});
+
 export function InstagramCarousel() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; scrollLeft: number } | null>(null);
   const interactionLockUntilRef = useRef(0);
@@ -27,6 +72,7 @@ export function InstagramCarousel() {
   const previousFrameRef = useRef<number | null>(null);
   const isPointerDownRef = useRef(false);
   const isFocusedWithinRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [items, setItems] = useState<InstagramMediaItem[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -46,7 +92,25 @@ export function InstagramCarousel() {
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (items.length > 0) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || items.length > 0) return;
 
     let active = true;
 
@@ -73,7 +137,7 @@ export function InstagramCarousel() {
     return () => {
       active = false;
     };
-  }, [items.length]);
+  }, [isVisible, items.length]);
 
   useEffect(() => {
     isPointerDownRef.current = isPointerDown;
@@ -88,7 +152,7 @@ export function InstagramCarousel() {
   };
 
   useEffect(() => {
-    if (!items.length || prefersReducedMotion) {
+    if (!items.length || prefersReducedMotion || !isVisible) {
       return;
     }
 
@@ -135,7 +199,7 @@ export function InstagramCarousel() {
       animationFrameRef.current = null;
       previousFrameRef.current = null;
     };
-  }, [items.length, prefersReducedMotion]);
+  }, [items.length, prefersReducedMotion, isVisible]);
 
   const normalizeInfiniteScroll = () => {
     const track = trackRef.current;
@@ -241,12 +305,35 @@ export function InstagramCarousel() {
     lockInteraction();
   };
 
-  if (!items.length) {
-    return null;
+  if (!isVisible || !items.length) {
+    return (
+      <section ref={containerRef} className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
+        <div className="relative w-full overflow-hidden border-y px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.34em]" style={{ color: "var(--gold)" }}>
+                Instagram Journal
+              </p>
+              <h2 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl" style={{ color: "var(--primary)" }}>
+                The visual diary of Trayati
+              </h2>
+            </div>
+          </div>
+          <div className="mt-8 flex gap-4 overflow-hidden">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="w-[14rem] sm:w-[17rem] lg:w-[18rem] shrink-0 aspect-[4/5] rounded-[1.65rem] bg-gray-200 animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
+    <section ref={containerRef} className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
       <div className="relative w-full overflow-hidden border-y px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
         <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
         <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
@@ -270,7 +357,7 @@ export function InstagramCarousel() {
               style={{
                 color: "var(--primary)",
                 borderColor: "rgba(74,101,68,0.18)",
-                backgroundColor: "rgba(245,241,233,0.88)",
+                backgroundColor: "rgba(245,241,232,0.88)",
               }}
             >
               Open Instagram
@@ -320,37 +407,7 @@ export function InstagramCarousel() {
           >
             <div className="flex w-max gap-4 pr-4 sm:gap-5">
               {items.map((item, index) => (
-                <a
-                  key={`${item.id}-${index}`}
-                  href={item.permalink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ultra-3d-hover group relative block w-[14rem] shrink-0 snap-start overflow-hidden rounded-[1.65rem] border sm:w-[17rem] lg:w-[18rem]"
-                  style={{
-                    borderColor: "rgba(74,101,68,0.12)",
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(245,241,233,0.78))",
-                    boxShadow: "0 18px 40px rgba(74,101,68,0.08)",
-                  }}
-                >
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <Image
-                      src={item.mediaUrl}
-                      alt={item.alt}
-                      fill
-                      sizes="(max-width: 640px) 224px, 288px"
-                      className="object-cover transition duration-700 group-hover:scale-110"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(74,101,68,0.76)_100%)]" />
-                    <div className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full text-white backdrop-blur-md" style={{ backgroundColor: "rgba(164,108,43,0.88)" }}>
-                      <FaInstagram />
-                    </div>
-                    <div className="absolute inset-x-4 bottom-4">
-                      <p className="max-h-16 overflow-hidden text-sm leading-5 text-white/90">{item.caption}</p>
-                    </div>
-                  </div>
-                </a>
+                <InstagramCard key={`${item.id}-${index}`} item={item} index={index} />
               ))}
             </div>
           </div>
