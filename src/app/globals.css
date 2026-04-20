@@ -23,7 +23,7 @@
   --panel: rgba(245, 241, 233, 0.90);
   --panel-strong: rgba(245, 241, 233, 0.96);
   --border-soft: rgba(74, 101, 68, 0.12);
-  --cursor-clickable: url("/images/custom-cursor.png") 18 18, pointer;
+
 
   --font-body: clamp(1.1rem, 2vw, 1.5rem);
   --font-heading: clamp(2rem, 5vw, 3rem);
@@ -93,7 +93,7 @@ input[type="submit"],
 input[type="button"],
 label[for],
 select {
-  cursor: var(--cursor-clickable);
+  cursor: pointer;
 }
 
 button {
@@ -109,6 +109,22 @@ button {
 
 .text-balance {
   text-wrap: balance;
+}
+
+/* CSS-only hero reveal — replaces framer-motion motion.div to cut TBT */
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(44px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-content-reveal {
+  animation: hero-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
 .hero-glow {
@@ -776,8 +792,7 @@ button {
   }
 
   body::before {
-    background-size: 220px 220px, 180px 180px;
-    opacity: 0.03;
+    display: none;
   }
 
   .home-depth-orb--sage {
@@ -986,5 +1001,19 @@ button {
 
   .marquee-track {
     animation: none;
+  }
+}
+
+/* ── Performance: skip rendering off-screen homepage sections ── */
+/* content-visibility: auto defers layout/paint for below-fold sections
+   until ~50px before they enter the viewport, reducing initial render cost. */
+.perf-cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+@media (max-width: 767px) {
+  .perf-cv-auto {
+    contain-intrinsic-size: auto 500px;
   }
 }

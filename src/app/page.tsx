@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { getAllStays } from "@/lib/stays-store";
+import { getAllTestimonials } from "@/lib/testimonials-store";
+import { getAllExperiences } from "@/lib/experiences-store";
+import { getInstagramFeed } from "@/lib/instagram";
 import { HomePageExperience } from "@/components/home-page-experience";
 
 export const metadata: Metadata = {
@@ -8,6 +12,22 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function Home() {
-  return <HomePageExperience />;
+export default async function Home() {
+  // Fetch all homepage data in parallel on the server — zero client-side API calls
+  const [stays, testimonials, experiences, instagramItems] = await Promise.all([
+    getAllStays(),
+    getAllTestimonials(),
+    getAllExperiences(),
+    getInstagramFeed(),
+  ]);
+
+  return (
+    <HomePageExperience
+      stays={stays}
+      testimonials={testimonials}
+      experiences={experiences}
+      instagramItems={instagramItems}
+      instagramUsingFallback={!process.env.INSTAGRAM_ACCESS_TOKEN}
+    />
+  );
 }

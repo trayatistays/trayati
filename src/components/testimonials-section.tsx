@@ -321,20 +321,8 @@ function MobileTestimonialCarousel({
   );
 }
 
-export function TestimonialsSection() {
-  const [items, setItems] = useState<Testimonial[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = sessionStorage.getItem("trayati-testimonials");
-      if (!raw) return [];
-      const { data, ts } = JSON.parse(raw) as { data: Testimonial[]; ts: number };
-      const STALE_MS = 5 * 60 * 1000;
-      if (Date.now() - ts < STALE_MS) return data;
-    } catch {}
-    return [];
-  });
+export function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   const [activeItem, setActiveItem] = useState<Testimonial | null>(null);
-  const [isLoading, setIsLoading] = useState(() => items.length === 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -346,36 +334,7 @@ export function TestimonialsSection() {
     });
   };
 
-  useEffect(() => {
-    if (items.length > 0) return;
-
-    let active = true;
-
-    void fetch("/api/testimonials", {
-      headers: { Accept: "application/json" },
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: { testimonials?: Testimonial[] } | null) => {
-        if (!active) return;
-        const fetched = data?.testimonials ?? [];
-        setItems(fetched);
-        try {
-          sessionStorage.setItem("trayati-testimonials", JSON.stringify({ data: fetched, ts: Date.now() }));
-        } catch {}
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      })
-      .catch(() => undefined);
-
-    return () => {
-      active = false;
-    };
-  }, [items.length]);
-
-  if (isLoading && items.length === 0) {
-    return null;
-  }
+  const items = testimonials;
 
   if (items.length === 0) {
     return null;

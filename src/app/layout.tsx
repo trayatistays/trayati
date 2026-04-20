@@ -12,7 +12,7 @@ import "./globals.css";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ const inter = Inter({
 const ebGaramond = EB_Garamond({
   variable: "--font-eb-garamond",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -33,14 +33,13 @@ const imFellEnglish = IM_Fell_English({
   variable: "--font-im-fell",
   subsets: ["latin"],
   weight: ["400"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["600"],
   display: "swap",
 });
 
@@ -68,6 +67,15 @@ export default function RootLayout({
         <meta name="naver-site-verification" content="" />
         <link rel="preconnect" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
         <link rel="dns-prefetch" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
+        {/* Preconnect to Clerk to reduce auth SDK load time */}
+        <link rel="preconnect" href="https://flowing-trout-96.clerk.accounts.dev" crossOrigin="anonymous" />
+        {/* Preload hero LCP image — eliminates 1.3s resource load delay */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
+          fetchPriority="high"
+        />
       </head>
       <body className="min-h-full antialiased">
         <script

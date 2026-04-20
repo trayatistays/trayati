@@ -12,8 +12,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
-import { featuredStays, type FeaturedStay } from "@/data/featured-stays";
-import { useStays } from "@/hooks/use-stays";
+import type { FeaturedStay } from "@/data/featured-stays";
 
 const VH_PER_CARD = 88;
 const SPRING_CONFIG = { stiffness: 350, damping: 35, mass: 0.2 };
@@ -543,10 +542,9 @@ function RotatingBadge() {
 }
 
 // ─── Main Export ──────────────────────────────────────────────────
-export function FeaturedStaysSection() {
+export function FeaturedStaysSection({ stays }: { stays: FeaturedStay[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { stays } = useStays();
-  const activeStays = stays.length ? stays : featuredStays;
+  const activeStays = stays;
   const topFeatured = activeStays
     .filter((s) => s.isFeatured)
     .slice(0, 4);

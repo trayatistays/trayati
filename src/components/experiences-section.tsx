@@ -345,20 +345,8 @@ function MobileExperienceCarousel({
   );
 }
 
-export function ExperiencesSection() {
-  const [items, setItems] = useState<Experience[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = sessionStorage.getItem("trayati-experiences");
-      if (!raw) return [];
-      const { data, ts } = JSON.parse(raw) as { data: Experience[]; ts: number };
-      const STALE_MS = 5 * 60 * 1000;
-      if (Date.now() - ts < STALE_MS) return data;
-    } catch {}
-    return [];
-  });
+export function ExperiencesSection({ experiences }: { experiences: Experience[] }) {
   const [activeItem, setActiveItem] = useState<Experience | null>(null);
-  const [isLoading, setIsLoading] = useState(() => items.length === 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -370,36 +358,7 @@ export function ExperiencesSection() {
     });
   };
 
-  useEffect(() => {
-    if (items.length > 0) return;
-
-    let active = true;
-
-    void fetch("/api/experiences", {
-      headers: { Accept: "application/json" },
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: { experiences?: Experience[] } | null) => {
-        if (!active) return;
-        const fetched = data?.experiences ?? [];
-        setItems(fetched);
-        try {
-          sessionStorage.setItem("trayati-experiences", JSON.stringify({ data: fetched, ts: Date.now() }));
-        } catch {}
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      })
-      .catch(() => undefined);
-
-    return () => {
-      active = false;
-    };
-  }, [items.length]);
-
-  if (isLoading && items.length === 0) {
-    return null;
-  }
+  const items = experiences;
 
   if (items.length === 0) {
     return null;

@@ -94,6 +94,12 @@ const nextConfig: NextConfig = {
 
     ];
   },
+
+  // Tree-shake framer-motion — reduces main-thread JS evaluation time
+  // react-icons/* is already optimized by default in Next.js
+  experimental: {
+    optimizePackageImports: ["framer-motion"],
+  },
 };
 
 export default nextConfig;

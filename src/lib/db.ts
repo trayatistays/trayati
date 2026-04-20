@@ -110,11 +110,27 @@ export async function dbGetAllStays(activeOnly = false): Promise<FeaturedStay[]>
 }
 
 export async function dbGetStayById(id: string): Promise<FeaturedStay | null> {
+  const cacheKey = `stay:${id}`;
+  try {
+    const cached = await redis.get<FeaturedStay>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetStayById:", e);
+  }
+
   const supabase = requireSupabaseAdmin();
   const { data, error } = await supabase.from("stays").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(`Failed to fetch stay ${id}: ${error.message}`);
   if (!data) return null;
-  return dbRowToStay(data as StayRow);
+  const stay = dbRowToStay(data as StayRow);
+
+  try {
+    await redis.set(cacheKey, stay, { ex: 3600 });
+  } catch (e) {
+    console.error("Redis set error in dbGetStayById:", e);
+  }
+
+  return stay;
 }
 
 export async function dbGetStayBySlug(slug: string): Promise<FeaturedStay | null> {
@@ -131,11 +147,12 @@ export async function dbUpsertStay(stay: FeaturedStay & { isActive?: boolean; so
   const { error } = await supabase.from("stays").upsert(row, { onConflict: "id" });
   if (error) throw new Error(`Failed to upsert stay: ${error.message}`);
   
-  // Invalidate cache
+  // Invalidate cache (list + individual stay)
   try {
     await Promise.all([
       redis.del("stays:active"),
-      redis.del("stays:all")
+      redis.del("stays:all"),
+      redis.del(`stay:${stay.id}`),
     ]);
   } catch (e) {
     console.error("Redis invalidation error in dbUpsertStay:", e);
@@ -149,11 +166,12 @@ export async function dbDeleteStay(id: string): Promise<boolean> {
   const { error } = await supabase.from("stays").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete stay: ${error.message}`);
   
-  // Invalidate cache
+  // Invalidate cache (list + individual stay)
   try {
     await Promise.all([
       redis.del("stays:active"),
-      redis.del("stays:all")
+      redis.del("stays:all"),
+      redis.del(`stay:${id}`),
     ]);
   } catch (e) {
     console.error("Redis invalidation error in dbDeleteStay:", e);
@@ -326,8 +344,10 @@ export async function dbUpsertTestimonial(t: Testimonial & { isActive?: boolean;
   if (error) throw new Error(`Failed to upsert testimonial: ${error.message}`);
   
   try {
-    await redis.del("testimonials:active");
-    await redis.del("testimonials:all");
+    await Promise.all([
+      redis.del("testimonials:active"),
+      redis.del("testimonials:all"),
+    ]);
   } catch (e) {
     console.error("Redis cache clear error:", e);
   }
@@ -341,8 +361,10 @@ export async function dbDeleteTestimonial(id: string): Promise<boolean> {
   if (error) throw new Error(`Failed to delete testimonial: ${error.message}`);
   
   try {
-    await redis.del("testimonials:active");
-    await redis.del("testimonials:all");
+    await Promise.all([
+      redis.del("testimonials:active"),
+      redis.del("testimonials:all"),
+    ]);
   } catch (e) {
     console.error("Redis cache clear error:", e);
   }

@@ -19,7 +19,13 @@ const AUTO_SCROLL_SPEED_MOBILE = 8;
 const INTERACTION_COOLDOWN_MS = 1800;
 const TOUCH_INTERACTION_COOLDOWN_MS = 4200;
 
-export function InstagramCarousel() {
+export function InstagramCarousel({
+  items: serverItems,
+  usingFallback: serverUsingFallback,
+}: {
+  items: InstagramMediaItem[];
+  usingFallback: boolean;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; scrollLeft: number } | null>(null);
   const interactionLockUntilRef = useRef(0);
@@ -27,53 +33,14 @@ export function InstagramCarousel() {
   const previousFrameRef = useRef<number | null>(null);
   const isPointerDownRef = useRef(false);
   const isFocusedWithinRef = useRef(false);
-  const [items, setItems] = useState<InstagramMediaItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = sessionStorage.getItem("trayati-instagram");
-      if (!raw) return [];
-      const { data, ts } = JSON.parse(raw) as { data: { items: InstagramMediaItem[]; usingFallback: boolean }; ts: number };
-      const STALE_MS = 15 * 60 * 1000;
-      if (Date.now() - ts < STALE_MS && data.items.length > 0) {
-        return [...data.items, ...data.items];
-      }
-    } catch { }
-    return [];
-  });
-  const [usingFallback, setUsingFallback] = useState(true);
+  // Double items for infinite scroll loop
+  const items = serverItems.length > 0
+    ? [...serverItems, ...serverItems]
+    : [];
+  const usingFallback = serverUsingFallback;
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isFocusedWithin, setIsFocusedWithin] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (items.length > 0) return;
-
-    let active = true;
-
-    void fetch("/api/instagram-feed", {
-      headers: { Accept: "application/json" },
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload: { items?: InstagramMediaItem[]; usingFallback?: boolean } | null) => {
-        if (!active || !payload?.items?.length) {
-          return;
-        }
-
-        setItems([...payload.items, ...payload.items]);
-        setUsingFallback(Boolean(payload.usingFallback));
-        try {
-          sessionStorage.setItem("trayati-instagram", JSON.stringify({
-            data: { items: payload.items, usingFallback: payload.usingFallback },
-            ts: Date.now(),
-          }));
-        } catch { }
-      })
-      .catch(() => undefined);
-
-    return () => {
-      active = false;
-    };
-  }, [items.length]);
 
   useEffect(() => {
     isPointerDownRef.current = isPointerDown;

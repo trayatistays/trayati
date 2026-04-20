@@ -18,10 +18,11 @@ export function AnimatedText({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mql = window.matchMedia("(max-width: 767px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
   }, []);
 
   useEffect(() => {

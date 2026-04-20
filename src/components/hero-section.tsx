@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { AnimatedText } from "@/components/animated-text";
 
@@ -15,13 +14,13 @@ export function HeroSection() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const checkDesktop = () => {
-      const desktop = window.innerWidth >= 768;
-      setIsDesktop(desktop);
+    const mql = window.matchMedia("(min-width: 768px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsDesktop(e.matches);
     };
-    checkDesktop();
-    window.addEventListener("resize", checkDesktop);
-    return () => window.removeEventListener("resize", checkDesktop);
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
   }, []);
 
   useEffect(() => {
@@ -82,11 +81,9 @@ export function HeroSection() {
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 44 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-              className="relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
+            {/* CSS-only fade+slide animation — avoids loading framer-motion in the critical path */}
+            <div
+              className="hero-content-reveal relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
               <h1
                 className="mobile-heading text-balance mt-6 max-w-4xl text-[1.65rem] sm:text-[2.25rem] md:text-[2.85rem] lg:text-[3.65rem] xl:text-[4.35rem] font-semibold leading-[1.1] tracking-[-0.02em]"
@@ -115,7 +112,7 @@ export function HeroSection() {
                   Explore Properties
                 </Link>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
