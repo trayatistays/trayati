@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllStays } from "@/lib/stays-store";
+import { dbGetAllExperiences } from "@/lib/db";
+import { slugify } from "@/lib/schemas";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
 
@@ -10,10 +12,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     stays = [];
   }
+
+  let experiences: { title: string, id: string }[] = [];
+  try {
+    experiences = await dbGetAllExperiences(true);
+  } catch {
+    experiences = [];
+  }
+
   const staticRoutes = [
     { route: "", changeFrequency: "daily" as const, priority: 1 },
     { route: "/blogs", changeFrequency: "weekly" as const, priority: 0.8 },
     { route: "/booking", changeFrequency: "weekly" as const, priority: 0.8 },
+    { route: "/list-property", changeFrequency: "weekly" as const, priority: 0.8 },
     { route: "/about", changeFrequency: "weekly" as const, priority: 0.7 },
     { route: "/connect", changeFrequency: "weekly" as const, priority: 0.7 },
     { route: "/contact", changeFrequency: "weekly" as const, priority: 0.7 },
@@ -32,6 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.9,
+    })),
+    ...experiences.map((exp) => ({
+      url: `${siteUrl}/blogs/${slugify(exp.title) || slugify(exp.id)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
     })),
   ];
 }

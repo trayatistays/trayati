@@ -20,9 +20,6 @@ export const siteMetadata: Metadata = {
     "heritage stays",
     "holiday rentals India",
   ],
-  alternates: {
-    canonical: "/",
-  },
   category: "travel",
   openGraph: {
     type: "website",
@@ -45,7 +42,7 @@ export const siteMetadata: Metadata = {
 export function buildStayMetadata(stay: FeaturedStay): Metadata {
   const title = `${stay.title} in ${stay.city}, ${stay.state}`;
   const description = `${stay.title} is a ${stay.type.toLowerCase()} in ${stay.city}, ${stay.state}. ${stay.description}`;
-  const url = `/property/${stay.id}`;
+  const url = `${siteUrl}/property/${stay.id}`;
 
   return {
     title,
