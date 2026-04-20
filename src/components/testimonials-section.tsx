@@ -323,7 +323,18 @@ function MobileTestimonialCarousel({
 
 export function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   const [activeItem, setActiveItem] = useState<Testimonial | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsDesktop(e.matches);
+    };
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
@@ -384,70 +395,71 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
           />
 
           {/* Desktop: marquee carousel */}
-          <div className="group/carousel relative hidden md:block">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              className="carousel-nav-button absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-              aria-label="Scroll testimonials left"
-            >
-              <HiOutlineChevronLeft className="text-2xl" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              className="carousel-nav-button absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-              aria-label="Scroll testimonials right"
-            >
-              <HiOutlineChevronRight className="text-2xl" />
-            </button>
-
-            <div 
-              ref={scrollContainerRef}
-              className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] scroll-smooth"
-            >
-              <div
-                className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
-                style={
-                  {
-                    "--marquee-duration": "60s",
-                    "--marquee-duration-hover": "100s",
-                    "--marquee-direction": "normal",
-                  } as CSSProperties
-                }
+          {isDesktop && (
+            <div className="group/carousel relative hidden md:block">
+              <button
+                type="button"
+                onClick={() => scroll("left")}
+                className="carousel-nav-button absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+                aria-label="Scroll testimonials left"
               >
-                {carouselItems.map((testimonial, index) => (
-                  <button
-                    key={`${testimonial.id}-${index}`}
-                    type="button"
-                    onClick={() => setActiveItem(testimonial)}
-                    className="ultra-3d-hover group w-[18rem] shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left sm:w-[22rem]"
-                    style={{
-                      borderColor: "rgba(74,101,68,0.12)",
-                      background:
-                        "linear-gradient(155deg, rgba(255,255,255,0.78), rgba(245,241,233,0.88))",
-                      boxShadow: "0 18px 48px rgba(74,101,68,0.08)",
-                    }}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="relative h-14 w-14 overflow-hidden rounded-full border" style={{ borderColor: "rgba(74,101,68,0.12)" }}>
-                        <Image
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          fill
-                          className="object-cover transition duration-500 group-hover:scale-110"
-                          loader={supabaseImageLoader}
-                        />
-                      </div>
-                      <span className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(164,108,43,0.12)", color: "var(--cta)" }}>
-                        <HiOutlineStar className="text-sm" />
-                        {testimonial.rating.toFixed(1)}
-                      </span>
-                    </div>
+                <HiOutlineChevronLeft className="text-2xl" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll("right")}
+                className="carousel-nav-button absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+                aria-label="Scroll testimonials right"
+              >
+                <HiOutlineChevronRight className="text-2xl" />
+              </button>
 
-                    <h3 className="mt-5 font-display text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--primary)" }}>
-                      {testimonial.name}
-                    </h3>
+              <div 
+                ref={scrollContainerRef}
+                className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] scroll-smooth"
+              >
+                <div
+                  className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
+                  style={
+                    {
+                      "--marquee-duration": "60s",
+                      "--marquee-duration-hover": "100s",
+                      "--marquee-direction": "normal",
+                    } as CSSProperties
+                  }
+                >
+                  {carouselItems.map((testimonial, index) => (
+                    <button
+                      key={`${testimonial.id}-${index}`}
+                      type="button"
+                      onClick={() => setActiveItem(testimonial)}
+                      className="ultra-3d-hover group w-[18rem] shrink-0 overflow-hidden rounded-[1.9rem] border p-5 text-left sm:w-[22rem]"
+                      style={{
+                        borderColor: "rgba(74,101,68,0.12)",
+                        background:
+                          "linear-gradient(155deg, rgba(255,255,255,0.78), rgba(245,241,233,0.88))",
+                        boxShadow: "0 18px 48px rgba(74,101,68,0.08)",
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="relative h-14 w-14 overflow-hidden rounded-full border" style={{ borderColor: "rgba(74,101,68,0.12)" }}>
+                          <Image
+                            src={testimonial.image}
+                            alt={testimonial.name}
+                            fill
+                            className="object-cover transition duration-500 group-hover:scale-110"
+                            loader={supabaseImageLoader}
+                          />
+                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(164,108,43,0.12)", color: "var(--cta)" }}>
+                          <HiOutlineStar className="text-sm" />
+                          {testimonial.rating.toFixed(1)}
+                        </span>
+                      </div>
+
+                      <h3 className="mt-5 font-display text-2xl font-semibold tracking-[-0.03em]" style={{ color: "var(--primary)" }}>
+                        {testimonial.name}
+                      </h3>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--muted)" }}>
                       {testimonial.title}
                     </p>
@@ -468,8 +480,9 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
+    </section>
 
       <TestimonialDialog item={activeItem} onClose={() => setActiveItem(null)} />
     </>

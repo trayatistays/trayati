@@ -10,7 +10,6 @@ export type ExperienceOverlayItem = {
   title: string;
   description: string;
   iconColor: string;
-  bullets: string[];
   icon: ExperienceIcon;
 };
 
@@ -202,26 +201,7 @@ export function ExperienceItem({
           </div>
         </div>
 
-        <AnimatePresence initial={false}>
-          {active ? (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden pl-[4rem] sm:pl-[5.25rem] lg:pl-0"
-            >
-              <ul
-                className="space-y-2 text-sm leading-relaxed sm:text-[1rem]"
-                style={{ color: "var(--foreground-soft)" }}
-              >
-                {experience.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
-                ))}
-              </ul>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+
       </motion.button>
     </motion.div>
   );

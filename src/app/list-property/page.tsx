@@ -317,7 +317,7 @@ export default function ListPropertyPage() {
               List Your Property
             </h1>
             <p style={{ color: "var(--muted)" }}>
-              Share your property with travelers across India. Our team will review and approve your listing within 48 hours.
+              List your property for travelers across India and reach a wider audience. Our team will carefully review and approve your listing within 48 hours, ensuring a seamless and trusted experience.
             </p>
           </motion.div>
 
@@ -534,8 +534,8 @@ export default function ListPropertyPage() {
                     onClick={() => toggleAmenity(amenity)}
                     className="rounded-full border px-4 py-2 text-sm font-medium transition-all"
                     style={{
-                  borderColor: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--border-soft)",
-                  backgroundColor: selectedAmenities.includes(amenity) ? "rgba(164,108,43,0.1)" : "transparent",
+                      borderColor: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--border-soft)",
+                      backgroundColor: selectedAmenities.includes(amenity) ? "rgba(164,108,43,0.1)" : "transparent",
                       color: selectedAmenities.includes(amenity) ? "var(--cta)" : "var(--primary)",
                     }}
                   >
@@ -562,7 +562,7 @@ export default function ListPropertyPage() {
               <p className="mb-4 text-sm" style={{ color: "var(--muted)" }}>
                 Add photo URLs or upload images. First photo will be the main preview.
               </p>
-              
+
               <div className="mb-4 flex flex-wrap gap-3">
                 {photoUrls.map((url, index) => (
                   <div key={index} className="relative aspect-video w-32 overflow-hidden rounded-lg border">

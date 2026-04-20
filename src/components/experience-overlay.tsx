@@ -14,58 +14,40 @@ const experiences: Array<
     imageAlt: string;
   }
 > = [
-  {
-    id: "folklore-homestays",
-    title: "Folklore Homestays",
-    description:
-      "Local hosts, raw culture. Think family-run village homes where you eat farm-fresh meals, hear folk tales by the fire, and learn chai-making from someone who's done it 50 years.",
-    routeValue: "Folklore Homestays",
-    image: "/property-lounge.webp",
-    imageAlt: "Warm heritage-style homestay lounge with handcrafted character.",
-    iconColor: "rgba(196, 212, 120, 0.95)",
-    icon: "homestay",
-    bullets: [
-      "family-run village homes",
-      "farm-fresh local meals",
-      "fireside folk tales",
-      "slow rituals & chai-making",
-    ],
-  },
-  {
-    id: "apartments-and-condos",
-    title: "Apartments & Condos",
-    description:
-      "Independent, automated, hassle-free. Smart locks, self check-in, modern comforts in heritage locations. Perfect for digital nomads or families wanting privacy without host interaction but still breathing destination vibes.",
-    routeValue: "Apartments & Condos",
-    image: "/property-bedroom.webp",
-    imageAlt: "Refined apartment-style stay with clean contemporary interiors.",
-    iconColor: "rgba(255, 120, 86, 0.95)",
-    icon: "apartment",
-    bullets: [
-      "smart locks & self check-in",
-      "modern comforts in heritage locations",
-      "privacy-first stays",
-      "ideal for digital nomads & families",
-    ],
-  },
-  {
-    id: "villas",
-    title: "Villas",
-    description:
-      "Private luxury escapes. Gated compounds, pools, sprawling lawns-your own palace with staff on call. Heritage havelis turned boutique estates, colonial bungalows with history, modern villas in cultural hotspots.",
-    routeValue: "Villas",
-    image: "/samar-villa.webp",
-    imageAlt: "Private villa escape with open grounds and a premium retreat atmosphere.",
-    iconColor: "rgba(179, 221, 244, 0.95)",
-    icon: "villa",
-    bullets: [
-      "private compounds & pools",
-      "staff on call",
-      "heritage havelis & colonial bungalows",
-      "large-format luxury escapes",
-    ],
-  },
-];
+    {
+      id: "folklore-homestays",
+      title: "Folklore Homestays",
+      description:
+        "Local hosts, raw culture. Think family-run village homes where you eat farm-fresh meals, hear folk tales by the fire, and learn chai-making from someone who's done it 50 years.",
+      routeValue: "Folklore Homestays",
+      image: "/property-lounge.webp",
+      imageAlt: "Warm heritage-style homestay lounge with handcrafted character.",
+      iconColor: "rgba(196, 212, 120, 0.95)",
+      icon: "homestay",
+    },
+    {
+      id: "apartments-and-condos",
+      title: "Apartments & Condos",
+      description:
+        "Independent, automated, hassle-free. Smart locks, self check-in, modern comforts in heritage locations. Perfect for digital nomads or families wanting privacy without host interaction but still breathing destination vibes.",
+      routeValue: "Apartments & Condos",
+      image: "/property-bedroom.webp",
+      imageAlt: "Refined apartment-style stay with clean contemporary interiors.",
+      iconColor: "rgba(255, 120, 86, 0.95)",
+      icon: "apartment",
+    },
+    {
+      id: "villas",
+      title: "Villas",
+      description:
+        "Private luxury escapes. Gated compounds, pools, sprawling lawns-your own palace with staff on call. Heritage havelis turned boutique estates, colonial bungalows with history, modern villas in cultural hotspots.",
+      routeValue: "Villas",
+      image: "/samar-villa.webp",
+      imageAlt: "Private villa escape with open grounds and a premium retreat atmosphere.",
+      iconColor: "rgba(179, 221, 244, 0.95)",
+      icon: "villa",
+    },
+  ];
 
 type ExperienceOverlayProps = {
   isOpen: boolean;
@@ -170,7 +152,7 @@ export function ExperienceOverlay({
                   className="mt-4 font-sans text-[2.4rem] font-medium leading-none tracking-[-0.07em] sm:text-[4rem] lg:text-[6rem]"
                   style={{ color: "#1f2329" }}
                 >
-                  Live India Soul
+                  Live India's Soul
                 </h2>
                 <p
                   className="mt-4 max-w-[32rem] font-serif text-base leading-relaxed sm:text-lg"
@@ -246,7 +228,7 @@ export function ExperienceOverlay({
                           className="text-[0.65rem] font-semibold uppercase tracking-[0.28em]"
                           style={{ color: "rgba(245,241,232,0.78)" }}
                         >
-                          Live India Soul
+                          Live India's Soul
                         </p>
                         <p
                           className="mt-2 font-sans text-2xl font-semibold tracking-[-0.04em]"

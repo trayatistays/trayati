@@ -57,7 +57,7 @@ export function HeroSection() {
           fill
           priority
           fetchPriority="high"
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, 85vw"
           className="absolute inset-0 object-cover object-center"
         />
         {isDesktop && shouldLoadVideo ? (

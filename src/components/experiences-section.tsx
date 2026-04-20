@@ -347,7 +347,18 @@ function MobileExperienceCarousel({
 
 export function ExperiencesSection({ experiences }: { experiences: Experience[] }) {
   const [activeItem, setActiveItem] = useState<Experience | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsDesktop(e.matches);
+    };
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
@@ -408,40 +419,41 @@ export function ExperiencesSection({ experiences }: { experiences: Experience[] 
           />
 
           {/* Desktop: marquee carousel */}
-          <div className="group/carousel relative hidden md:block">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              className="carousel-nav-button absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-              aria-label="Scroll stories left"
-            >
-              <HiOutlineChevronLeft className="text-2xl" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              className="carousel-nav-button absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
-              aria-label="Scroll stories right"
-            >
-              <HiOutlineChevronRight className="text-2xl" />
-            </button>
-
-            <div 
-              ref={scrollContainerRef}
-              className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] scroll-smooth"
-            >
-              <div
-                className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
-                style={
-                  {
-                    "--marquee-duration": "60s",
-                    "--marquee-duration-hover": "100s",
-                    "--marquee-direction": "normal",
-                  } as CSSProperties
-                }
+          {isDesktop && (
+            <div className="group/carousel relative hidden md:block">
+              <button
+                type="button"
+                onClick={() => scroll("left")}
+                className="carousel-nav-button absolute left-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+                aria-label="Scroll stories left"
               >
-                {carouselItems.map((experience, index) => (
-                  <button
+                <HiOutlineChevronLeft className="text-2xl" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll("right")}
+                className="carousel-nav-button absolute right-4 top-1/2 z-20 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border backdrop-blur-md transition-all"
+                aria-label="Scroll stories right"
+              >
+                <HiOutlineChevronRight className="text-2xl" />
+              </button>
+
+              <div 
+                ref={scrollContainerRef}
+                className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] scroll-smooth"
+              >
+                <div
+                  className="marquee-track marquee-track--hover-slow flex w-max gap-5 px-4 sm:px-6 lg:px-10"
+                  style={
+                    {
+                      "--marquee-duration": "60s",
+                      "--marquee-duration-hover": "100s",
+                      "--marquee-direction": "normal",
+                    } as CSSProperties
+                  }
+                >
+                  {carouselItems.map((experience, index) => (
+                    <button
                     key={`${experience.id}-${index}`}
                     type="button"
                     onClick={() => setActiveItem(experience)}
@@ -504,7 +516,8 @@ export function ExperiencesSection({ experiences }: { experiences: Experience[] 
               </div>
             </div>
           </div>
-        </div>
+        )}
+      </div>
 
         <motion.div
           initial={{ opacity: 0 }}
