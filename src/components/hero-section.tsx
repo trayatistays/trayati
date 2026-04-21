@@ -3,15 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
+import MuxPlayer from "@mux/mux-player-react";
 import { AnimatedText } from "@/components/animated-text";
 
 const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments"];
+const MUX_PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID || "";
 
 export function HeroSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
@@ -24,34 +26,36 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (!isDesktop) return;
-    const timer = window.setTimeout(() => {
-      setShouldLoadVideo(true);
-    }, 250);
-    return () => window.clearTimeout(timer);
+    if (!isDesktop || !MUX_PLAYBACK_ID) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setTimeout(() => setShouldLoadVideo(true), 250);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
   }, [isDesktop]);
 
-  useEffect(() => {
-    if (!shouldLoadVideo) return;
-    const video = videoRef.current;
-    if (!video) return;
-    const handleCanPlay = () => setVideoLoaded(true);
-    if (video.readyState >= 2) {
-      handleCanPlay();
-    } else {
-      video.addEventListener("canplay", handleCanPlay);
-    }
-    return () => video.removeEventListener("canplay", handleCanPlay);
-  }, [shouldLoadVideo]);
+  const backgroundImageUrl = "https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg";
 
   return (
     <section
+      ref={sectionRef}
       id="top"
       className="relative isolate min-h-[85vh]"
     >
       <div className="absolute inset-0 -z-20">
         <Image
-          src="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
+          src={backgroundImageUrl}
           alt=""
           aria-hidden="true"
           fill
@@ -60,20 +64,20 @@ export function HeroSection() {
           sizes="(max-width: 768px) 100vw, 85vw"
           className="absolute inset-0 object-cover object-center"
         />
-        {isDesktop && shouldLoadVideo ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="none"
-            poster="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
-          >
-            <source src="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/output-720p-nosound.mp4" type="video/mp4" />
-          </video>
-        ) : null}
+        {isDesktop && shouldLoadVideo && MUX_PLAYBACK_ID && (
+          <div className={`absolute inset-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}>
+            <MuxPlayer
+              playbackId={MUX_PLAYBACK_ID}
+              muted
+              autoPlay
+              loop
+              playsInline
+              streamType="on-demand"
+              onCanPlay={() => setVideoLoaded(true)}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
@@ -81,7 +85,6 @@ export function HeroSection() {
       <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
-            {/* CSS-only fade+slide animation — avoids loading framer-motion in the critical path */}
             <div
               className="hero-content-reveal relative flex max-w-[980px] flex-col justify-center py-3 sm:py-8 lg:px-4 lg:py-16 xl:max-w-[1100px] xl:pl-8"
             >
