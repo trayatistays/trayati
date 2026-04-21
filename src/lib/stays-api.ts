@@ -2,7 +2,7 @@
 
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import type { FeaturedStay } from "@/data/featured-stays";
-import { dbRowToStay } from "@/lib/db";
+import { dbRowToStay, dbGetPropertyImages } from "@/lib/db";
 
 export async function getStayById(id: string): Promise<FeaturedStay | null> {
   const supabase = requireSupabaseAdmin();
@@ -40,4 +40,8 @@ export async function getStayBySlug(slug: string): Promise<FeaturedStay | null> 
   }
 
   return dbRowToStay(data);
+}
+
+export async function getPropertyImages(id: string): Promise<string[]> {
+  return dbGetPropertyImages(id);
 }

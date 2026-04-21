@@ -141,6 +141,38 @@ export async function dbGetStayBySlug(slug: string): Promise<FeaturedStay | null
   return dbRowToStay(data as StayRow);
 }
 
+export async function dbGetPropertyImages(id: string): Promise<string[]> {
+  const cacheKey = `property:${id}:images`;
+  try {
+    const cached = await redis.get<string[]>(cacheKey);
+    if (cached) return cached;
+  } catch (e) {
+    console.error("Redis error in dbGetPropertyImages:", e);
+  }
+
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase.from("stays").select("photos, image").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Failed to fetch images for property ${id}: ${error.message}`);
+  
+  let photos: string[] = [];
+  if (data) {
+    const rawPhotos = ensureArray<string>(data.photos);
+    if (rawPhotos.length > 0) {
+      photos = rawPhotos;
+    } else if (data.image && typeof data.image === 'string') {
+      photos = [data.image];
+    }
+  }
+
+  try {
+    await redis.set(cacheKey, photos, { ex: 3600 });
+  } catch (e) {
+    console.error("Redis set error in dbGetPropertyImages:", e);
+  }
+
+  return photos;
+}
+
 export async function dbUpsertStay(stay: FeaturedStay & { isActive?: boolean; sortOrder?: number }): Promise<FeaturedStay> {
   const supabase = requireSupabaseAdmin();
   const row = stayToDbRow(stay);

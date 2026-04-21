@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useStays } from "@/hooks/use-stays";
+import { ReserveNowButton } from "@/components/reserve-now-button";
 
 type FilterState = {
   location: string;
@@ -164,15 +165,15 @@ export function BookingResults({ filters }: { filters: FilterState }) {
               >
                 Details
               </Link>
-              <Link
-                href={`/booking?stayId=${stay.id}`}
+              <ReserveNowButton
+                stayId={stay.id}
+                bookingLink={stay.bookingLink}
+                text="Book Now"
                 className="flex-1 rounded-full bg-[var(--button-primary)] py-3 text-center text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-105 hover:bg-[var(--button-primary-hover)] active:scale-95"
                 style={{
                   boxShadow: "0 8px 24px rgba(74,101,68,0.3)",
                 }}
-              >
-                Book Now
-              </Link>
+              />
             </div>
           </div>
         </motion.div>

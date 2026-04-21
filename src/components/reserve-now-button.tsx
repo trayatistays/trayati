@@ -45,6 +45,7 @@ type ReserveNowButtonProps = {
   guests?: number;
   className?: string;
   style?: React.CSSProperties;
+  text?: string;
 };
 
 export function ReserveNowButton({
@@ -56,6 +57,7 @@ export function ReserveNowButton({
   guests = 1,
   className,
   style,
+  text = "Reserve Now",
 }: ReserveNowButtonProps) {
   const { isSignedIn } = useUser();
   const { isLoaded } = useAuth();
@@ -147,7 +149,7 @@ export function ReserveNowButton({
             savePending({ stayId, bookingLink, roomId: roomId ?? undefined, checkIn, checkOut, guests });
           }}
         >
-          Reserve Now
+          {text}
         </button>
       </SignInButton>
     );
@@ -162,7 +164,7 @@ export function ReserveNowButton({
         style={style}
         type="button"
       >
-        {isSubmitting ? "Reserving..." : "Reserve Now"}
+        {isSubmitting ? "Reserving..." : text}
       </button>
       {message && (
         <p

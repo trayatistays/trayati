@@ -101,15 +101,17 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
           className="block w-full rounded-lg bg-[var(--button-primary)] px-4 py-3 text-center font-bold text-white transition-all hover:bg-[var(--button-primary-hover)] hover:shadow-xl"
         />
 
-        <button
+        <ReserveNowButton
+          text="View Rooms"
+          stayId={stay.id}
+          stayTitle={stay.title}
+          bookingLink={stay.bookingLink}
           className="w-full rounded-lg border-2 py-2 px-4 font-semibold transition-colors"
           style={{
             borderColor: "var(--cta)",
             color: "var(--cta)",
           }}
-        >
-          View Rooms
-        </button>
+        />
 
         <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
           No payment required until you confirm
