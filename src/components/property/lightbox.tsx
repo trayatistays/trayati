@@ -75,14 +75,14 @@ export default function Lightbox({ photos, initialIndex, onClose }: LightboxProp
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 backdrop-blur-sm">
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-[200] flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+        className="fixed top-20 right-4 z-[10001] flex items-center justify-center w-12 h-12 rounded-full bg-white/90 hover:bg-white text-gray-800 hover:text-gray-900 transition-colors shadow-lg"
         aria-label="Close fullscreen view"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      <div className="absolute top-4 left-4 z-[200]">
+      <div className="fixed top-20 left-4 z-[10001]">
         <span className="text-sm font-medium tracking-wide text-white drop-shadow-md px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md">
           {currentIndex + 1} / {photos.length}
         </span>

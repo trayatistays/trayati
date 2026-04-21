@@ -10,7 +10,7 @@ import { Navbar } from "@/components/navbar";
 import { ExperienceOverlay } from "@/components/experience-overlay";
 import { socialLinks } from "@/data/social-links";
 
-const destinations = ["Kasar Devi", "Bir", "Manali", "Goa"];
+const destinations = ["Uttrakhand","Himanchal Pradesh"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [
   { label: "WhatsApp", href: socialLinks.whatsapp.url, icon: FaWhatsapp },
