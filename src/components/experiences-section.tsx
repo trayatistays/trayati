@@ -379,31 +379,23 @@ export function ExperiencesSection({ experiences }: { experiences: Experience[] 
 
   return (
     <>
-      <section className="relative w-full overflow-hidden px-0 py-12 sm:py-16 lg:py-20">
+      <section className="relative w-full overflow-hidden px-0 py-8 sm:py-10 lg:py-12">
         <div className="px-4 sm:px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="mb-8 flex flex-col gap-4 lg:mb-10 lg:flex-row lg:items-end lg:justify-between"
+            className="mb-8 flex flex-col items-center text-center gap-4 lg:mb-10"
           >
-            <div>
-              <span
-                className="inline-block rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.3em]"
-                style={{
-                  backgroundColor: "rgba(199,91,26,0.1)",
-                  color: "var(--cta)",
-                }}
-              >
-                Travel Stories & Insights
-              </span>
-              <h2 className="mobile-heading mt-4 max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.4rem]">
-                Turn Trips Into Timeless Memories
-              </h2>
-            </div>
-            <p className="mobile-body-text max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "var(--foreground-soft)" }}>
-              From hidden gems to popular escapes, discover stories that inspire your next journey.
+            <h2 
+              className="mobile-heading max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.6rem]"
+              style={{ color: "var(--cta)" }}
+            >
+              Travel Stories & Insights
+            </h2>
+            <p className="mobile-body-text max-w-3xl text-base leading-8 sm:text-lg sm:leading-relaxed lg:text-xl lg:leading-loose font-serif italic" style={{ color: "var(--foreground-soft)" }}>
+              From hidden gems to popular escapes, discover our blogs and stories that inspire your next journey.
             </p>
           </motion.div>
         </div>

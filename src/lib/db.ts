@@ -765,3 +765,142 @@ export async function dbDeleteDestination(id: string): Promise<boolean> {
   
   return true;
 }
+
+// ─── COUPONS ─────────────────────────────────────────────────────────────────
+
+type CouponMasterRow = {
+  id: string;
+  code: string;
+  discount: number;
+  max_uses: number;
+  used_count: number;
+  is_active: boolean;
+  expires_at: string | null;
+  created_at: string;
+};
+
+export type Coupon = {
+  id: string;
+  code: string;
+  discount: number;
+  maxUses: number;
+  usedCount: number;
+  isActive: boolean;
+  expiresAt: string | null;
+  createdAt: string;
+};
+
+export type CouponStats = {
+  totalCoupons: number;
+  activeCoupons: number;
+  totalAssigned: number;
+  totalUsed: number;
+  conversionRate: number;
+};
+
+function dbRowToCoupon(row: CouponMasterRow): Coupon {
+  return {
+    id: row.id,
+    code: row.code,
+    discount: row.discount,
+    maxUses: row.max_uses,
+    usedCount: row.used_count,
+    isActive: row.is_active,
+    expiresAt: row.expires_at ?? null,
+    createdAt: row.created_at,
+  };
+}
+
+export async function dbGetAllCoupons(): Promise<Coupon[]> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("coupons_master")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Failed to fetch coupons: ${error.message}`);
+  return (data as CouponMasterRow[]).map(dbRowToCoupon);
+}
+
+export async function dbCreateCoupon(input: {
+  code: string;
+  discount: number;
+  maxUses: number;
+  expiresAt: string | null;
+  isActive: boolean;
+}): Promise<Coupon> {
+  const supabase = requireSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("coupons_master")
+    .insert({
+      code: input.code,
+      discount: input.discount,
+      max_uses: input.maxUses,
+      expires_at: input.expiresAt,
+      is_active: input.isActive,
+    })
+    .select("*")
+    .single();
+  if (error) throw new Error(`Failed to create coupon: ${error.message}`);
+  return dbRowToCoupon(data as CouponMasterRow);
+}
+
+export async function dbUpdateCoupon(
+  id: string,
+  patch: Partial<{
+    code: string;
+    discount: number;
+    maxUses: number;
+    expiresAt: string | null;
+    isActive: boolean;
+  }>,
+): Promise<Coupon> {
+  const supabase = requireSupabaseAdmin();
+  const updateRow: Record<string, unknown> = {};
+  if (patch.code !== undefined) updateRow.code = patch.code;
+  if (patch.discount !== undefined) updateRow.discount = patch.discount;
+  if (patch.maxUses !== undefined) updateRow.max_uses = patch.maxUses;
+  if (patch.expiresAt !== undefined) updateRow.expires_at = patch.expiresAt;
+  if (patch.isActive !== undefined) updateRow.is_active = patch.isActive;
+
+  const { data, error } = await supabase
+    .from("coupons_master")
+    .update(updateRow)
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(`Failed to update coupon: ${error.message}`);
+  return dbRowToCoupon(data as CouponMasterRow);
+}
+
+export async function dbDeleteCoupon(id: string): Promise<boolean> {
+  const supabase = requireSupabaseAdmin();
+  const { error } = await supabase
+    .from("coupons_master")
+    .delete()
+    .eq("id", id);
+  if (error) throw new Error(`Failed to delete coupon: ${error.message}`);
+  return true;
+}
+
+export async function dbGetCouponStats(): Promise<CouponStats> {
+  const supabase = requireSupabaseAdmin();
+  const [couponsRes, assignedRes, usedRes] = await Promise.all([
+    supabase.from("coupons_master").select("id, is_active"),
+    supabase.from("user_coupons").select("id", { count: "exact", head: true }),
+    supabase
+      .from("user_coupons")
+      .select("id", { count: "exact", head: true })
+      .eq("used", true),
+  ]);
+  const coupons = (couponsRes.data ?? []) as { is_active: boolean }[];
+  const totalAssigned = assignedRes.count ?? 0;
+  const totalUsed = usedRes.count ?? 0;
+  return {
+    totalCoupons: coupons.length,
+    activeCoupons: coupons.filter((c) => c.is_active).length,
+    totalAssigned,
+    totalUsed,
+    conversionRate:
+      totalAssigned > 0 ? Math.round((totalUsed / totalAssigned) * 100) : 0,
+  };
+}

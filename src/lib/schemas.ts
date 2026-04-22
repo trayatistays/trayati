@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { experienceTypes } from "@/data/experience-types";
 
-const stringArray = z.array(z.string().trim().min(1)).default([]);
+const stringArray = z.preprocess(
+  (val) => (Array.isArray(val) ? val.map((s: unknown) => (typeof s === "string" ? s.trim() : "")).filter(Boolean) : []),
+  z.array(z.string().min(1)).default([]),
+);
 
 const amenitiesDetailSchema = z.object({
   parking: z.boolean().default(false),

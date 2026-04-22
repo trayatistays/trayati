@@ -85,7 +85,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience, forceScrolled
               List With Us
             </Link>
           ) : (
-            <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
+            <SignInButton mode="modal" fallbackRedirectUrl="/list-property" signUpFallbackRedirectUrl="/list-property">
               <button type="button" className="navbar__link">
                 List With Us
               </button>
@@ -191,7 +191,7 @@ export function Navbar({ menuOpen, onToggleMenu, onOpenExperience, forceScrolled
                   List With Us
                 </Link>
               ) : (
-                <SignInButton mode="modal" fallbackRedirectUrl="/list-property">
+                <SignInButton mode="modal" fallbackRedirectUrl="/list-property" signUpFallbackRedirectUrl="/list-property">
                   <button
                     type="button"
                     className="navbar__mobile-link"

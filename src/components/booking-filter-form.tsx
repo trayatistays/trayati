@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { guestCategories } from "@/data/social-links";
 import { experienceTypes, type ExperienceType } from "@/data/experience-types";
 
 type FilterState = {
@@ -181,29 +180,24 @@ export function BookingFilterForm({
           />
         </div>
 
-        {/* Category */}
-        <div className="flex flex-col sm:col-span-2 lg:col-span-2">
-          <label className="text-[0.65rem] font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "var(--muted)" }}>
-            Guest Type
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {guestCategories.map((cat) => (
-              <motion.button
-                key={cat.value}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleChange("category", cat.value)}
-                className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition border"
-                style={{
-                  borderColor: filters.category === cat.value ? "var(--cta)" : "var(--border-soft)",
-                  backgroundColor: filters.category === cat.value ? "rgba(164,108,43,0.1)" : "rgba(255,255,255,0.6)",
-                  color: filters.category === cat.value ? "var(--cta)" : "var(--foreground)",
-                }}
-              >
-                {cat.label}
-              </motion.button>
-            ))}
-          </div>
+        {/* Search Button */}
+        <div className="flex flex-col justify-end sm:col-span-2 lg:col-span-1">
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => {
+              const resultsEl = document.getElementById("booking-results");
+              if (resultsEl) resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="w-full rounded-[1rem] px-6 py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition"
+            style={{
+              backgroundColor: "var(--button-primary)",
+              boxShadow: "0 8px 24px rgba(74,101,68,0.25)",
+            }}
+          >
+            Search Properties
+          </motion.button>
         </div>
       </div>
 

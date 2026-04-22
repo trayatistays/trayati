@@ -213,19 +213,19 @@ export function InstagramCarousel({
   }
 
   return (
-    <section className="relative w-full px-0 py-16 sm:py-24 lg:py-32">
-      <div className="relative w-full overflow-hidden border-y px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
+    <section className="relative w-full px-0 py-8 sm:py-10 lg:py-12">
+      <div className="relative w-full overflow-hidden border-y px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10" style={{ borderColor: "rgba(74,101,68,0.10)" }}>
         <div className="absolute inset-y-0 left-0 z-10 w-12 bg-[linear-gradient(90deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
         <div className="absolute inset-y-0 right-0 z-10 w-12 bg-[linear-gradient(270deg,rgba(245,241,233,0.92),transparent)] sm:w-20" />
 
-        <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.34em]" style={{ color: "var(--gold)" }}>
+        <div className="relative z-10 flex flex-col items-center text-center gap-6 mb-8">
+          <div className="flex flex-col items-center text-center gap-4 lg:mb-4">
+            <h2 className="mobile-heading max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.6rem]" style={{ color: "var(--primary)" }}>
               Instagram Journal
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl" style={{ color: "var(--primary)" }}>
-              The visual diary of Trayati
             </h2>
+            <p className="mobile-body-text max-w-3xl text-base leading-8 sm:text-lg sm:leading-relaxed lg:text-xl lg:leading-loose font-serif italic" style={{ color: "var(--foreground-soft)" }}>
+              The visual diary of Trayati Stays.
+            </p>
           </div>
 
           <div className="flex items-center gap-3">

@@ -19,10 +19,12 @@ import {
   HiOutlineXMark,
   HiOutlineEye,
   HiOutlineChevronDown,
+  HiOutlineTicket,
 } from "react-icons/hi2";
 import { ImageUploadButton, MultiImageUploadButton } from "@/components/admin/image-upload-button";
+import { AdminCouponsPanel } from "@/components/admin/coupons-panel";
 
-type Tab = "overview" | "stays" | "testimonials" | "experiences" | "submissions" | "reservations" | "messages";
+type Tab = "overview" | "stays" | "testimonials" | "experiences" | "submissions" | "reservations" | "messages" | "coupons";
 
 const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "overview", label: "Overview", icon: HiOutlineHome },
@@ -32,6 +34,7 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: st
   { id: "submissions", label: "Submissions", icon: HiOutlineInbox },
   { id: "reservations", label: "Reservations", icon: HiOutlineCalendarDays },
   { id: "messages", label: "Messages", icon: HiOutlineEnvelope },
+  { id: "coupons", label: "Coupons", icon: HiOutlineTicket },
 ];
 
 async function api<T>(url: string, options?: RequestInit): Promise<T> {
@@ -133,6 +136,7 @@ export default function AdminPage() {
             {activeTab === "submissions" && <SubmissionsTab />}
             {activeTab === "reservations" && <ReservationsTab />}
             {activeTab === "messages" && <MessagesTab />}
+            {activeTab === "coupons" && <AdminCouponsPanel />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -267,13 +271,15 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
     }, mealOptions: [], cancellationPolicies: [],
   });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   function update(key: string, value: unknown) { setForm((prev) => ({ ...prev, [key]: value })); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    try { await onSave(form); } finally { setSaving(false); }
+    setSaveError("");
+    try { await onSave(form); } catch (err) { setSaveError(err instanceof Error ? err.message : "Save failed. Check all required fields."); } finally { setSaving(false); }
   }
 
   return (
@@ -282,6 +288,7 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
         <h1 className="font-display text-2xl font-bold" style={{ color: "var(--foreground)" }}>{initial ? "Edit Stay" : "New Stay"}</h1>
         <button type="button" onClick={onCancel} className="text-sm font-semibold" style={{ color: "var(--muted)" }}>Cancel</button>
       </div>
+      {saveError && <p className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{saveError}</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         {[
           { key: "title", label: "Title *" }, { key: "subtitle", label: "Subtitle *" },

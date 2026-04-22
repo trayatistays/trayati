@@ -336,30 +336,48 @@ function MobileStayCard({
         </h3>
 
         <div className="cta-group-gap mt-4 flex flex-wrap items-center gap-2">
-<span
-className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
+            <span
+              className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-bold text-white"
               style={{
                 backgroundColor: "#6B1F1F",
                 boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
+                color: "#ffffff",
               }}
             >
               {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
             </span>
-<span
-className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
-                style={{
-                  backgroundColor: "#6B1F1F",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                ★&nbsp;{stay.rating.toFixed(1)}
-              </span>
+            <span
+              className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
+              style={{
+                backgroundColor: "#6B1F1F",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "#ffffff",
+              }}
+            >
+              ★&nbsp;{stay.rating.toFixed(1)}
+            </span>
+           {stay.googleMapsUrl && (
+             <a
+               href={stay.googleMapsUrl}
+               target="_blank"
+               rel="noopener noreferrer"
+               className="cta-min-target inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-[#8B2F2F]"
+               style={{
+                 backgroundColor: "#6B1F1F",
+                 border: "1px solid rgba(255,255,255,0.1)",
+                 color: "#ffffff",
+               }}
+             >
+               Map&nbsp;↗
+             </a>
+           )}
            <Link
              href={`/booking?stayId=${stay.id}`}
              className="cta-min-target inline-flex items-center rounded-full px-5 py-2 text-xs font-bold text-white transition-all duration-300 active:scale-[0.98] hover:bg-[#8B2F2F]"
              style={{
                backgroundColor: "#6B1F1F",
                boxShadow: "0 8px 32px rgba(107,31,31,0.4)",
+               color: "#ffffff",
              }}
           >
             Book Now
@@ -370,6 +388,7 @@ className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-x
              style={{
                backgroundColor: "#6B1F1F",
                border: "1px solid rgba(255,255,255,0.1)",
+               color: "#ffffff",
              }}
           >
             View Details&nbsp;-&gt;
@@ -501,40 +520,48 @@ function MobileFeaturedCarousel({ stays }: { stays: FeaturedStay[] }) {
   );
 }
 
-// ─── Rotating Badge ───────────────────────────────────────────────
-function RotatingBadge() {
-  const text = "FEATURED STAYS · TRAYATI · EXPLORE · ";
+// ─── Discount Badge ───────────────────────────────────────────────
+function DiscountBadge() {
   return (
     <div className="absolute top-8 right-8 hidden lg:block z-50">
       <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 24, ease: "linear" }}
-        className="relative size-28"
-        style={{ willChange: "transform" }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
       >
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <defs>
-            <path
-              id="badge-path"
-              d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
-            />
-          </defs>
-          <text
-            fontSize="9.5"
-            fill="rgba(199,91,26,0.85)"
-            fontWeight="800"
-            letterSpacing="2"
-            style={{ fontFamily: "var(--font-montserrat)" }}
-          >
-            <textPath href="#badge-path">{text}</textPath>
-          </text>
-        </svg>
         <div
-          className="absolute inset-0 m-auto size-7 rounded-full"
+          className="relative overflow-hidden rounded-2xl px-5 py-4 backdrop-blur-xl"
           style={{
-            background: "linear-gradient(135deg, var(--gold) 0%, #d4a053 100%)",
-            boxShadow: "0 0 24px rgba(199,91,26,0.5), 0 0 8px rgba(199,91,26,0.3)",
+            background: "linear-gradient(135deg, rgba(107,31,31,0.92) 0%, rgba(164,108,43,0.88) 100%)",
+            boxShadow: "0 12px 40px rgba(107,31,31,0.35), 0 0 0 1px rgba(255,255,255,0.1) inset",
           }}
+        >
+          {/* Shimmer animation */}
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)",
+            }}
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "linear", repeatDelay: 2 }}
+          />
+          <div className="relative text-center">
+            <p className="text-[0.55rem] font-bold uppercase tracking-[0.35em] text-white/60 mb-1">
+              Special Offer
+            </p>
+            <p className="font-display text-2xl font-bold tracking-[-0.02em] text-white leading-none">
+              Upto 10%
+            </p>
+            <p className="font-display text-lg font-bold text-white/90 tracking-wide">
+              OFF
+            </p>
+          </div>
+        </div>
+        {/* Subtle glow */}
+        <div
+          className="absolute -inset-2 -z-10 rounded-3xl blur-xl"
+          style={{ background: "radial-gradient(circle, rgba(164,108,43,0.25) 0%, transparent 70%)" }}
         />
       </motion.div>
     </div>
@@ -569,42 +596,25 @@ export function FeaturedStaysSection({ stays }: { stays: FeaturedStay[] }) {
 
   return (
     <>
-      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 pt-16 pb-8 sm:pt-24 sm:pb-12 lg:pt-28 lg:pb-14">
+      <section id="featured-stays" className="px-6 sm:px-10 lg:px-16 py-6 sm:py-8 lg:py-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex items-center gap-4 mb-5">
-            <div
-              className="h-px flex-1 max-w-[2rem]"
-              style={{ background: "linear-gradient(to right, var(--cta), transparent)" }}
-            />
-            <p
-              className="text-[0.65rem] font-bold uppercase tracking-[0.5em]"
-              style={{ color: "var(--cta)" }}
-            >
-              Featured Stays
-            </p>
-            <div
-              className="h-px flex-1"
-              style={{ background: "linear-gradient(to right, var(--cta), transparent)" }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col items-center text-center gap-4 lg:mb-10 mb-8">
             <h2
-              className="mobile-heading font-display text-3xl sm:text-5xl lg:text-[3.6rem] font-bold tracking-[-0.04em] leading-[1.05] max-w-2xl"
+              className="mobile-heading max-w-4xl font-display text-4xl font-bold tracking-[-0.04em] sm:text-5xl lg:text-[3.6rem]"
               style={{ color: "var(--primary)" }}
             >
-              Curated for the curious traveller.
+              Featured Stays
             </h2>
             <p
-              className="mobile-body-text max-w-[40ch] text-sm sm:text-base leading-7 lg:text-right"
+              className="mobile-body-text max-w-3xl text-base leading-8 sm:text-lg sm:leading-relaxed lg:text-xl lg:leading-loose font-serif italic"
               style={{ color: "var(--foreground-soft)" }}
             >
-              Each property is handpicked for its character, setting, and the quality of experience it delivers.
+              Curated for the curious traveller. Each property is handpicked for its character, setting, and the quality of experience it delivers.
             </p>
           </div>
         </motion.div>
@@ -632,7 +642,7 @@ export function FeaturedStaysSection({ stays }: { stays: FeaturedStay[] }) {
             ))}
           </div>
 
-          <RotatingBadge />
+          <DiscountBadge />
 
           <div
             className="absolute top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3.5 backdrop-blur-sm rounded-full px-1.5 py-3"

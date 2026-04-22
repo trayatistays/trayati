@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClerkShell } from "@/components/clerk-shell";
 import { PublicSiteShell } from "@/components/public-site-shell";
+import { OfferPopupLoader } from "@/components/offer-popup-loader";
 import { siteMetadata } from "@/lib/seo";
 import { socialLinks } from "@/data/social-links";
 import "./globals.css";
@@ -86,6 +87,8 @@ export default function RootLayout({
           <Suspense>
             <PublicSiteShell>{children}</PublicSiteShell>
           </Suspense>
+          {/* Offer popup — loaded only client-side, zero SSR overhead */}
+          <OfferPopupLoader />
         </ClerkShell>
         <Analytics />
         <SpeedInsights />

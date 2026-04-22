@@ -102,7 +102,6 @@ export function ReserveNowButton({
         }
 
         clearPending();
-        setMessage("Reservation created! Redirecting to booking...");
 
         const redirectUrl = data.bookingLink || bl;
         if (redirectUrl) {

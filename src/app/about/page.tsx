@@ -124,13 +124,13 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden group shadow-2xl"
+            className="relative aspect-auto min-h-[16rem] sm:aspect-[4/3] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden group shadow-2xl"
           >
             {/* Using a placeholder for brand image style */}
             <div className="absolute inset-0 bg-gradient-to-br from-[rgba(74,101,68,0.2)] via-[rgba(74,101,68,0.05)] to-[rgba(164,108,43,0.1)] transition-transform duration-1000 group-hover:scale-105" />
-            <div className="absolute inset-0 flex items-center justify-center p-12 text-center">
-              <RiDoubleQuotesL className="absolute top-10 left-10 text-6xl opacity-10" style={{ color: "var(--primary)" }} />
-              <p className="text-2xl sm:text-3xl font-display font-medium leading-normal italic" style={{ color: "var(--primary)" }}>
+            <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10 lg:p-12 text-center">
+              <RiDoubleQuotesL className="absolute top-6 left-6 sm:top-10 sm:left-10 text-4xl sm:text-6xl opacity-10" style={{ color: "var(--primary)" }} />
+              <p className="text-lg sm:text-2xl lg:text-3xl font-display font-medium leading-relaxed sm:leading-normal italic" style={{ color: "var(--primary)" }}>
                 &ldquo;Modern travellers crave authenticity over cookie-cutter hotels, yet finding verified stays scattered across OTAs feels impossible.&rdquo;
               </p>
             </div>
