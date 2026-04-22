@@ -1017,3 +1017,52 @@ button {
     contain-intrinsic-size: auto 500px;
   }
 }
+
+/* ── Mux Player — full-bleed hero background video ────────────────────────
+   --media-object-fit / --media-object-position are the authoritative Mux CSS
+   custom properties that control the <video> element inside the shadow DOM.
+   All other selectors below are belt-and-suspenders for older Mux versions. */
+mux-player.hero-video {
+  /* Mux-native cover variables (highest priority) */
+  --media-object-fit: cover;
+  --media-object-position: center;
+
+  /* Hide all chrome */
+  --controls: none;
+  --loading-indicator: none;
+
+  /* Remove any aspect-ratio constraint the player imposes */
+  --aspect-ratio: none;
+  aspect-ratio: unset;
+
+  /* Fill the absolutely-positioned container */
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* Belt-and-suspenders: target the exposed shadow parts */
+mux-player.hero-video::part(media),
+mux-player.hero-video::part(video),
+mux-player.hero-video::part(gesture-layer),
+mux-player.hero-video::part(poster) {
+  object-fit: cover !important;
+  object-position: center center !important;
+  width: 100% !important;
+  height: 100% !important;
+  inset: 0 !important;
+  position: absolute !important;
+}
+
+/* Fallback: pierce any remaining shadow boundary */
+mux-player.hero-video video {
+  object-fit: cover !important;
+  object-position: center center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}

@@ -12,13 +12,13 @@ const MUX_PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID || "";
 export function HeroSection() {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      setIsDesktop(e.matches);
+      setIsLargeScreen(e.matches);
     };
     handleChange(mql);
     mql.addEventListener("change", handleChange);
@@ -26,7 +26,7 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (!isDesktop || !MUX_PLAYBACK_ID) return;
+    if (!MUX_PLAYBACK_ID || !isLargeScreen) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -43,7 +43,7 @@ export function HeroSection() {
     }
 
     return () => observer.disconnect();
-  }, [isDesktop]);
+  }, [isLargeScreen]);
 
   const backgroundImageUrl = "https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg";
 
@@ -51,7 +51,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative isolate min-h-[85vh]"
+      className="relative isolate h-[100svh] min-h-screen overflow-hidden"
     >
       <div className="absolute inset-0 -z-20">
         <Image
@@ -64,17 +64,26 @@ export function HeroSection() {
           sizes="(max-width: 768px) 100vw, 85vw"
           className="absolute inset-0 object-cover object-center"
         />
-        {isDesktop && shouldLoadVideo && MUX_PLAYBACK_ID && (
-          <div className={`absolute inset-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}>
+        {isLargeScreen && shouldLoadVideo && MUX_PLAYBACK_ID && (
+          <div
+            className={`absolute inset-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
+          >
             <MuxPlayer
               playbackId={MUX_PLAYBACK_ID}
+              streamType="on-demand"
+              autoPlay="muted"
               muted
-              autoPlay
               loop
               playsInline
-              streamType="on-demand"
+              preload="metadata"
               onCanPlay={() => setVideoLoaded(true)}
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              className="hero-video"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+              }}
             />
           </div>
         )}
@@ -82,7 +91,7 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.35)_60%,rgba(0,0,0,0.55)_100%)] md:hidden" />
       </div>
 
-      <div className="flex min-h-[85vh] w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
+      <div className="flex h-[100svh] min-h-screen w-full flex-col px-4 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-28 lg:pt-36">
         <div className="relative mt-6 flex flex-1 items-start lg:mt-8 lg:items-center">
           <div className="w-full">
             <div
