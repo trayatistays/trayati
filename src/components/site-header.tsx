@@ -10,7 +10,7 @@ import { Navbar } from "@/components/navbar";
 import { ExperienceOverlay } from "@/components/experience-overlay";
 import { socialLinks } from "@/data/social-links";
 
-const destinations = ["Uttrakhand","Himanchal Pradesh"];
+const destinations = ["Uttrakhand","Himachal Pradesh"];
 const menuItems = ["About", "Blogs", "Connect", "Solutions"];
 const socials = [
   { label: "WhatsApp", href: socialLinks.whatsapp.url, icon: FaWhatsapp },
@@ -113,11 +113,7 @@ export function SiteHeader({ forceScrolled = false }: { forceScrolled?: boolean 
         <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(74,101,68,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(74,101,68,0.06)_1px,transparent_1px)] [background-size:72px_72px] pointer-events-none" />
 
         <div className="relative flex min-h-full min-w-0 flex-col px-4 pt-28 pb-4 sm:px-8 sm:pt-32 sm:pb-6 lg:px-12 lg:pt-36">
-          <div className="flex items-center justify-center pt-2">
-            <h2 className="font-display text-2xl font-semibold tracking-[-0.05em] sm:text-4xl" style={{ color: "var(--primary)" }}>
-              Trayati Stays
-            </h2>
-          </div>
+
 
           <div className="grid min-w-0 flex-1 items-start gap-8 py-6 md:grid-cols-[0.9fr_auto_1fr] md:items-center md:gap-20 lg:gap-24">
             {/* Preview card */}
@@ -193,10 +189,7 @@ export function SiteHeader({ forceScrolled = false }: { forceScrolled?: boolean 
 
             {/* Nav links */}
             <div className="flex min-w-0 flex-col justify-center md:pl-2">
-              <p className="text-xs uppercase tracking-[0.34em]" style={{ color: "var(--muted)" }}>
-                Explore section
-              </p>
-              <div className="mt-3 text-2xl font-medium sm:text-3xl" style={{ color: "var(--gold)" }}>
+              <div className="text-2xl font-medium sm:text-3xl" style={{ color: "var(--gold)" }}>
                 <AnimatedText items={destinations} interval={1800} />
               </div>
 

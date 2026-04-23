@@ -159,9 +159,7 @@ button {
 }
 
 .hero-word-shadow {
-  text-shadow:
-    0 0 20px rgba(164, 108, 43, 0.28),
-    0 0 44px rgba(164, 108, 43, 0.12);
+  text-shadow: none;
 }
 
 .public-site-shell {

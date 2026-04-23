@@ -131,7 +131,7 @@ export default function AboutPage() {
             <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10 lg:p-12 text-center">
               <RiDoubleQuotesL className="absolute top-6 left-6 sm:top-10 sm:left-10 text-4xl sm:text-6xl opacity-10" style={{ color: "var(--primary)" }} />
               <p className="text-lg sm:text-2xl lg:text-3xl font-display font-medium leading-relaxed sm:leading-normal italic" style={{ color: "var(--primary)" }}>
-                &ldquo;Modern travellers crave authenticity over cookie-cutter hotels, yet finding verified stays scattered across OTAs feels impossible.&rdquo;
+                &ldquo;Modern travellers crave authenticity over cliché hotels, yet finding verified stays scattered across platform feels impossible.&rdquo;
               </p>
             </div>
           </motion.div>
@@ -177,7 +177,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.4em]" style={{ color: "var(--cta)" }}>
+            <span className="text-[0.85rem] font-bold uppercase tracking-[0.4em]" style={{ color: "var(--cta)" }}>
               Meet The Visionary
             </span>
           </motion.div>
@@ -213,7 +213,7 @@ export default function AboutPage() {
               className="lg:col-span-7 space-y-8"
             >
               <div>
-                <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-3" style={{ color: "var(--foreground)" }}>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.03em] mb-3" style={{ color: "var(--foreground)" }}>
                   Ishan Saraf
                 </h2>
                 <p className="text-lg font-medium" style={{ color: "var(--primary)" }}>

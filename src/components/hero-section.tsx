@@ -99,18 +99,18 @@ export function HeroSection() {
             >
               <h1
                 className="mobile-heading text-balance mt-6 max-w-4xl text-[1.65rem] sm:text-[2.25rem] md:text-[2.85rem] lg:text-[3.65rem] xl:text-[4.35rem] font-semibold leading-[1.1] tracking-[-0.02em]"
-                style={{ color: "#FFFFFF", fontFamily: "var(--font-playfair)" }}
+                style={{ color: "#FFFFFF", fontFamily: "var(--font-playfair)", textShadow: "0 2px 12px rgba(0,0,0,0.45), 0 0 30px rgba(0,0,0,0.25)" }}
               >
                 we curate
               </h1>
 
               <div className="mt-4 flex min-h-[5.4rem] w-full max-w-full items-center text-[2.25rem] font-semibold leading-[0.95] tracking-[-0.06em] sm:mt-5 sm:min-h-[6.8rem] sm:text-[4.2rem] sm:leading-none lg:text-[5.7rem] xl:text-[6.15rem]" style={{ fontFamily: '"Trajan Pro 3 Semibold", "Trajan Pro 3", serif', fontWeight: 600 }}>
-                <AnimatedText items={keywords} className="hero-word-shadow text-[var(--gold)]" />
+                <AnimatedText items={keywords} className="hero-word-shadow text-[#fa902f]" />
               </div>
 
               <p
                 className="mobile-body-text text-balance mt-5 max-w-3xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 lg:text-[1.12rem]"
-                style={{ color: "#FFFFFF" }}
+                style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.5), 0 0 24px rgba(0,0,0,0.3)" }}
               >
                 Our Vision is to reach experimental travellers across all classes, craving authenticity and experience. From Bir&apos;s 100-year-old Mudhouse to Kasar Devi&apos;s luxury villas, we preserve living history and promote authenticity.
               </p>
