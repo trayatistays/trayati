@@ -157,6 +157,8 @@ export default async function BlogsPage() {
                     fill
                     className="object-cover transition duration-700 group-hover:scale-105"
                     loader={supabaseImageLoader}
+                    fetchPriority="high"
+                    sizes="(max-width: 1024px) 100vw, 45vw"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,58,82,0.12),rgba(13,58,82,0.68))]" />
                   <div className="absolute inset-x-4 bottom-4 sm:inset-x-8 sm:bottom-8">
@@ -239,6 +241,7 @@ export default async function BlogsPage() {
                       fill
                       className="object-cover transition duration-500 group-hover:scale-105"
                       loader={supabaseImageLoader}
+                      sizes="96px"
                     />
                   </div>
 

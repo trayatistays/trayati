@@ -33,6 +33,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: `Photos of ${stay.title} - Trayati Stays`,
     description: `View all photos for ${stay.title}. See the rooms, amenities, and details.`,
+    alternates: { canonical: `/property/${stay.id}/gallery` },
+    openGraph: {
+      title: `Photos of ${stay.title} - Trayati Stays`,
+      description: `View all photos for ${stay.title}. See the rooms, amenities, and details.`,
+      url: `/property/${stay.id}/gallery`,
+      images: [{ url: stay.image, alt: stay.alt || stay.title }],
+    },
   };
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,15 +8,14 @@ import { motion, AnimatePresence } from "framer-motion";
 const POPUP_STORAGE_KEY = "trayati_offer_popup_shown";
 const POPUP_DELAY_MS = 10_000;
 
-export function OfferPopup() {
+export function OfferPopup({ openImmediately = false }: { openImmediately?: boolean }) {
   const { isSignedIn, isLoaded } = useAuth();
   const [open, setOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 640);
+  const isMobile = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 640;
   }, []);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -28,12 +27,12 @@ export function OfferPopup() {
     timerRef.current = setTimeout(() => {
       setOpen(true);
       try { localStorage.setItem(POPUP_STORAGE_KEY, "1"); } catch {}
-    }, POPUP_DELAY_MS);
+    }, openImmediately ? 0 : POPUP_DELAY_MS);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, openImmediately]);
 
   const modalVariants = isMobile
     ? {

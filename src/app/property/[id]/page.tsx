@@ -4,7 +4,7 @@ import { cacheLife } from "next/cache";
 import { PropertyPageClient } from "@/components/property-page-client";
 import { getStayById } from "@/lib/stays-api";
 import { getAllStays } from "@/lib/stays-store";
-import { buildStayJsonLd, buildStayMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { buildStayJsonLd, buildStayMetadata, buildBreadcrumbJsonLd, serializeJsonLd } from "@/lib/seo";
 
 const STAYS_CACHE_PROFILE = {
   stale: 300,
@@ -47,8 +47,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
       <PropertyPageClient stay={stay} />
     </>
   );

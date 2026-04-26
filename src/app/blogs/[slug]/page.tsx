@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { dbGetAllExperiences } from "@/lib/db";
 import { slugify } from "@/lib/schemas";
+import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 import supabaseImageLoader from "@/lib/supabase-image-loader";
 import type { Experience } from "@/data/testimonials-and-blogs";
 
@@ -92,8 +93,6 @@ export default async function BlogPostPage({
 
   const paragraphs = getParagraphs(post);
   const author = post.author ?? "Trayati Editorial";
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
-
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -110,12 +109,12 @@ export default async function BlogPostPage({
       name: "Trayati Stays",
       logo: {
         "@type": "ImageObject",
-        url: `${siteUrl}/trayati-logo.jpg`,
+        url: absoluteUrl("/trayati-logo.jpg"),
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteUrl}/blogs/${slug}`,
+      "@id": absoluteUrl(`/blogs/${slug}`),
     },
   };
 
@@ -147,7 +146,7 @@ export default async function BlogPostPage({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
       />
 
       <article className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
@@ -178,7 +177,8 @@ export default async function BlogPostPage({
               fill
               className="object-cover"
               loader={supabaseImageLoader}
-              preload
+              fetchPriority="high"
+              sizes="(max-width: 896px) 100vw, 896px"
             />
           </div>
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,58,82,0.02),rgba(13,58,82,0.34))]" />

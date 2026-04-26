@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClerkShell } from "@/components/clerk-shell";
 import { PublicSiteShell } from "@/components/public-site-shell";
 import { OfferPopupLoader } from "@/components/offer-popup-loader";
-import { siteMetadata } from "@/lib/seo";
+import { absoluteUrl, serializeJsonLd, siteMetadata } from "@/lib/seo";
 import { socialLinks } from "@/data/social-links";
 import "./globals.css";
 
@@ -53,13 +53,15 @@ export default function RootLayout({
 }>) {
   const organizationJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "TravelAgency"],
     name: "Trayati Stays",
-    url: siteMetadata.metadataBase?.toString(),
-    logo: `${siteMetadata.metadataBase?.toString() ?? ""}/trayati-logo.jpg`,
+    url: absoluteUrl("/"),
+    logo: absoluteUrl("/trayati-logo.jpg"),
+    image: absoluteUrl("/og-banner.jpg"),
     sameAs: [socialLinks.instagram.url, socialLinks.facebook.url, socialLinks.whatsapp.url],
     email: socialLinks.email,
     telephone: socialLinks.phone,
+    areaServed: "India",
   };
 
   return (
@@ -68,26 +70,16 @@ export default function RootLayout({
         <meta name="naver-site-verification" content="" />
         <link rel="preconnect" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
         <link rel="dns-prefetch" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
-        {/* Preconnect to Clerk to reduce auth SDK load time */}
-        <link rel="preconnect" href="https://flowing-trout-96.clerk.accounts.dev" crossOrigin="anonymous" />
-        {/* Preload hero LCP image — eliminates 1.3s resource load delay */}
-        <link
-          rel="preload"
-          as="image"
-          href="https://lintxbjljzaubwuqhwdf.supabase.co/storage/v1/object/public/trayati-media/admin/background.jpg"
-          fetchPriority="high"
-        />
       </head>
       <body className="min-h-full antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationJsonLd) }}
         />
         <ClerkShell>
           <Suspense>
             <PublicSiteShell>{children}</PublicSiteShell>
           </Suspense>
-          {/* Offer popup — loaded only client-side, zero SSR overhead */}
           <OfferPopupLoader />
         </ClerkShell>
         <Analytics />

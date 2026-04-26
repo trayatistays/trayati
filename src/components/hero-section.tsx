@@ -59,9 +59,8 @@ export function HeroSection() {
           alt=""
           aria-hidden="true"
           fill
-          priority
-          fetchPriority="high"
-          sizes="(max-width: 768px) 100vw, 85vw"
+          preload
+          sizes="100vw"
           className="absolute inset-0 object-cover object-center"
         />
         {isLargeScreen && shouldLoadVideo && MUX_PLAYBACK_ID && (

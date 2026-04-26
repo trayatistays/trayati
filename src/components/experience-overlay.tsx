@@ -152,7 +152,7 @@ export function ExperienceOverlay({
                   className="mt-4 font-sans text-[2.4rem] font-medium leading-none tracking-[-0.07em] sm:text-[4rem] lg:text-[6rem]"
                   style={{ color: "#1f2329" }}
                 >
-                  Live India's Soul
+                  Live India&apos;s Soul
                 </h2>
                 <p
                   className="mt-4 max-w-[32rem] font-serif text-base leading-relaxed sm:text-lg"
@@ -228,7 +228,7 @@ export function ExperienceOverlay({
                           className="text-[0.65rem] font-semibold uppercase tracking-[0.28em]"
                           style={{ color: "rgba(245,241,232,0.78)" }}
                         >
-                          Live India's Soul
+                          Live India&apos;s Soul
                         </p>
                         <p
                           className="mt-2 font-sans text-2xl font-semibold tracking-[-0.04em]"
