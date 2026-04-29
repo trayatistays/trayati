@@ -152,7 +152,6 @@ export function buildStayJsonLd(stay: FeaturedStay) {
           reviewCount: stay.reviewCount ?? 10,
         }
       : undefined,
-    priceRange: `INR ${stay.pricePerNight}`,
     amenityFeature: (Array.isArray(stay.amenities) ? stay.amenities : []).map((amenity) => ({
       "@type": "LocationFeatureSpecification",
       name: amenity,

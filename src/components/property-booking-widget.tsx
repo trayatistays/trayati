@@ -9,10 +9,6 @@ interface PropertyBookingWidgetProps {
 }
 
 export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
-  const roomPrices = stay.roomTypes.map((r) => r.pricePerNight);
-  const minPrice = roomPrices.length > 0 ? Math.min(...roomPrices) : stay.pricePerNight;
-  const maxPrice = roomPrices.length > 0 ? Math.max(...roomPrices) : stay.pricePerNight;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -32,20 +28,11 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
         }}
       >
         <div className="mb-2 text-sm font-semibold tracking-wide" style={{ color: "rgba(255,255,255,0.8)" }}>
-          From
+          Book Your Stay
         </div>
         <div className="mb-6 flex items-baseline gap-1">
-          <span className="text-4xl font-bold text-white">
-            &#8377;{minPrice.toLocaleString()}
-          </span>
-          <span className="font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>/night</span>
+          <span className="text-4xl font-bold text-white">Contact Us</span>
         </div>
-
-        {minPrice !== maxPrice && (
-          <div className="mb-6 text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
-            up to &#8377;{maxPrice.toLocaleString()} for premium rooms
-          </div>
-        )}
 
         <div className="space-y-3">
           <motion.div
@@ -90,7 +77,7 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
                 clipRule="evenodd"
               />
             </svg>
-            <span style={{ color: "var(--primary)" }}>&#9733; {stay.rating.toFixed(1)} rating</span>
+            <span style={{ color: "var(--primary)" }}>★ {stay.rating.toFixed(1)} rating</span>
           </div>
         </div>
 
@@ -137,7 +124,7 @@ export function PropertyBookingWidget({ stay }: PropertyBookingWidgetProps) {
               className="block text-sm font-medium"
               style={{ color: "var(--cta)" }}
             >
-              &#128205; View on Map
+              📍 View on Map
             </a>
           )}
           <p className="text-sm" style={{ color: "var(--foreground-soft)" }}>

@@ -204,7 +204,7 @@ export default function ListPropertyPage() {
         bedConfiguration: r.bedConfiguration,
         bathroom: r.bathroom,
         extraBedOption: r.extraBedOption || null,
-        pricePerNight: parseInt(r.pricePerNight) || 0,
+        
         maxOccupancy: parseInt(r.maxOccupancy) || 2,
       }));
 
@@ -801,3 +801,10 @@ export default function ListPropertyPage() {
     </>
   );
 }
+
+
+
+
+
+
+

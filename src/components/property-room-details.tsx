@@ -77,9 +77,7 @@ export function PropertyRoomDetails({ roomTypes }: PropertyRoomDetailsProps) {
                   {room.category}
                 </span>
               </div>
-              <span className="text-2xl font-bold" style={{ color: "var(--cta)" }}>
-                &#8377;{room.pricePerNight.toLocaleString()}
-              </span>
+              <span className="text-2xl font-bold" style={{ color: "var(--cta)" }}>Contact for pricing</span>
             </div>
 
             <div className="space-y-3 text-sm" style={{ color: "var(--foreground-soft)" }}>
@@ -129,3 +127,4 @@ export function PropertyRoomDetails({ roomTypes }: PropertyRoomDetailsProps) {
     </div>
   );
 }
+

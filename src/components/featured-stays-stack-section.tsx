@@ -13,14 +13,6 @@ const VISIBLE_STACK = 3;
 const CARD_OFFSET = 18;
 const CARD_SCALE_STEP = 0.05;
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 function StayCard({
   stay,
   index,
@@ -110,7 +102,7 @@ function StayCard({
               className="rounded-full px-4 py-2 text-xs sm:text-sm font-bold text-white"
               style={{ backgroundColor: "#6B1F1F" }}
             >
-              {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+              View This Stay
             </span>
             <span
               className="rounded-full px-3 py-2 text-xs sm:text-sm font-semibold text-white"
@@ -292,3 +284,5 @@ export function FeaturedStaysStackSection() {
     </section>
   );
 }
+
+

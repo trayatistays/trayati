@@ -16,14 +16,6 @@ type FilterState = {
   experienceType: string;
 };
 
-function formatPrice(n: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
 export function BookingResults({ filters }: { filters: FilterState }) {
   const { stays, isLoading, error } = useStays();
   const filteredStays = useMemo(() => {
@@ -143,7 +135,7 @@ export function BookingResults({ filters }: { filters: FilterState }) {
                 className="rounded-full px-3 py-1.5"
                 style={{ backgroundColor: "rgba(164,108,43,0.15)", color: "var(--cta)" }}
               >
-                {formatPrice(stay.pricePerNight)}/night
+                View Pricing
               </span>
             </div>
 
@@ -181,3 +173,5 @@ export function BookingResults({ filters }: { filters: FilterState }) {
     </motion.div>
   );
 }
+
+

@@ -238,7 +238,7 @@ function StaysTab() {
               <div className="min-w-0 flex-1">
                 <h3 className="truncate font-bold" style={{ color: "var(--foreground)" }}>{item.title as string}</h3>
                 <p className="text-sm" style={{ color: "var(--muted)" }}>{item.city as string}, {item.state as string}</p>
-                <p className="text-xs" style={{ color: "var(--cta)" }}>&#8377;{item.pricePerNight as number}/night &middot; {item.experienceType as string}</p>
+                <p className="text-xs" style={{ color: "var(--cta)" }}>{item.experienceType as string} {item.experienceType as string}</p>
                 {(item.isFeatured as boolean) && (
                   <p className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>
                     Featured On Homepage
@@ -297,7 +297,7 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
           { key: "pin", label: "Pin Code *" }, { key: "country", label: "Country *" },
           { key: "address", label: "Address *" },           { key: "googleMapsUrl", label: "Google Maps URL" },
           { key: "bookingLink", label: "Booking Link (redirect URL after reservation)" },
-          { key: "pricePerNight", label: "Price Per Night *" }, { key: "basePrice", label: "Base Price *" },
+          
           { key: "rating", label: "Rating" },
           { key: "type", label: "Property Type *" },
           { key: "alt", label: "Image Alt Text *" },
@@ -305,12 +305,12 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
           <label key={field.key} className="block">
             <span className="mb-1 block text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{field.label}</span>
             <input
-              type={["pricePerNight", "basePrice", "rating"].includes(field.key) ? "number" : "text"}
+              type={["rating"].includes(field.key) ? "number" : "text"}
               step={field.key === "rating" ? "0.1" : "any"}
               min={field.key === "rating" ? "0" : undefined}
               max={field.key === "rating" ? "5" : undefined}
               value={(form[field.key] ?? "") as string | number}
-              onChange={(e) => update(field.key, ["pricePerNight", "basePrice", "rating"].includes(field.key) ? Number(e.target.value) : e.target.value)}
+              onChange={(e) => update(field.key, ["rating"].includes(field.key) ? Number(e.target.value) : e.target.value)}
               className="w-full rounded-lg border px-4 py-3 text-sm"
               style={{ borderColor: "var(--border-soft)" }}
             />
@@ -378,7 +378,7 @@ function StayForm({ initial, onSave, onCancel }: { initial: Record<string, unkno
                     { key: "name", label: "Room Name *" }, { key: "category", label: "Category *" },
                     { key: "units", label: "Units *", type: "number" }, { key: "bedConfiguration", label: "Bed Configuration *" },
                     { key: "bathroom", label: "Bathroom *" }, { key: "extraBedOption", label: "Extra Bed Option" },
-                    { key: "pricePerNight", label: "Price Per Night *", type: "number" }, { key: "maxOccupancy", label: "Max Occupancy *", type: "number" },
+                     { key: "maxOccupancy", label: "Max Occupancy *", type: "number" },
                   ].map((field) => (
                     <label key={field.key} className="block">
                       <span className="mb-1 block text-[0.65rem] font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{field.label}</span>
@@ -714,7 +714,7 @@ function SubmissionsTab() {
             <p className="text-sm"><strong>Date:</strong> {new Date(viewing.submittedAt as string || viewing.submitted_at as string).toLocaleDateString()}</p>
             <p className="text-sm"><strong>City:</strong> {(prop.city as string) || "N/A"}</p>
             <p className="text-sm"><strong>State:</strong> {(prop.state as string) || "N/A"}</p>
-            <p className="text-sm"><strong>Price:</strong> &#8377;{(prop.pricePerNight as number || prop.price_per_night as number) ?? "N/A"}/night</p>
+            <p className="text-sm"><strong>Type:</strong> {(prop.experienceType as string || prop.experience_type as string) || (prop.type as string) || "N/A"}</p>\n            <p className="text-sm"><strong>Price:</strong> Contact for details</p>
             <p className="text-sm"><strong>Type:</strong> {(prop.experienceType as string || prop.experience_type as string) || (prop.type as string) || "N/A"}</p>
           </div>
           {(prop.description as string) && <p className="mb-4 text-sm" style={{ color: "var(--foreground-soft)" }}>{prop.description as string}</p>}
@@ -880,3 +880,9 @@ function MessagesTab() {
     </div>
   );
 }
+
+
+
+
+
+

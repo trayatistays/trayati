@@ -165,7 +165,7 @@ function BookingContent() {
                       className="rounded-full px-4 py-2 text-sm font-bold"
                       style={{ backgroundColor: "rgba(164,108,43,0.15)", color: "var(--cta)" }}
                     >
-                      ₹{selectedStay.pricePerNight.toLocaleString()}/night
+                       {selectedStay.experienceType}
                     </span>
                   </div>
 
@@ -233,7 +233,7 @@ function BookingContent() {
                                   backgroundColor: "var(--cta)",
                                 }}
                               >
-                                ₹{room.pricePerNight.toLocaleString()}/night
+                                 {room.category}
                               </span>
                             </div>
 
@@ -352,7 +352,7 @@ function BookingContent() {
                                   className="font-bold text-sm"
                                   style={{ color: "var(--primary)" }}
                                 >
-                                  ₹{selectedRoom.pricePerNight.toLocaleString()}
+                                   {selectedRoom.category}
                                 </span>
                               </div>
                               <p className="text-xs opacity-70">
@@ -468,3 +468,7 @@ export default function BookingPage() {
     </Suspense>
   );
 }
+
+
+
+

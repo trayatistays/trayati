@@ -19,14 +19,6 @@ const SPRING_CONFIG = { stiffness: 350, damping: 35, mass: 0.2 };
 const AUTO_ADVANCE_MS = 5000;
 const MOBILE_INTERACTION_RESUME_MS = 4200;
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 // ─── Progress Dot (Desktop) ─────────────────────────────────────────
 function ProgressDot({
   index,
@@ -218,7 +210,7 @@ function StayCard({
                      boxShadow: "0 4px 20px rgba(107,31,31,0.35)",
                    }}
                 >
-                  {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+                  View This Stay
                 </span>
                 <span
  className="cta-min-target inline-flex items-center rounded-full px-4 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-md sm:px-5 sm:py-3"
@@ -344,7 +336,7 @@ function MobileStayCard({
                 color: "#ffffff",
               }}
             >
-              {formatPrice(stay.pricePerNight)}&nbsp;/&nbsp;night
+              View This Stay
             </span>
             <span
               className="cta-min-target inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white"
@@ -685,3 +677,8 @@ export function FeaturedStaysSection({ stays }: { stays: FeaturedStay[] }) {
     </>
   );
 }
+
+
+
+
+
