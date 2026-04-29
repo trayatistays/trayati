@@ -1,6 +1,6 @@
 import "server-only";
 
-import { dbGetAllStays, dbGetStayById, dbUpsertStay, dbDeleteStay } from "@/lib/db";
+import { dbGetAllStays, dbGetStayById, dbGetPropertyImages, dbUpsertStay, dbDeleteStay } from "@/lib/db";
 import { cacheLife, cacheTag } from "next/cache";
 import type { FeaturedStay } from "@/data/featured-stays";
 
@@ -24,6 +24,14 @@ export async function getStayById(id: string) {
   cacheTag("stays", `stay-${id}`);
 
   return dbGetStayById(id);
+}
+
+export async function getPropertyImages(id: string): Promise<string[]> {
+  "use cache";
+  cacheLife(STAYS_CACHE_PROFILE);
+  cacheTag("stays", `stay-${id}`, `stay-${id}-images`);
+
+  return dbGetPropertyImages(id);
 }
 
 export async function createStay(stay: FeaturedStay) {

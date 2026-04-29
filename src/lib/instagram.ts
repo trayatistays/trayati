@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { socialLinks } from "@/data/social-links";
 import { getAllStays } from "@/lib/stays-store";
 
@@ -23,6 +24,10 @@ type InstagramGraphResponse = {
 };
 
 export async function getInstagramFeed(limit = 8): Promise<InstagramMediaItem[]> {
+  "use cache";
+  cacheLife("instagram");
+  cacheTag("instagram-feed", "stays");
+
   const fallbackInstagramItems = (await getAllStays())
     .slice(0, limit)
     .map((stay, index) => ({

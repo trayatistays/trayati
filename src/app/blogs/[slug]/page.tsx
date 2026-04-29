@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { dbGetAllExperiences } from "@/lib/db";
+import { getAllExperiences } from "@/lib/experiences-store";
 import { slugify } from "@/lib/schemas";
 import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 import supabaseImageLoader from "@/lib/supabase-image-loader";
@@ -37,12 +37,12 @@ function experienceToSlug(post: Experience) {
 }
 
 async function getExperienceBySlug(slug: string): Promise<Experience | null> {
-  const experiences = await dbGetAllExperiences(true);
+  const experiences = await getAllExperiences();
   return experiences.find((e) => experienceToSlug(e) === slug) ?? null;
 }
 
 export async function generateStaticParams() {
-  const experiences = await dbGetAllExperiences(true);
+  const experiences = await getAllExperiences();
   return experiences.map((e) => ({ slug: experienceToSlug(e) }));
 }
 

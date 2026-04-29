@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cacheLife } from "next/cache";
 import { PropertyPageClient } from "@/components/property-page-client";
-import { getStayById } from "@/lib/stays-api";
-import { getAllStays } from "@/lib/stays-store";
+import { getAllStays, getStayById } from "@/lib/stays-store";
 import { buildStayJsonLd, buildStayMetadata, buildBreadcrumbJsonLd, serializeJsonLd } from "@/lib/seo";
 
 const STAYS_CACHE_PROFILE = {

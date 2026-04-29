@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 
 type FormData = {
   name: string;
@@ -61,10 +60,7 @@ export function ContactForm({
   };
 
   return (
-    <motion.form
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <form
       onSubmit={handleSubmit}
       className="rounded-[2rem] border p-8 sm:p-10 backdrop-blur-xl max-w-2xl mx-auto"
       style={{
@@ -159,12 +155,10 @@ export function ContactForm({
       </div>
 
       {/* Submit Button */}
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+      <button
         type="submit"
         disabled={loading}
-        className={`mt-8 w-full rounded-full py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition disabled:opacity-50 ${
+        className={`mt-8 w-full rounded-full py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 ${
           loading
             ? "bg-[rgba(74,101,68,0.5)]"
             : "bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)]"
@@ -174,22 +168,19 @@ export function ContactForm({
         }}
       >
         {loading ? "Sending..." : success ? "Message Sent! ✓" : "Send Message"}
-      </motion.button>
+      </button>
 
       {/* Success Message */}
       {success && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          className="mt-4 rounded-full px-4 py-2 text-center text-sm font-semibold"
+        <div
+          className="connect-success mt-4 rounded-full px-4 py-2 text-center text-sm font-semibold"
           style={{
             backgroundColor: "rgba(74, 107, 68, 0.15)",
             color: "var(--primary)",
           }}
         >
           Thank you! We&apos;ll get back to you soon.
-        </motion.div>
+        </div>
       )}
 
       {error && (
@@ -203,6 +194,6 @@ export function ContactForm({
           {error}
         </div>
       )}
-    </motion.form>
+    </form>
   );
 }

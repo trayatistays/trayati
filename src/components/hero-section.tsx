@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRef, useEffect, useState } from "react";
-import MuxPlayer from "@mux/mux-player-react";
 import { AnimatedText } from "@/components/animated-text";
 
 const keywords = ["Folklore Homestays", "Villas and Estates", "Apartments"];
 const MUX_PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID || "";
+const MuxPlayer = dynamic(() => import("@mux/mux-player-react"), { ssr: false });
 
 export function HeroSection() {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);

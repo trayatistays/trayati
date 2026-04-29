@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "List Your Property With Trayati Stays",
@@ -21,5 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default function ListPropertyLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <Suspense fallback={null}>{children}</Suspense>;
 }

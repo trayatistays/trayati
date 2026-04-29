@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HiMiniArrowUpRight, HiOutlineClock, HiOutlineSparkles } from "react-icons/hi2";
-import { dbGetAllExperiences } from "@/lib/db";
+import { getAllExperiences } from "@/lib/experiences-store";
 import { slugify } from "@/lib/schemas";
 import supabaseImageLoader from "@/lib/supabase-image-loader";
 import type { Experience } from "@/data/testimonials-and-blogs";
@@ -25,7 +25,7 @@ function getFeaturedPost(posts: Experience[]) {
 }
 
 export default async function BlogsPage() {
-  const blogPosts = await dbGetAllExperiences(true);
+  const blogPosts = await getAllExperiences();
 
   const featuredPost = getFeaturedPost(blogPosts);
   const secondaryPosts = blogPosts.filter((post) => post.id !== featuredPost?.id);

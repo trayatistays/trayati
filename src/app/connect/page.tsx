@@ -1,17 +1,12 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ContactForm } from "@/components/contact-form";
 
 export default function ConnectPage() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--background)" }}>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-20 border-b backdrop-blur-xl"
+      <div
+        className="connect-reveal sticky top-0 z-20 border-b backdrop-blur-xl"
           style={{
             borderColor: "var(--border-soft)",
             backgroundColor: "rgba(245,241,233,0.95)",
@@ -26,15 +21,11 @@ export default function ConnectPage() {
               &larr; Back
             </Link>
           </div>
-        </motion.div>
+        </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="connect-reveal connect-reveal--content">
           <h1 className="font-display text-5xl sm:text-6xl font-bold tracking-[-0.03em] mb-4">
             Connect With Us
           </h1>
@@ -61,31 +52,25 @@ export default function ConnectPage() {
                 description: "Connect with our audience of premium travelers.",
               },
             ].map((item, idx) => (
-              <motion.div
+              <div
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                className="rounded-[1.5rem] border p-6 backdrop-blur-xl"
+                className="connect-reveal-card rounded-[1.5rem] border p-6 backdrop-blur-xl"
                 style={{
                   borderColor: "rgba(74,101,68,0.2)",
                   backgroundColor: "rgba(245,241,233,0.9)",
+                  animationDelay: `${idx * 80}ms`,
                 }}
               >
                 <h3 className="font-display text-xl font-bold mb-2">{item.title}</h3>
                 <p style={{ color: "var(--foreground-soft)" }}>{item.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
+          <div className="connect-reveal connect-reveal--form">
             <ContactForm source="connect" />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </main>
   );

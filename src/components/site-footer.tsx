@@ -1,10 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa6";
 import { socialLinks } from "@/data/social-links";
-import { useState } from "react";
 
 const quickLinks = [
   { href: "/", label: "Home" },
@@ -17,16 +13,10 @@ const quickLinks = [
 ];
 
 export function SiteFooter() {
-  const [year] = useState(() => new Date().getFullYear());
-
   return (
     <footer className="relative w-full mt-8">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        viewport={{ once: true, margin: "-60px" }}
-        className="relative overflow-hidden"
+      <div
+        className="connect-reveal relative overflow-hidden"
         style={{ backgroundColor: "var(--footer-background)" }}
       >
         <div className="pointer-events-none absolute -left-24 -top-16 size-56 rounded-full bg-[rgba(245,241,233,0.06)] blur-3xl" />
@@ -83,7 +73,7 @@ export function SiteFooter() {
             className="text-[0.65rem] uppercase tracking-[0.22em]"
             style={{ color: "var(--footer-foreground)" }}
           >
-            &copy; {year} Trayati Stays &middot; All rights reserved
+            &copy; 2026 Trayati Stays &middot; All rights reserved
           </p>
           <p
             className="text-[0.65rem] uppercase tracking-[0.22em]"
@@ -92,7 +82,7 @@ export function SiteFooter() {
             FIND YOUR RHYTHM
           </p>
         </div>
-      </motion.div>
+      </div>
     </footer>
   );
 }

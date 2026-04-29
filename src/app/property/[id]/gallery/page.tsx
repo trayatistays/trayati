@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cacheLife } from "next/cache";
-import { getStayById, getPropertyImages } from "@/lib/stays-api";
-import { getAllStays } from "@/lib/stays-store";
+import { getAllStays, getPropertyImages, getStayById } from "@/lib/stays-store";
 import { GalleryGrid } from "@/components/property/gallery-grid";
 
 const STAYS_CACHE_PROFILE = {

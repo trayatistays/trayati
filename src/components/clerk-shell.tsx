@@ -1,15 +1,14 @@
 "use client";
 
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
-import { useEffect, Suspense } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "trayati_pending_reservation";
 
 function ReservationRecoveryInner({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
