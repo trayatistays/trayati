@@ -64,7 +64,7 @@ export const roomTypeSchema = z.object({
   bedConfiguration: z.string().trim().min(1),
   bathroom: z.string().trim().min(1),
   extraBedOption: z.string().nullable().optional(),
-  pricePerNight: z.coerce.number().min(0),
+  pricePerNight: z.coerce.number().min(0).default(0),
   maxOccupancy: z.coerce.number().int().min(1),
 });
 
@@ -81,8 +81,8 @@ export const staySchema = z.object({
   address: z.string().trim().min(1),
   description: z.string().trim().min(1),
   rating: z.coerce.number().min(0).max(5),
-  pricePerNight: z.coerce.number().min(0),
-  basePrice: z.coerce.number().min(0),
+  pricePerNight: z.preprocess((v) => (v === "" || v === null || v === undefined ? 0 : v), z.coerce.number().min(0).default(0)),
+  basePrice: z.preprocess((v) => (v === "" || v === null || v === undefined ? 0 : v), z.coerce.number().min(0).default(0)),
   image: z.string().trim().min(1),
   alt: z.string().trim().min(1),
   tag: z.string().trim().min(1),
@@ -144,7 +144,7 @@ export const propertySubmissionSchema = z.object({
     state: z.string().trim().min(1),
     country: z.string().trim().min(1),
     description: z.string().trim().min(1),
-    pricePerNight: z.coerce.number().min(0),
+    pricePerNight: z.coerce.number().min(0).default(0),
     image: z.string().trim().min(1),
   }).passthrough(),
 });

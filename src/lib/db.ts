@@ -288,6 +288,8 @@ function stayToDbRow(stay: FeaturedStay & { isActive?: boolean; sortOrder?: numb
     google_maps_url: stay.googleMapsUrl ?? "",
     description: stay.description,
     rating: stay.rating,
+    price_per_night: (stay as Record<string, unknown>).pricePerNight ?? 0,
+    base_price: (stay as Record<string, unknown>).basePrice ?? 0,
     image: stay.image,
     alt: stay.alt,
     tag: stay.tag,
