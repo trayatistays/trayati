@@ -28,8 +28,31 @@ export async function getInstagramFeed(limit = 8): Promise<InstagramMediaItem[]>
   cacheLife("instagram");
   cacheTag("instagram-feed", "stays");
 
-  const fallbackInstagramItems = (await getAllStays())
-    .slice(0, limit)
+  const customFallbacks: InstagramMediaItem[] = [
+    {
+      id: "insta-custom-1",
+      mediaUrl: "/images/instagram/insta-1.jpg",
+      permalink: socialLinks.instagram.url,
+      caption: "Chasing sunsets and mountain roads. The journey is the destination at Trayati.",
+      alt: "Exterior view of a Trayati stay with a motorcycle parked in front",
+    },
+    {
+      id: "insta-custom-2",
+      mediaUrl: "/images/instagram/insta-2.jpg",
+      permalink: socialLinks.instagram.url,
+      caption: "Finding beauty in simplicity. Traditional architecture meets mountain stillness.",
+      alt: "Black and white view of a traditional mountain cabin",
+    },
+    {
+      id: "insta-custom-3",
+      mediaUrl: "/images/instagram/insta-3.jpg",
+      permalink: socialLinks.instagram.url,
+      caption: "The perfect corner for a quiet evening. Warm lights and mountain dreams.",
+      alt: "Cozy bedside lamp and candles in a Trayati stay",
+    },
+  ];
+
+  const stayFallbacks = (await getAllStays())
     .map((stay, index) => ({
       id: `fallback-${stay.id}-${index}`,
       mediaUrl: stay.image,
@@ -37,6 +60,8 @@ export async function getInstagramFeed(limit = 8): Promise<InstagramMediaItem[]>
       caption: `${stay.title} at ${stay.location}`,
       alt: stay.alt,
     }));
+
+  const fallbackInstagramItems = [...customFallbacks, ...stayFallbacks];
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
 
   if (!accessToken) {
