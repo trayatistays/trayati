@@ -177,7 +177,9 @@ export default async function BlogsPage() {
                       Featured story
                     </p>
                     <p className="mt-3 text-sm leading-7 sm:mt-4 sm:text-lg sm:leading-8" style={{ color: "var(--foreground-soft)" }}>
-                      {featuredPost.description}
+                      {featuredPost.description.length > 130
+                        ? `${featuredPost.description.slice(0, 130).trimEnd()}…`
+                        : featuredPost.description}
                     </p>
                   </div>
 
@@ -253,7 +255,9 @@ export default async function BlogsPage() {
                       {post.title}
                     </h4>
                     <p className="mt-2 hidden line-clamp-2 text-sm leading-6 sm:block" style={{ color: "var(--foreground-soft)" }}>
-                      {post.description}
+                      {post.description.length > 90
+                        ? `${post.description.slice(0, 90).trimEnd()}…`
+                        : post.description}
                     </p>
                   </div>
                 </Link>

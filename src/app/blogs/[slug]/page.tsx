@@ -53,10 +53,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getExperienceBySlug(slug);
-  if (!post) return { title: "Post Not Found" };
+  if (!post) return { title: "Post Not Found", robots: { index: false } };
 
-  const title = post.title;
-  const description = post.description;
+  const title = post.title?.trim() || "Travel Story — Trayati Stays";
+  const description =
+    post.description?.trim() ||
+    "A curated travel story and destination guide from Trayati Stays.";
   const url = `/blogs/${slug}`;
 
   return {

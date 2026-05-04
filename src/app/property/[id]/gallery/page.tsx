@@ -31,11 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   return {
     title: `Photos of ${stay.title} - Trayati Stays`,
-    description: `View all photos for ${stay.title}. See the rooms, amenities, and details.`,
-    alternates: { canonical: `/property/${stay.id}/gallery` },
+    description: `Browse all photos of ${stay.title} in ${stay.city}, ${stay.state} — rooms, amenities, views and more.`,
+    // Gallery is a thin image-only page; direct all ranking signals to the parent property page
+    alternates: { canonical: `/property/${stay.id}` },
+    robots: { index: false, follow: true },
     openGraph: {
       title: `Photos of ${stay.title} - Trayati Stays`,
-      description: `View all photos for ${stay.title}. See the rooms, amenities, and details.`,
+      description: `Browse all photos of ${stay.title} in ${stay.city}, ${stay.state}.`,
       url: `/property/${stay.id}/gallery`,
       images: [{ url: stay.image, alt: stay.alt || stay.title }],
     },
