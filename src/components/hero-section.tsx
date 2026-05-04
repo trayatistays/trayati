@@ -52,15 +52,20 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative isolate h-[100svh] min-h-screen overflow-hidden"
+      className="relative h-[100svh] min-h-screen overflow-hidden"
     >
-      <div className="absolute inset-0 -z-20">
+      {/*
+        Background layer — rendered first in DOM so it's naturally behind the content div.
+        Dark placeholder (#1a1a18) shows instantly before the remote image loads,
+        keeping the transparent navbar always over a dark surface.
+      */}
+      <div className="absolute inset-0" style={{ backgroundColor: "#1a1a18" }}>
         <Image
           src={backgroundImageUrl}
           alt=""
           aria-hidden="true"
           fill
-          preload
+          priority
           sizes="100vw"
           className="absolute inset-0 object-cover object-center"
         />
