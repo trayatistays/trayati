@@ -8,12 +8,13 @@ interface LightboxProps {
   photos: string[];
   initialIndex: number;
   onClose: () => void;
+  propertyTitle?: string;
 }
 
 const BLUR_PLACEHOLDER =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-export default function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
+export default function Lightbox({ photos, initialIndex, onClose, propertyTitle }: LightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -118,7 +119,7 @@ export default function Lightbox({ photos, initialIndex, onClose }: LightboxProp
       >
         <Image
           src={photos[currentIndex]}
-          alt={`Photo ${currentIndex + 1}`}
+          alt={propertyTitle ? `${propertyTitle} — photo ${currentIndex + 1} of ${photos.length}` : `Photo ${currentIndex + 1} of ${photos.length}`}
           fill
           className="object-contain"
           sizes="100vw"
@@ -128,12 +129,13 @@ export default function Lightbox({ photos, initialIndex, onClose }: LightboxProp
           blurDataURL={BLUR_PLACEHOLDER}
         />
         
-        {/* Preload adjacent images */}
-        <div className="hidden">
+        {/* Preload adjacent images — purely technical, hidden from screen readers */}
+        <div className="hidden" aria-hidden="true">
           {photos[currentIndex - 1] && (
             <Image
               src={photos[currentIndex - 1]}
-              alt="preload-prev"
+              alt=""
+              aria-hidden="true"
               width={10}
               height={10}
               loader={supabaseImageLoader}
@@ -143,7 +145,8 @@ export default function Lightbox({ photos, initialIndex, onClose }: LightboxProp
           {photos[currentIndex + 1] && (
             <Image
               src={photos[currentIndex + 1]}
-              alt="preload-next"
+              alt=""
+              aria-hidden="true"
               width={10}
               height={10}
               loader={supabaseImageLoader}

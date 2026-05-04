@@ -53,7 +53,7 @@ function StayCard({
       >
         <Image
           src={stay.image}
-          alt={stay.alt}
+          alt={stay.alt || `${stay.title} — ${stay.type} in ${stay.city}, ${stay.state}`}
           fill
           className="object-cover"
           loading={index === 0 ? "eager" : "lazy"}

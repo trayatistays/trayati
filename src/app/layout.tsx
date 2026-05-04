@@ -56,7 +56,7 @@ export default function RootLayout({
     "@type": ["Organization", "TravelAgency"],
     name: "Trayati Stays",
     url: absoluteUrl("/"),
-    logo: absoluteUrl("/trayati-logo.jpg"),
+    logo: absoluteUrl("/fevicon/web-app-manifest-512x512.png"),
     image: absoluteUrl("/og-banner.jpg"),
     sameAs: [socialLinks.instagram.url, socialLinks.facebook.url, socialLinks.whatsapp.url],
     email: socialLinks.email,
@@ -68,6 +68,14 @@ export default function RootLayout({
     <html lang="en" className={`${montserrat.variable} ${inter.variable} ${ebGaramond.variable} ${imFellEnglish.variable} ${playfairDisplay.variable} h-full`}>
       <head>
         <meta name="naver-site-verification" content="" />
+        {/* Favicon — all sizes for Google Search, browsers, and PWA */}
+        <link rel="icon" type="image/x-icon" href="/fevicon/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/fevicon/favicon-96x96.png" />
+        <link rel="icon" type="image/svg+xml" href="/fevicon/favicon.svg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/fevicon/apple-touch-icon.png" />
+        <link rel="manifest" href="/fevicon/site.webmanifest" />
+        <meta name="theme-color" content="#6B1F1F" />
+        {/* Performance */}
         <link rel="preconnect" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
         <link rel="dns-prefetch" href="https://lintxbjljzaubwuqhwdf.supabase.co" />
       </head>

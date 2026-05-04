@@ -96,7 +96,7 @@ export function PropertyPhotoCarousel({ photos, title }: PropertyPhotoCarouselPr
             >
               <Image
                 src={photo}
-                alt={`${title} photo ${index + 1}`}
+                alt={`${title} — photo ${index + 1} of ${photos.length}`}
                 fill
                 className="object-cover transition-transform duration-500 hover:scale-[1.02]"
                 loading={index === 0 ? "eager" : "lazy"}
@@ -121,7 +121,7 @@ export function PropertyPhotoCarousel({ photos, title }: PropertyPhotoCarouselPr
               <div className="absolute inset-0 opacity-40 group-hover/cta:scale-105 transition-transform duration-500">
                 <Image
                   src={photos[MAX_VISIBLE]}
-                  alt={`${title} more photos`}
+                  alt={`View all ${photos.length} photos of ${title}`}
                   fill
                   className="object-cover blur-[2px]"
                   loading="lazy"
@@ -161,6 +161,7 @@ export function PropertyPhotoCarousel({ photos, title }: PropertyPhotoCarouselPr
         <Lightbox
           photos={photos}
           initialIndex={lightboxIndex}
+          propertyTitle={title}
           onClose={() => setLightboxOpen(false)}
         />
       )}

@@ -3,7 +3,7 @@ import type { FeaturedStay } from "@/data/featured-stays";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.trayatistays.com";
 const ogImage = "/og-banner.jpg";
-const logoImage = "/trayati-logo.jpg";
+const logoImage = "/fevicon/web-app-manifest-512x512.png";
 
 export function absoluteUrl(path: string) {
   if (/^https?:\/\//i.test(path)) return path;
@@ -53,8 +53,18 @@ export const siteMetadata: Metadata = {
     images: [ogImage],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: logoImage,
+    icon: [
+      { url: "/fevicon/favicon.ico", sizes: "32x32 48x48", type: "image/x-icon" },
+      { url: "/fevicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/fevicon/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/fevicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { url: "/fevicon/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/fevicon/web-app-manifest-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
   },
   robots: {
     index: true,

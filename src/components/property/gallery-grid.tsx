@@ -67,7 +67,7 @@ export function GalleryGrid({ photos, propertyId, propertyTitle }: GalleryGridPr
               >
                 <Image
                   src={photo}
-                  alt={`Photo ${index + 1} of ${propertyTitle}`}
+                  alt={`${propertyTitle} — photo ${index + 1} of ${photos.length}`}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
@@ -88,6 +88,7 @@ export function GalleryGrid({ photos, propertyId, propertyTitle }: GalleryGridPr
         <Lightbox
           photos={photos}
           initialIndex={lightboxIndex}
+          propertyTitle={propertyTitle}
           onClose={() => setLightboxOpen(false)}
         />
       )}
