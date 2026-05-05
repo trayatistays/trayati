@@ -205,6 +205,12 @@ button {
   padding-top: 0;
 }
 
+/* Keep the homepage hero under the transparent navbar even before route-based
+   shell classes hydrate on deployed/static HTML. */
+.public-site-shell__content > main.home-depth-shell {
+  padding-top: 0;
+}
+
 .public-site-shell main {
   background-color: transparent !important;
 }
